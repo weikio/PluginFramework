@@ -1,0 +1,146 @@
+root=true
+# EditorConfig is awesome:http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+# Don't use tabs for indentation.
+[*]
+indent_style=space
+charset=utf-8
+end_of_line=crlf
+trim_trailing_whitespace=false
+insert_final_newline=false
+indent_size=4
+
+# Microsoft .NET properties
+csharp_preferred_modifier_order=public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:suggestion
+dotnet_style_require_accessibility_modifiers=for_non_interface_members:hint
+
+# ReSharper properties
+resharper_autodetect_indent_settings=true
+resharper_blank_lines_after_control_transfer_statements=1
+resharper_blank_lines_around_block_case_section=1
+resharper_blank_lines_around_single_line_local_method=1
+resharper_blank_lines_before_block_statements=1
+resharper_blank_lines_before_control_transfer_statements=1
+resharper_blank_lines_before_multiline_statements=1
+resharper_blank_lines_before_single_line_comment=1
+resharper_braces_for_for=required
+resharper_braces_for_foreach=required
+resharper_braces_for_ifelse=required
+resharper_braces_for_while=required
+resharper_csharp_keep_blank_lines_in_code=1
+resharper_csharp_keep_blank_lines_in_declarations=1
+resharper_csharp_max_line_length=160
+resharper_enforce_line_ending_style=true
+resharper_keep_existing_embedded_arrangement=false
+resharper_place_simple_embedded_statement_on_same_line=False
+resharper_use_indent_from_vs=false
+resharper_space_within_single_line_array_initializer_braces=true
+resharper_accessor_owner_body=accessors_with_block_body
+
+# ReSharper inspection severities
+resharper_convert_to_null_coalescing_compound_assignment_highlighting=hint
+resharper_enforce_foreach_statement_braces_highlighting=error
+resharper_enforce_for_statement_braces_highlighting=error
+resharper_enforce_if_statement_braces_highlighting=error
+resharper_enforce_while_statement_braces_highlighting=error
+resharper_identifier_typo_highlighting=none
+resharper_redundant_base_qualifier_highlighting=warning
+resharper_web_config_module_not_resolved_highlighting=warning
+resharper_web_config_type_not_resolved_highlighting=warning
+resharper_web_config_wrong_module_highlighting=warning
+# (Please don't specify an indent_size here; that has too many unintended consequences.)
+
+# Code files
+[*.{cs,csx,vb,vbx}]
+indent_size=4
+insert_final_newline=true
+
+# Xml project files
+[*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
+indent_size=2
+
+# Xml config files
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
+indent_size=2
+
+# JSON files
+[*.json]
+indent_size=2
+
+# Dotnet code style settings:
+[*.{cs,vb}]
+# Sort using and Import directives with System.* appearing first
+dotnet_sort_system_directives_first=true
+# Avoid "this." and "Me." if not necessary
+dotnet_style_qualification_for_field=false:error
+dotnet_style_qualification_for_property=false:error
+dotnet_style_qualification_for_method=false:error
+dotnet_style_qualification_for_event=false:error
+
+# Use language keywords instead of framework type names for type references
+dotnet_style_predefined_type_for_locals_parameters_members=true:suggestion
+dotnet_style_predefined_type_for_member_access=true:suggestion
+
+# Suggest more modern language features when available
+dotnet_style_object_initializer=true:suggestion
+dotnet_style_collection_initializer=true:suggestion
+dotnet_style_coalesce_expression=true:suggestion
+dotnet_style_null_propagation=true:suggestion
+dotnet_style_explicit_tuple_names=true:suggestion
+
+dotnet_naming_rule.private_members_with_underscore.symbols=private_fields
+dotnet_naming_rule.private_members_with_underscore.style=prefix_underscore
+dotnet_naming_rule.private_members_with_underscore.severity=suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds=field
+dotnet_naming_symbols.private_fields.applicable_accessibilities=private
+
+dotnet_naming_style.prefix_underscore.capitalization=camel_case
+dotnet_naming_style.prefix_underscore.required_prefix=_
+
+# CSharp code style settings:
+[*.cs]
+# Prefer "var" everywhere
+csharp_style_var_for_built_in_types=true:error
+csharp_style_var_when_type_is_apparent=true:error
+csharp_style_var_elsewhere=true:error
+
+# Prefer method-like constructs to have a block body
+csharp_style_expression_bodied_methods=false:none
+csharp_style_expression_bodied_constructors=false:none
+csharp_style_expression_bodied_operators=false:none
+
+# Prefer property-like constructs to have an expression-body
+csharp_style_expression_bodied_properties=true:none
+csharp_style_expression_bodied_indexers=true:none
+csharp_style_expression_bodied_accessors=true:none
+
+# Suggest more modern language features when available
+csharp_style_pattern_matching_over_is_with_cast_check=true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check=true:suggestion
+csharp_style_inlined_variable_declaration=true:suggestion
+csharp_style_throw_expression=true:suggestion
+csharp_style_conditional_delegate_call=true:suggestion
+
+# Newline settings
+csharp_new_line_before_open_brace=all
+csharp_new_line_before_else=true
+csharp_new_line_before_catch=true
+csharp_new_line_before_finally=true
+csharp_new_line_before_members_in_object_initializers=true
+csharp_new_line_before_members_in_anonymous_types=true
+csharp_new_line_between_query_expression_clauses=true
+
+csharp_preserve_single_line_statements=false
+csharp_preserve_single_line_blocks=true
+
+[{.eslintrc,.babelrc,.stylelintrc,jest.config,*.uproject,*.bowerrc,*.jsb3,*.jsb2,*.json}]
+indent_style=space
+indent_size=2
+
+[*.{appxmanifest,asax,ascx,aspx,build,cs,cshtml,dtd,master,nuspec,razor,resw,resx,skin,vb,xaml,xamlx,xoml,xsd}]
+indent_style=space
+indent_size=4
+tab_width=4

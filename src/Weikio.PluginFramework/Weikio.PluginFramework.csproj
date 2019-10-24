@@ -1,7 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Weik.io</Authors>
+    <Company>Adafy Oy</Company>
+    <Description>Plugin Framework is a powerful plugin SDK for your .NET Core applications.</Description>
+    <PackageDescription>Everything is a plugin! Use assemblies, NuGet packages and C# Scripts as plugins in your .NET Core Applications.</PackageDescription>
+    <PackageProjectUrl>https://www.pluginframework.com</PackageProjectUrl>
+    <Copyright>©2019 Weik.io</Copyright>
+    <PackageId>Weikio.PluginFramework</PackageId>
+    <Product>Weikio.PluginFramework</Product>
+    <AssemblyName>Weikio.PluginFramework</AssemblyName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/weikio/PluginFramework</RepositoryUrl>
+    <PackageTags>plugins;addons;extesions;plugin framework</PackageTags>
+    <PackageIcon>logo_256.png</PackageIcon>
+    <Title>Plugin Framework</Title>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+  </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath=""/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.0.0"/>
+  </ItemGroup>
+  
 </Project>

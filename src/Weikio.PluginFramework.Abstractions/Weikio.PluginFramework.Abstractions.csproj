@@ -17,7 +17,7 @@
     <RepositoryUrl>https://github.com/weikio/PluginFramework</RepositoryUrl>
     <PackageTags>plugins;addons;extensions;plugin framework</PackageTags>
     <PackageIcon>logo_256.png</PackageIcon>
-    <Title>Plugin Framework</Title>
+    <Title>Plugin Framework Abstractions</Title>
     <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
   </PropertyGroup>
 

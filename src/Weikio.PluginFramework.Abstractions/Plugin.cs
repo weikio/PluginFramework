@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Weikio.PluginFramework
+namespace Weikio.PluginFramework.Abstractions
 {
     public class Plugin
     {
@@ -18,7 +18,7 @@ namespace Weikio.PluginFramework
                 return PluginTypes.Select(x => x.Type).ToList();
             }
         }
-        
+
         public Plugin(PluginDefinition definition, Assembly assembly, List<(string Tag, Type Type)> pluginTypes)
         {
             Definition = definition;

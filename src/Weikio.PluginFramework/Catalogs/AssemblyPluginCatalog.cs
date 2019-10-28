@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {
@@ -38,7 +39,7 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task<List<PluginDefinition>> GetAll()
         {
-            var result = new List<PluginDefinition>() {_pluginDefinition};
+            var result = new List<PluginDefinition>() { _pluginDefinition };
 
             return Task.FromResult(result);
         }

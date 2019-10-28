@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework", "Weikio.PluginFramework\Weikio.PluginFramework.csproj", "{BB67695B-1CDF-4FEC-8627-82FD349D1403}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Abstractions", "Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj", "{5C264288-C384-48A3-AF94-850D98830E13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{BB67695B-1CDF-4FEC-8627-82FD349D1403}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB67695B-1CDF-4FEC-8627-82FD349D1403}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB67695B-1CDF-4FEC-8627-82FD349D1403}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C264288-C384-48A3-AF94-850D98830E13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C264288-C384-48A3-AF94-850D98830E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C264288-C384-48A3-AF94-850D98830E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C264288-C384-48A3-AF94-850D98830E13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

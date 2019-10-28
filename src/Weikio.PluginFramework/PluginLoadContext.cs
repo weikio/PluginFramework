@@ -31,6 +31,7 @@ namespace Weikio.PluginFramework
             try
             {
                 var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);
+
                 if (defaultAssembly != null)
                 {
                     // This assembly is available from default AssemlyLoadContext. Use that instead of this context
@@ -41,7 +42,7 @@ namespace Weikio.PluginFramework
             {
                 // Default-context doesn't have the assembly so try to resolve with this AssemblyLoadContext. 
             }
-            
+
             var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
 
             if (assemblyPath != null)

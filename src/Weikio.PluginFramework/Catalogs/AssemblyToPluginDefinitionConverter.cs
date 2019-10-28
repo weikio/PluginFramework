@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Reflection;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {

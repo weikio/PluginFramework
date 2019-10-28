@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {
@@ -23,7 +24,7 @@ namespace Weikio.PluginFramework.Catalogs
 
             var version = GetVersion(assemblyLocation);
             var pluginName = GetPluginName();
-            
+
             _pluginDefinition = new PluginDefinition(pluginName, version, this);
 
             IsInitialized = true;
@@ -37,7 +38,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 return _pluginType.Name;
             }
-            
+
             return _pluginType.Namespace.Split('.').Last();
         }
 
@@ -63,7 +64,7 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task<List<PluginDefinition>> GetAll()
         {
-            var result = new List<PluginDefinition>() {_pluginDefinition};
+            var result = new List<PluginDefinition>() { _pluginDefinition };
 
             return Task.FromResult(result);
         }

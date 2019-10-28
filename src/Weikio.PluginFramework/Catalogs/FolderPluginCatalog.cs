@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {
@@ -75,6 +76,8 @@ namespace Weikio.PluginFramework.Catalogs
 
                 _plugins.Add((definition, assembly));
             }
+
+            IsInitialized = true;
 
             return Task.CompletedTask;
         }

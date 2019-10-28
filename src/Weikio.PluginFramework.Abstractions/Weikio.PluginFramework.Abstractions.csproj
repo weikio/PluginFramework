@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Weik.io</Authors>
     <Company>Weik.io</Company>
-    <Description>Plugin Framework is a powerful plugin SDK for your .NET Core applications.</Description>
-    <PackageDescription>Everything is a plugin! Use assemblies, NuGet packages and C# Scripts as plugins in your .NET Core Applications.</PackageDescription>
+    <Description>Abstractions for Plugin Framework.</Description>
+    <PackageDescription>Abstractions for Plugin Framework.</PackageDescription>
     <PackageProjectUrl>https://www.pluginframework.com</PackageProjectUrl>
     <Copyright>©2019 Weik.io</Copyright>
-    <PackageId>Weikio.PluginFramework</PackageId>
-    <Product>Weikio.PluginFramework</Product>
-    <AssemblyName>Weikio.PluginFramework</AssemblyName>
+    <PackageId>Weikio.PluginFramework.Abstractions</PackageId>
+    <Product>Weikio.PluginFramework.Abstractions</Product>
+    <AssemblyName>Weikio.PluginFramework.Abstractions</AssemblyName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/weikio/PluginFramework</RepositoryUrl>
     <PackageTags>plugins;addons;extensions;plugin framework</PackageTags>
@@ -27,10 +27,6 @@
 
   <ItemGroup>
     <PackageReference Include="MinVer" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
   </ItemGroup>
   
 </Project>

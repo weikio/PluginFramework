@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {

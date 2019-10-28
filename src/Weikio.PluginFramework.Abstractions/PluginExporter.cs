@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Weikio.PluginFramework
+namespace Weikio.PluginFramework.Abstractions
 {
     public class PluginExporter : IPluginExporter
     {
@@ -14,7 +14,7 @@ namespace Weikio.PluginFramework
 
         public async Task<Plugin> Get(PluginDefinition definition, Predicate<Type> filter)
         {
-            var taggedFilters = new Dictionary<string, Predicate<Type>>() {{string.Empty, filter}};
+            var taggedFilters = new Dictionary<string, Predicate<Type>>() { { string.Empty, filter } };
 
             return await Get(definition, taggedFilters);
         }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Weikio.PluginFramework
+namespace Weikio.PluginFramework.Abstractions
 {
     public interface IPluginExporter
     {

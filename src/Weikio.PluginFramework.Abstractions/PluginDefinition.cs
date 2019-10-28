@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Weikio.PluginFramework
+namespace Weikio.PluginFramework.Abstractions
 {
     public class PluginDefinition
     {

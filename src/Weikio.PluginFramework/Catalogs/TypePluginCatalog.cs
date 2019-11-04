@@ -24,8 +24,9 @@ namespace Weikio.PluginFramework.Catalogs
 
             var version = GetVersion(assemblyLocation);
             var pluginName = GetPluginName();
+            var modeDetails = GetMoreVersionDetails(assemblyLocation);
 
-            _pluginDefinition = new PluginDefinition(pluginName, version, this);
+            _pluginDefinition = new PluginDefinition(pluginName, version, this, modeDetails.Description, modeDetails.ProductVersion);
 
             IsInitialized = true;
 
@@ -48,9 +49,9 @@ namespace Weikio.PluginFramework.Catalogs
 
             if (!string.IsNullOrWhiteSpace(assemblyLocation))
             {
-                var fileVersion = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
+                var versionInfo = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
 
-                version = Version.Parse(fileVersion.ProductVersion);
+                version = Version.Parse(versionInfo.FileVersion);
             }
             else
             {
@@ -58,6 +59,18 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             return version;
+        }
+
+        private (string Description, string ProductVersion) GetMoreVersionDetails(string assemblyLocation)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyLocation))
+            {
+                return ("", "");
+            }
+
+            var versionInfo = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
+
+            return (versionInfo.Comments, versionInfo.ProductVersion);
         }
 
         public bool IsInitialized { get; private set; }

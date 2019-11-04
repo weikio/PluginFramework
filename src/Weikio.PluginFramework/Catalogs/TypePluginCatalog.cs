@@ -50,7 +50,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 var fileVersion = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
 
-                version = Version.Parse(fileVersion.FileVersion);
+                version = Version.Parse(fileVersion.ProductVersion);
             }
             else
             {

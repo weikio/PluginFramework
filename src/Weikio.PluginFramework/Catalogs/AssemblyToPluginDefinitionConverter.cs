@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using Weikio.PluginFramework.Abstractions;
 
@@ -10,7 +11,7 @@ namespace Weikio.PluginFramework.Catalogs
         public static PluginDefinition Convert(Assembly assembly, IPluginCatalog source)
         {
             var fileVersion = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var result = new PluginDefinition(assembly.GetName().Name, Version.Parse(fileVersion.FileVersion), source);
+            var result = new PluginDefinition(assembly.GetName().Name, Version.Parse(fileVersion.ProductVersion), source);
 
             return result;
         }

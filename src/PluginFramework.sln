@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Abstractions", "Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj", "{5C264288-C384-48A3-AF94-850D98830E13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Tests", "..\tests\unit\Weikio.PluginFramework.Tests\Weikio.PluginFramework.Tests.csproj", "{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{5C264288-C384-48A3-AF94-850D98830E13}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C264288-C384-48A3-AF94-850D98830E13}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C264288-C384-48A3-AF94-850D98830E13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

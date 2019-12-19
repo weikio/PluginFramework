@@ -28,6 +28,7 @@ namespace Weikio.PluginFramework
         protected override Assembly Load(AssemblyName assemblyName)
         {
             // TODO: Allow configuration for loading assemblies from default context.
+            // Cache the results
             try
             {
                 var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);

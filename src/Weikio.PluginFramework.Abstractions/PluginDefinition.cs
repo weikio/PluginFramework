@@ -4,11 +4,7 @@ namespace Weikio.PluginFramework.Abstractions
 {
     public class PluginDefinition
     {
-        public PluginDefinition(string name, Version version, IPluginCatalog source) : this(name, version, source, "", "")
-        {
-        }
-
-        public PluginDefinition(string name, Version version, IPluginCatalog source, string description, string productVersion)
+        public PluginDefinition(string name, Version version, IPluginCatalog source, string description = "", string productVersion = "")
         {
             Name = name;
             Version = version;

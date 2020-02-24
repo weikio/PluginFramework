@@ -12,65 +12,26 @@ namespace Weikio.PluginFramework.Catalogs
     {
         private readonly Type _pluginType;
         private PluginDefinition _pluginDefinition;
+        private readonly TypePluginCatalogOptions _options;
 
-        public TypePluginCatalog(Type pluginType)
+        public TypePluginCatalog(Type pluginType, TypePluginCatalogOptions options = null)
         {
             _pluginType = pluginType;
+            _options = options ?? new TypePluginCatalogOptions();
         }
 
         public Task Initialize()
         {
-            var assemblyLocation = _pluginType.Assembly.Location;
+            var version = _options.PluginVersionGenerator(_options, _pluginType);
+            var pluginName = _options.PluginNameGenerator(_options, _pluginType);
+            var description = _options.PluginDescriptionGenerator(_options, _pluginType);
+            var productVersion = _options.PluginProductVersionGenerator(_options, _pluginType);
 
-            var version = GetVersion(assemblyLocation);
-            var pluginName = GetPluginName();
-            var modeDetails = GetMoreVersionDetails(assemblyLocation);
-
-            _pluginDefinition = new PluginDefinition(pluginName, version, this, modeDetails.Description, modeDetails.ProductVersion);
+            _pluginDefinition = new PluginDefinition(pluginName, version, this, description, productVersion);
 
             IsInitialized = true;
 
             return Task.CompletedTask;
-        }
-
-        private string GetPluginName()
-        {
-            if (string.IsNullOrWhiteSpace(_pluginType.Namespace))
-            {
-                return _pluginType.Name;
-            }
-
-            return _pluginType.Namespace.Split('.').Last();
-        }
-
-        private Version GetVersion(string assemblyLocation)
-        {
-            Version version;
-
-            if (!string.IsNullOrWhiteSpace(assemblyLocation))
-            {
-                var versionInfo = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
-
-                version = Version.Parse(versionInfo.FileVersion);
-            }
-            else
-            {
-                version = new Version(1, 0, 0, 0);
-            }
-
-            return version;
-        }
-
-        private (string Description, string ProductVersion) GetMoreVersionDetails(string assemblyLocation)
-        {
-            if (string.IsNullOrWhiteSpace(assemblyLocation))
-            {
-                return ("", "");
-            }
-
-            var versionInfo = FileVersionInfo.GetVersionInfo(_pluginType.Assembly.Location);
-
-            return (versionInfo.Comments, versionInfo.ProductVersion);
         }
 
         public bool IsInitialized { get; private set; }

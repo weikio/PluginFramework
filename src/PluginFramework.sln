@@ -6,6 +6,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Abst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Tests", "..\tests\unit\Weikio.PluginFramework.Tests\Weikio.PluginFramework.Tests.csproj", "{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DE041517-4760-4748-97F6-DB71D6AFFF5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly1", "..\tests\Assemblies\TestAssembly1\TestAssembly1.csproj", "{DB21DEFB-37D4-4006-A6B9-735671151D29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly2", "..\tests\Assemblies\TestAssembly2\TestAssembly2.csproj", "{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly3", "..\tests\Assemblies\TestAssembly3\TestAssembly3.csproj", "{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntefaces", "..\tests\Assemblies\TestIntefaces\TestIntefaces.csproj", "{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +34,28 @@ Global
 		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB21DEFB-37D4-4006-A6B9-735671151D29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB21DEFB-37D4-4006-A6B9-735671151D29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB21DEFB-37D4-4006-A6B9-735671151D29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB21DEFB-37D4-4006-A6B9-735671151D29}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
+		{DB21DEFB-37D4-4006-A6B9-735671151D29} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
+		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
+		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
+		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
 	EndGlobalSection
 EndGlobal

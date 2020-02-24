@@ -13,9 +13,8 @@ namespace Weikio.PluginFramework.Catalogs
     public class FolderPluginCatalog : IPluginCatalog
     {
         private readonly string _folderPath;
-        private List<(PluginDefinition PluginDefinition, Assembly Assembly)> _plugins = new List<(PluginDefinition, Assembly)>();
-
-        private readonly Func<MetadataReader, TypeDefinition, bool> _pluginResolver;
+        private readonly List<(PluginDefinition PluginDefinition, Assembly Assembly)> _plugins = new List<(PluginDefinition, Assembly)>();
+        private readonly FolderPluginCatalogOptions _options;
 
         public bool IsInitialized { get; private set; }
 
@@ -24,10 +23,10 @@ namespace Weikio.PluginFramework.Catalogs
             return Task.FromResult(_plugins.Select(x => x.PluginDefinition).ToList());
         }
 
-        public FolderPluginCatalog(string folderPath, Func<MetadataReader, TypeDefinition, bool> pluginResolver = null)
+        public FolderPluginCatalog(string folderPath, FolderPluginCatalogOptions options = null)
         {
             _folderPath = folderPath;
-            _pluginResolver = pluginResolver;
+            _options = options ?? new FolderPluginCatalogOptions();
         }
 
         public Task<PluginDefinition> Get(string name, Version version)
@@ -60,9 +59,18 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task Initialize()
         {
-            var dllFiles = Directory.GetFiles(_folderPath, "*.dll");
+            var foundFiles = new List<string>();
 
-            foreach (var assemblyPath in dllFiles)
+            foreach (var searchPattern in _options.SearchPatterns)
+            {
+                var dllFiles = Directory.GetFiles(_folderPath, searchPattern,
+                    _options.IncludSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                foundFiles.AddRange(dllFiles);
+            }
+
+            foundFiles = foundFiles.Distinct().ToList();
+
+            foreach (var assemblyPath in foundFiles)
             {
                 if (!IsPlugin(assemblyPath))
                 {
@@ -92,11 +100,45 @@ namespace Weikio.PluginFramework.Catalogs
                     return false;
                 }
 
-                if (_pluginResolver == null)
+                // First try to resolve plugin assemblies using MetadataLoadContext
+                if (_options.AssemblyPluginResolvers?.Any() == true)
                 {
-                    return true;
+                    var coreAssemblyPath = typeof(int).Assembly.Location;
+                    var corePath = Path.GetDirectoryName(coreAssemblyPath);
+
+                    var coreLocation = Path.Combine(corePath, "mscorlib.dll");
+                    if (!File.Exists(coreLocation))
+                    {
+                        throw new FileNotFoundException(coreLocation);
+                    }
+            
+                    var referencePaths = new[]
+                    {
+                        coreLocation,
+                        assemblyPath
+                    };
+            
+                    var resolver = new PathAssemblyResolver(referencePaths);
+
+                    using (var metadataContext = new MetadataLoadContext(resolver))
+                    {
+                        var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
+                        foreach (var assemblyPluginResolver in _options.AssemblyPluginResolvers)
+                        {
+                            if (assemblyPluginResolver(readonlyAssembly))
+                            {
+                                return true;
+                            }
+                        }
+                    }
                 }
 
+                if (_options.PluginResolvers?.Any() != true)
+                {
+                    return false;
+                }
+
+                // Then using the PEReader
                 var metadata = reader.GetMetadataReader();
 
                 var publicTypes = metadata.TypeDefinitions
@@ -106,12 +148,13 @@ namespace Weikio.PluginFramework.Catalogs
 
                 foreach (var type in publicTypes)
                 {
-                    if (!_pluginResolver(metadata, type))
+                    foreach (var pluginResolver in _options.PluginResolvers)
                     {
-                        continue;
+                        if (pluginResolver(assemblyPath, metadata, type))
+                        {
+                            return true;
+                        }
                     }
-
-                    return true;
                 }
             }
 

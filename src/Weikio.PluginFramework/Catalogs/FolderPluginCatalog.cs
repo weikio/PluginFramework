@@ -65,6 +65,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 var dllFiles = Directory.GetFiles(_folderPath, searchPattern,
                     _options.IncludSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                
                 foundFiles.AddRange(dllFiles);
             }
 
@@ -77,7 +78,7 @@ namespace Weikio.PluginFramework.Catalogs
                     continue;
                 }
 
-                var loadContext = new PluginLoadContext(assemblyPath);
+                var loadContext = new PluginLoadContext(assemblyPath, _options.PluginLoadContextOptions);
                 var assembly = loadContext.Load();
 
                 var definition = AssemblyToPluginDefinitionConverter.Convert(assembly, this);
@@ -131,11 +132,18 @@ namespace Weikio.PluginFramework.Catalogs
                             }
                         }
                     }
-                }
 
+                    if (_options.PluginResolvers.Any() != true)
+                    {
+                        // If there is assembly resolvers but no plugin resolvers, return false by default if not assembly resolver did not match.
+                        return false;
+                    }
+                }
+                
                 if (_options.PluginResolvers?.Any() != true)
                 {
-                    return false;
+                    // If there are not resolvers, assume that each DLL is a plugin
+                    return true;
                 }
 
                 // Then using the PEReader

@@ -11,5 +11,6 @@ namespace Weikio.PluginFramework.Catalogs
         public List<string> SearchPatterns = new List<string>() {"*.dll"};
         public List<Func<string, MetadataReader, TypeDefinition, bool>> PluginResolvers = new List<Func<string, MetadataReader, TypeDefinition, bool>>();
         public List<Func<Assembly, bool>> AssemblyPluginResolvers = new List<Func<Assembly, bool>>();
+        public PluginLoadContextOptions PluginLoadContextOptions = new PluginLoadContextOptions();
     }
 }

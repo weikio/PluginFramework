@@ -11,19 +11,23 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly string _assemblyPath;
         private readonly Assembly _assembly;
         private PluginDefinition _pluginDefinition;
+        private readonly AssemblyPluginCatalogOptions _options;
 
-        public AssemblyPluginCatalog(string assemblyPath)
+        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
         {
-            var loadContext = new PluginLoadContext(assemblyPath);
+            _options = options ?? new AssemblyPluginCatalogOptions();
+            
+            var loadContext = new PluginLoadContext(assemblyPath, _options.PluginLoadContextOptions);
             _assembly = loadContext.Load();
 
             _assemblyPath = assemblyPath;
         }
 
-        public AssemblyPluginCatalog(Assembly assembly)
+        public AssemblyPluginCatalog(Assembly assembly, AssemblyPluginCatalogOptions options = null)
         {
             _assembly = assembly;
             _assemblyPath = _assembly.Location;
+            _options = options ?? new AssemblyPluginCatalogOptions();
         }
 
         public Task Initialize()

@@ -9,11 +9,13 @@ namespace Weikio.PluginFramework
     {
         private readonly string _pluginPath;
         private readonly AssemblyDependencyResolver _resolver;
+        private readonly PluginLoadContextOptions _options;
 
-        public PluginLoadContext(string pluginPath)
+        public PluginLoadContext(string pluginPath, PluginLoadContextOptions options = null)
         {
             _pluginPath = pluginPath;
             _resolver = new AssemblyDependencyResolver(pluginPath);
+            _options = options ?? new PluginLoadContextOptions();
         }
 
         public Assembly Load()
@@ -29,19 +31,20 @@ namespace Weikio.PluginFramework
         {
             // TODO: Allow configuration for loading assemblies from default context.
             // Cache the results
-            try
-            {
-                var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);
 
-                if (defaultAssembly != null)
+            if (_options.UseHostApplicationAssemblies)
+            {
+                try
                 {
+                    var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);
+
                     // This assembly is available from default AssemlyLoadContext. Use that instead of this context
                     return null;
                 }
-            }
-            catch
-            {
-                // Default-context doesn't have the assembly so try to resolve with this AssemblyLoadContext. 
+                catch
+                {
+                    // Default-context doesn't have the assembly so try to resolve with this AssemblyLoadContext. 
+                }
             }
 
             var assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);

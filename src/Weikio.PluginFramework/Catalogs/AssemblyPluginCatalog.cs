@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
@@ -9,18 +10,19 @@ namespace Weikio.PluginFramework.Catalogs
     public class AssemblyPluginCatalog : IPluginCatalog
     {
         private readonly string _assemblyPath;
-        private readonly Assembly _assembly;
+        private Assembly _assembly;
         private PluginDefinition _pluginDefinition;
         private readonly AssemblyPluginCatalogOptions _options;
 
         public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
         {
-            _options = options ?? new AssemblyPluginCatalogOptions();
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
             
-            var loadContext = new PluginLoadContext(assemblyPath, _options.PluginLoadContextOptions);
-            _assembly = loadContext.Load();
-
             _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
         }
 
         public AssemblyPluginCatalog(Assembly assembly, AssemblyPluginCatalogOptions options = null)
@@ -32,6 +34,17 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task Initialize()
         {
+            if (!string.IsNullOrWhiteSpace(_assemblyPath) && _assembly == null)
+            {
+                if (!File.Exists(_assemblyPath))
+                {
+                    throw new ArgumentException($"Assembly in path {_assemblyPath} does not exist.");
+                }
+
+                var loadContext = new PluginLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
+                _assembly = loadContext.Load();
+            }
+            
             _pluginDefinition = AssemblyToPluginDefinitionConverter.Convert(_assembly, this);
 
             IsInitialized = true;

@@ -42,6 +42,14 @@ namespace Weikio.PluginFramework.Catalogs
             return result;
         }
 
+        public bool SupportsUnload { get; }
+        public Task Unload()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Unloaded { get; }
+
         public CompositePluginCatalog(params IPluginCatalog[] catalogs)
         {
             _catalogs = catalogs.ToList();

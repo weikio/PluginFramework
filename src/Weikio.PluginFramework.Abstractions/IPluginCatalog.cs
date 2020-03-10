@@ -12,5 +12,8 @@ namespace Weikio.PluginFramework.Abstractions
         Task<List<PluginDefinition>> GetAll();
         Task<PluginDefinition> Get(string name, Version version);
         Task<Assembly> GetAssembly(PluginDefinition definition);
+        bool SupportsUnload { get; }
+        Task Unload();
+        bool Unloaded { get; }
     }
 }

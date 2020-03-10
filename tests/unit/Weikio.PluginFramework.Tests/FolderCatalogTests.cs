@@ -26,6 +26,19 @@ namespace Weikio.PluginFramework.Tests
 
             Assert.Equal(dllCount, pluginCount);
         }
+        
+        [Fact]
+        public async Task CanUnload()
+        {
+            var catalog = new FolderPluginCatalog(_pluginFolder);
+            await catalog.Initialize();
+
+            await catalog.GetAll();
+
+            await catalog.Unload();
+
+            await Assert.ThrowsAsync<CatalogUnloadedException>(async () => await catalog.GetAll());
+        }
 
         [Fact]
         public async Task CanInitializeWithPluginResolver()

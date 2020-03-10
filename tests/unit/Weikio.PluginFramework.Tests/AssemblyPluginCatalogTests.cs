@@ -24,6 +24,25 @@ namespace Weikio.PluginFramework.Tests
         }
         
         [Fact]
+        public async Task CanUnload()
+        {
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            await catalog.Initialize();
+
+            var pluginDefinition = (await catalog.GetAll()).Single();
+
+            var pluginExporter = new PluginExporter();
+            var plugin = await pluginExporter.Get(pluginDefinition);
+
+            dynamic jsonResolver = Activator.CreateInstance(plugin.Types.First());
+            jsonResolver.RunMe();
+
+            await catalog.Unload();
+
+            await Assert.ThrowsAsync<CatalogUnloadedException>(async () => await pluginExporter.Get(pluginDefinition));
+        }
+        
+        [Fact]
         public async Task ThrowsIfAssemblyNotFound()
         {
             var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\notexists.dll");
@@ -43,6 +62,9 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanUseReferencedDependencies()
         {
+            // Make sure that the referenced version of JSON.NET is loaded into memory
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
+            
             var assemblyCatalog1 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
             await assemblyCatalog1.Initialize();
 

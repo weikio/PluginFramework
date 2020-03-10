@@ -16,13 +16,9 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly string _folderPath;
         private readonly List<(PluginDefinition PluginDefinition, Assembly Assembly)> _plugins = new List<(PluginDefinition, Assembly)>();
         private readonly FolderPluginCatalogOptions _options;
+        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
 
         public bool IsInitialized { get; private set; }
-
-        public Task<List<PluginDefinition>> GetAll()
-        {
-            return Task.FromResult(_plugins.Select(x => x.PluginDefinition).ToList());
-        }
 
         public FolderPluginCatalog(string folderPath, FolderPluginCatalogOptions options = null)
         {
@@ -30,8 +26,23 @@ namespace Weikio.PluginFramework.Catalogs
             _options = options ?? new FolderPluginCatalogOptions();
         }
 
+        public Task<List<PluginDefinition>> GetAll()
+        {
+            if (Unloaded)
+            {
+                throw new CatalogUnloadedException();
+            }
+            
+            return Task.FromResult(_plugins.Select(x => x.PluginDefinition).ToList());
+        }
+        
         public Task<PluginDefinition> Get(string name, Version version)
         {
+            if (Unloaded)
+            {
+                throw new CatalogUnloadedException();
+            }
+
             foreach (var plugin in _plugins)
             {
                 if (string.Equals(name, plugin.PluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) &&
@@ -58,6 +69,24 @@ namespace Weikio.PluginFramework.Catalogs
             return null;
         }
 
+        public bool SupportsUnload { get; } = true;
+
+        public Task Unload()
+        {
+            foreach (var pluginLoadContext in _contexts)
+            {
+                pluginLoadContext.Unload();
+            }
+
+            _contexts.Clear();
+            
+            Unloaded = true;
+
+            return Task.CompletedTask;
+        }
+
+        public bool Unloaded { get; private set; }
+
         public Task Initialize()
         {
             var foundFiles = new List<string>();
@@ -66,7 +95,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 var dllFiles = Directory.GetFiles(_folderPath, searchPattern,
                     _options.IncludSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
-                
+
                 foundFiles.AddRange(dllFiles);
             }
 
@@ -81,6 +110,7 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var loadContext = new PluginLoadContext(assemblyPath, _options.PluginLoadContextOptions);
                 var assembly = loadContext.Load();
+                _contexts.Add(loadContext);
 
                 var definition = AssemblyToPluginDefinitionConverter.Convert(assembly, this);
 
@@ -109,22 +139,20 @@ namespace Weikio.PluginFramework.Catalogs
                     var corePath = Path.GetDirectoryName(coreAssemblyPath);
 
                     var coreLocation = Path.Combine(corePath, "mscorlib.dll");
+
                     if (!File.Exists(coreLocation))
                     {
                         throw new FileNotFoundException(coreLocation);
                     }
-            
-                    var referencePaths = new[]
-                    {
-                        coreLocation,
-                        assemblyPath
-                    };
-            
+
+                    var referencePaths = new[] { coreLocation, assemblyPath };
+
                     var resolver = new PathAssemblyResolver(referencePaths);
 
                     using (var metadataContext = new MetadataLoadContext(resolver))
                     {
                         var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
+
                         foreach (var assemblyPluginResolver in _options.AssemblyPluginResolvers)
                         {
                             if (assemblyPluginResolver(readonlyAssembly))
@@ -140,7 +168,7 @@ namespace Weikio.PluginFramework.Catalogs
                         return false;
                     }
                 }
-                
+
                 if (_options.PluginResolvers?.Any() != true)
                 {
                     // If there are not resolvers, assume that each DLL is a plugin

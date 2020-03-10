@@ -17,7 +17,7 @@ namespace Weikio.PluginFramework.Context
         private readonly AssemblyDependencyResolver _resolver;
         private readonly PluginLoadContextOptions _options;
 
-        public PluginLoadContext(string pluginPath, PluginLoadContextOptions options = null)
+        public PluginLoadContext(string pluginPath, PluginLoadContextOptions options = null) : base(true)
         {
             _pluginPath = pluginPath;
             _resolver = new AssemblyDependencyResolver(pluginPath);

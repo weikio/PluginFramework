@@ -58,5 +58,13 @@ namespace Weikio.PluginFramework.Catalogs
         {
             return Task.FromResult(_pluginType.Assembly);
         }
+
+        public bool SupportsUnload { get; }
+        public Task Unload()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Unloaded { get; }
     }
 }

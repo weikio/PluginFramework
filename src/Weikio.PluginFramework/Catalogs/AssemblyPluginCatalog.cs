@@ -14,6 +14,7 @@ namespace Weikio.PluginFramework.Catalogs
         private Assembly _assembly;
         private PluginDefinition _pluginDefinition;
         private readonly AssemblyPluginCatalogOptions _options;
+        private PluginLoadContext _pluginLoadContext;
 
         public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
         {
@@ -42,8 +43,8 @@ namespace Weikio.PluginFramework.Catalogs
                     throw new ArgumentException($"Assembly in path {_assemblyPath} does not exist.");
                 }
 
-                var loadContext = new PluginLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
-                _assembly = loadContext.Load();
+                _pluginLoadContext = new PluginLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
+                _assembly = _pluginLoadContext.Load();
             }
             
             _pluginDefinition = AssemblyToPluginDefinitionConverter.Convert(_assembly, this);
@@ -57,6 +58,11 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task<List<PluginDefinition>> GetAll()
         {
+            if (Unloaded)
+            {
+                throw new CatalogUnloadedException();
+            }
+
             var result = new List<PluginDefinition>() { _pluginDefinition };
 
             return Task.FromResult(result);
@@ -64,6 +70,11 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Task<PluginDefinition> Get(string name, Version version)
         {
+            if (Unloaded)
+            {
+                throw new CatalogUnloadedException();
+            }
+
             if (!string.Equals(name, _pluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) ||
                 version != _pluginDefinition.Version)
             {
@@ -77,5 +88,22 @@ namespace Weikio.PluginFramework.Catalogs
         {
             return Task.FromResult(_assembly);
         }
+
+        public bool SupportsUnload { get; } = true;
+        public Task Unload()
+        {
+            if (Unloaded)
+            {
+                return Task.CompletedTask;
+            }
+            
+            _pluginLoadContext.Unload();
+
+            Unloaded = true;
+
+            return Task.CompletedTask;
+        }
+
+        public bool Unloaded { get; private set; }
     }
 }

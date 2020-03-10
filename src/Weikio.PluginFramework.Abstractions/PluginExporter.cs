@@ -21,6 +21,16 @@ namespace Weikio.PluginFramework.Abstractions
 
         public async Task<Plugin> Get(PluginDefinition definition, Dictionary<string, Predicate<Type>> taggedFilters)
         {
+            if (definition == null)
+            {
+                throw new ArgumentNullException(nameof(definition));
+            }
+            
+            if (definition?.Source?.Unloaded == true)
+            {
+                throw new CatalogUnloadedException();
+            }
+
             var assembly = await definition.Source.GetAssembly(definition);
 
             if (assembly == null)

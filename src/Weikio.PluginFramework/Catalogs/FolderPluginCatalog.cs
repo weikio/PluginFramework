@@ -7,6 +7,7 @@ using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Context;
 
 namespace Weikio.PluginFramework.Catalogs
 {

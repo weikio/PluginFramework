@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Context;
 using Xunit;
 
 namespace Weikio.PluginFramework.Tests
@@ -40,14 +43,14 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanUseReferencedDependencies()
         {
-            var folder1Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
-            await folder1Catalog.Initialize();
+            var assemblyCatalog1 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
+            await assemblyCatalog1.Initialize();
 
-            var folder2Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll");
-            await folder2Catalog.Initialize();
+            var assemblyCatalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll");
+            await assemblyCatalog2.Initialize();
 
-            var newPluginDefinition = (await folder1Catalog.GetAll()).Single();
-            var oldPluginDefinition = (await folder2Catalog.GetAll()).Single();
+            var newPluginDefinition = (await assemblyCatalog1.GetAll()).Single();
+            var oldPluginDefinition = (await assemblyCatalog2.GetAll()).Single();
 
             var pluginExporter = new PluginExporter();
             var newPlugin = await pluginExporter.Get(newPluginDefinition);
@@ -64,13 +67,13 @@ namespace Weikio.PluginFramework.Tests
         }
 
         [Fact]
-        public async Task CanUseHoststDependencies()
+        public async Task CanUseHostsDependencies()
         {
             // Make sure that the referenced version of JSON.NET is loaded into memory
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
 
             var options = new AssemblyPluginCatalogOptions();
-            options.PluginLoadContextOptions = new PluginLoadContextOptions() { UseHostApplicationAssemblies = true };
+            options.PluginLoadContextOptions = new PluginLoadContextOptions() { UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Always };
 
             var folder1Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", options);
             await folder1Catalog.Initialize();
@@ -93,6 +96,40 @@ namespace Weikio.PluginFramework.Tests
 
             Assert.Equal("10.0.0.0", newPluginVersion);
             Assert.Equal("10.0.0.0", oldPluginVersion);
+        }
+        
+        [Fact]
+        public async Task CanUseSelectedHoststDependencies()
+        {
+            // Make sure that the referenced version of JSON.NET is loaded into memory
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
+            // Make sure that the referenced version of Microsoft.Extensions.Logging is loaded into memory
+            var logging = new Microsoft.Extensions.Logging.LoggerFactory();
+
+            var options = new AssemblyPluginCatalogOptions();;
+            options.PluginLoadContextOptions = new PluginLoadContextOptions()
+            {
+                UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
+                HostApplicationAssemblies = new List<AssemblyName>()
+                {
+                    typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName()
+                }
+            };
+
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
+            await catalog.Initialize();
+
+            var oldPluginDefinition = (await catalog.GetAll()).Single();
+
+            var pluginExporter = new PluginExporter();
+            var oldPlugin = await pluginExporter.Get(oldPluginDefinition);
+
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
+            var oldPluginVersion = oldPluginJsonResolver.GetVersion();
+            var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
+            
+            Assert.Equal("3.1.2.0", loggerVersion);
+            Assert.Equal("9.0.0.0", oldPluginVersion);
         }
     }
 }

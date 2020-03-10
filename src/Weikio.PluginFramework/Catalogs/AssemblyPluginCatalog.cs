@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Context;
 
 namespace Weikio.PluginFramework.Catalogs
 {

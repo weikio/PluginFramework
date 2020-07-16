@@ -14,7 +14,7 @@ namespace Weikio.PluginFramework.Tests
             var catalog = new TypePluginCatalog(typeof(TypePlugin));
             await catalog.Initialize();
 
-            var allPlugins = await catalog.GetAll();
+            var allPlugins = await catalog.GetPluginsOld();
 
             Assert.Single(allPlugins);
         }
@@ -25,7 +25,7 @@ namespace Weikio.PluginFramework.Tests
             var catalog = new TypePluginCatalog(typeof(TypePlugin));
             await catalog.Initialize();
 
-            var thePlugin = (await catalog.GetAll()).First();
+            var thePlugin = (await catalog.GetPluginsOld()).First();
 
             Assert.Equal("Weikio.PluginFramework.Tests.Plugins.TypePlugin", thePlugin.Name);
         }
@@ -37,7 +37,7 @@ namespace Weikio.PluginFramework.Tests
 
             await catalog.Initialize();
 
-            var thePlugin = (await catalog.GetAll()).First();
+            var thePlugin = (await catalog.GetPluginsOld()).First();
 
             Assert.Equal("HelloOptions", thePlugin.Name);
         }
@@ -48,7 +48,7 @@ namespace Weikio.PluginFramework.Tests
             var catalog = new TypePluginCatalog(typeof(TypePluginWithName));
             await catalog.Initialize();
 
-            var thePlugin = (await catalog.GetAll()).First();
+            var thePlugin = (await catalog.GetPluginsOld()).First();
 
             Assert.Equal("MyCustomName", thePlugin.Name);
         }

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
@@ -11,8 +9,9 @@ namespace Weikio.PluginFramework.Catalogs
     public class TypePluginCatalog : IPluginCatalog
     {
         private readonly Type _pluginType;
-        private PluginDefinition _pluginDefinition;
+        private PluginOld _pluginOld;
         private readonly TypePluginCatalogOptions _options;
+        private Plugin _plugin;
 
         public TypePluginCatalog(Type pluginType, TypePluginCatalogOptions options = null)
         {
@@ -27,8 +26,8 @@ namespace Weikio.PluginFramework.Catalogs
             var description = _options.PluginDescriptionGenerator(_options, _pluginType);
             var productVersion = _options.PluginProductVersionGenerator(_options, _pluginType);
 
-            _pluginDefinition = new PluginDefinition(pluginName, version, this, description, productVersion);
-
+            _pluginOld = new PluginOld(pluginName, version, this, description, productVersion);
+            _plugin = new Plugin(_pluginType.Assembly, _pluginType, pluginName, version, this, description, productVersion);
             IsInitialized = true;
 
             return Task.CompletedTask;
@@ -36,25 +35,25 @@ namespace Weikio.PluginFramework.Catalogs
 
         public bool IsInitialized { get; private set; }
 
-        public Task<List<PluginDefinition>> GetAll()
+        public Task<List<PluginOld>> GetPluginsOld()
         {
-            var result = new List<PluginDefinition>() { _pluginDefinition };
+            var result = new List<PluginOld>() { _pluginOld };
 
             return Task.FromResult(result);
         }
 
-        public Task<PluginDefinition> Get(string name, Version version)
+        public Task<PluginOld> GetPlugin(string name, Version version)
         {
-            if (!string.Equals(name, _pluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                version != _pluginDefinition.Version)
+            if (!string.Equals(name, _pluginOld.Name, StringComparison.InvariantCultureIgnoreCase) ||
+                version != _pluginOld.Version)
             {
-                return Task.FromResult<PluginDefinition>(null);
+                return Task.FromResult<PluginOld>(null);
             }
 
-            return Task.FromResult(_pluginDefinition);
+            return Task.FromResult(_pluginOld);
         }
 
-        public Task<Assembly> GetAssembly(PluginDefinition definition)
+        public Task<Assembly> GetAssembly(PluginOld definition)
         {
             return Task.FromResult(_pluginType.Assembly);
         }
@@ -66,5 +65,20 @@ namespace Weikio.PluginFramework.Catalogs
         }
 
         public bool Unloaded { get; }
+        public List<Plugin> GetPlugins()
+        {
+            return new List<Plugin>(){_plugin};
+        }
+
+        public Plugin Get(string name, Version version)
+        {
+            if (!string.Equals(name, _pluginOld.Name, StringComparison.InvariantCultureIgnoreCase) ||
+                version != _pluginOld.Version)
+            {
+                return null;
+            }
+
+            return _plugin;
+        }
     }
 }

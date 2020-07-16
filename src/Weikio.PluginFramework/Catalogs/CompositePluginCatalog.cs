@@ -12,20 +12,20 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly List<IPluginCatalog> _catalogs;
         public bool IsInitialized { get; private set; }
 
-        public async Task<List<PluginDefinition>> GetAll()
+        public async Task<List<PluginOld>> GetPluginsOld()
         {
-            var result = new List<PluginDefinition>();
+            var result = new List<PluginOld>();
 
             foreach (var pluginCatalog in _catalogs)
             {
-                var pluginsInCatalog = await pluginCatalog.GetAll();
+                var pluginsInCatalog = await pluginCatalog.GetPluginsOld();
                 result.AddRange(pluginsInCatalog);
             }
 
             return result;
         }
 
-        public async Task<Assembly> GetAssembly(PluginDefinition definition)
+        public async Task<Assembly> GetAssembly(PluginOld definition)
         {
             if (definition == null)
             {
@@ -49,6 +49,23 @@ namespace Weikio.PluginFramework.Catalogs
         }
 
         public bool Unloaded { get; }
+        public List<Plugin> GetPlugins()
+        {
+            var result = new List<Plugin>();
+
+            foreach (var pluginCatalog in _catalogs)
+            {
+                var pluginsInCatalog = pluginCatalog.GetPlugins();
+                result.AddRange(pluginsInCatalog);
+            }
+
+            return result;
+        }
+
+        public Plugin Get(string name, Version version)
+        {
+            throw new NotImplementedException();
+        }
 
         public CompositePluginCatalog(params IPluginCatalog[] catalogs)
         {
@@ -60,13 +77,13 @@ namespace Weikio.PluginFramework.Catalogs
             _catalogs.Add(catalog);
         }
 
-        public async Task<PluginDefinition> Get(string name, Version version)
+        public async Task<PluginOld> GetPlugin(string name, Version version)
         {
-            PluginDefinition result = null;
+            PluginOld result = null;
 
             foreach (var pluginCatalog in _catalogs)
             {
-                var plugin = await pluginCatalog.Get(name, version);
+                var plugin = await pluginCatalog.GetPlugin(name, version);
 
                 if (plugin == null)
                 {

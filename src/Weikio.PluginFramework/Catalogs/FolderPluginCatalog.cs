@@ -106,7 +106,8 @@ namespace Weikio.PluginFramework.Catalogs
                 var assemblyCatalogOptions = new AssemblyPluginCatalogOptions
                 {
                     PluginLoadContextOptions = _options.PluginLoadContextOptions, 
-                    TypeFinderCriterias = _options.TypeFinderCriterias
+                    TypeFinderCriterias = _options.TypeFinderCriterias,
+                    PluginNameOptions = _options.PluginNameOptions
                 };
 
                 var assemblyCatalog = new AssemblyPluginCatalog(assemblyPath, assemblyCatalogOptions);

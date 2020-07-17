@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Weik.io</Authors>
+    <Company>Weik.io</Company>
+    <Description>Plugin Framework for ASP.NET Core.</Description>
+    <PackageDescription>Plugin Framework for ASP.NET Core.</PackageDescription>
+    <PackageProjectUrl>https://www.pluginframework.com</PackageProjectUrl>
+    <Copyright>©2020 Weik.io</Copyright>
+    <PackageId>Weikio.PluginFramework.AspNetCore</PackageId>
+    <Product>Weikio.PluginFramework.AspNetCore</Product>
+    <AssemblyName>Weikio.PluginFramework.AspNetCore</AssemblyName>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/weikio/PluginFramework</RepositoryUrl>
+    <PackageTags>plugins;addons;aspnetextensions;plugin framework</PackageTags>
+    <PackageIcon>logo_256.png</PackageIcon>
+    <Title>Plugin Framework for ASP.NET Core</Title>
+    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
+  </ItemGroup>
+  
+</Project>

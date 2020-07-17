@@ -23,8 +23,9 @@ namespace WpfApp
             });
             
             var assemblyPluginCatalog = new AssemblyPluginCatalog(typeof(MainWindow).Assembly, type => typeof(IOperator).IsAssignableFrom(type));
+            var typePluginCatalog = new TypePluginCatalog(typeof(RemainderOperator));
             
-            var pluginCatalog = new CompositePluginCatalog(folderPluginCatalog, assemblyPluginCatalog); 
+            var pluginCatalog = new CompositePluginCatalog(folderPluginCatalog, assemblyPluginCatalog, typePluginCatalog); 
             await pluginCatalog.Initialize();
 
             var allPlugins = pluginCatalog.GetPlugins();

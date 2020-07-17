@@ -7,5 +7,6 @@ namespace Weikio.PluginFramework.Catalogs
     {
         public PluginLoadContextOptions PluginLoadContextOptions = new PluginLoadContextOptions();
         public Dictionary<string, TypeFinderCriteria> TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
+        public PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
     }
 }

@@ -21,11 +21,11 @@ namespace Weikio.PluginFramework.Catalogs
         public AssemblyPluginCatalog(string assemblyPath) : this(assemblyPath, options: null)
         {
         }
-        
-        public AssemblyPluginCatalog(Assembly assembly) : this(assembly, options : null)
+
+        public AssemblyPluginCatalog(Assembly assembly) : this(assembly, options: null)
         {
         }
-        
+
         public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
         {
             if (string.IsNullOrWhiteSpace(assemblyPath))
@@ -36,14 +36,14 @@ namespace Weikio.PluginFramework.Catalogs
             _assemblyPath = assemblyPath;
             _options = options ?? new AssemblyPluginCatalogOptions();
         }
-        
+
         public AssemblyPluginCatalog(Assembly assembly, AssemblyPluginCatalogOptions options = null)
         {
             _assembly = assembly;
             _assemblyPath = _assembly.Location;
             _options = options ?? new AssemblyPluginCatalogOptions();
         }
-        
+
         public AssemblyPluginCatalog(string assemblyPath, TypeFinderCriteria criteria = null, AssemblyPluginCatalogOptions options = null)
         {
             if (string.IsNullOrWhiteSpace(assemblyPath))
@@ -138,8 +138,23 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             _plugins = new List<TypePluginCatalog>();
-                
+
             var finder = new TypeFinder();
+
+            if (_options.TypeFinderCriterias?.Any() != true)
+            {
+                var findAll = new TypeFinderCriteria()
+                {
+                    Query = (context, type) => true
+                };
+
+                if (_options.TypeFinderCriterias == null)
+                {
+                    _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
+                }
+                
+                _options.TypeFinderCriterias.Add(string.Empty, findAll);
+            }
 
             foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
             {
@@ -147,13 +162,13 @@ namespace Weikio.PluginFramework.Catalogs
 
                 foreach (var type in pluginTypes)
                 {
-                    var typePluginCatalog = new TypePluginCatalog(type);
+                    var typePluginCatalog = new TypePluginCatalog(type, new TypePluginCatalogOptions() { PluginNameOptions = _options.PluginNameOptions });
                     await typePluginCatalog.Initialize();
-                    
+
                     _plugins.Add(typePluginCatalog);
                 }
             }
-            
+
             IsInitialized = true;
         }
 

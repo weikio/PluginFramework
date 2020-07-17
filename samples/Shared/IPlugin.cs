@@ -11,9 +11,4 @@ namespace Shared
     {
         string Get();
     }
-
-    public interface IOperator
-    {
-        int Calculate(int x, int y);
-    }
 }

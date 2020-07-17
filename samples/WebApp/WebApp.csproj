@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
+      <ProjectReference Include="..\..\src\Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\src\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
+      <ProjectReference Include="..\SharedPlugins\SharedPlugins.csproj" />
+      <ProjectReference Include="..\Shared\Shared.csproj" />
+    </ItemGroup>
+
+
+</Project>

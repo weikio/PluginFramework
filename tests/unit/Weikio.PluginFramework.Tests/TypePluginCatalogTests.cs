@@ -33,7 +33,10 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanConfigureNameResolver()
         {
-            var catalog = new TypePluginCatalog(typeof(TypePlugin), new TypePluginCatalogOptions() { PluginNameGenerator = (options, type) => "HelloOptions" });
+            var catalog = new TypePluginCatalog(typeof(TypePlugin), configure =>
+            {
+                configure.PluginNameGenerator = (opt, type) => "HelloOptions";
+            });
 
             await catalog.Initialize();
 

@@ -9,13 +9,11 @@ namespace Weikio.PluginFramework.Abstractions
     {
         Task Initialize();
         bool IsInitialized { get; }
-        Task<List<PluginOld>> GetPluginsOld();
-        Task<PluginOld> GetPlugin(string name, Version version);
-        Task<Assembly> GetAssembly(PluginOld definition);
+        Task<List<PluginDefinition>> GetAll();
+        Task<PluginDefinition> Get(string name, Version version);
+        Task<Assembly> GetAssembly(PluginDefinition definition);
         bool SupportsUnload { get; }
         Task Unload();
         bool Unloaded { get; }
-        List<Plugin> GetPlugins();
-        Plugin Get(string name, Version version);
     }
 }

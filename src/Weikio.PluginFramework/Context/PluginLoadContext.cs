@@ -5,20 +5,19 @@ using System.Reflection;
 using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Weikio.PluginFramework.Catalogs;
 
 namespace Weikio.PluginFramework.Context
 {
     /// <summary>
     /// Defines a Plugin Load Context which allows the loading of plugin specific version's of assemblies.
     /// </summary>
-    public class PluginAssemblyLoadContext : AssemblyLoadContext, ITypeFindingContext
+    public class PluginLoadContext : AssemblyLoadContext
     {
         private readonly string _pluginPath;
         private readonly AssemblyDependencyResolver _resolver;
         private readonly PluginLoadContextOptions _options;
 
-        public PluginAssemblyLoadContext(string pluginPath, PluginLoadContextOptions options = null) : base(true)
+        public PluginLoadContext(string pluginPath, PluginLoadContextOptions options = null) : base(true)
         {
             _pluginPath = pluginPath;
             _resolver = new AssemblyDependencyResolver(pluginPath);
@@ -115,9 +114,9 @@ namespace Weikio.PluginFramework.Context
         }
 
         private static string loggerLock = "lock";
-        private ILogger<PluginAssemblyLoadContext> _logger;
+        private ILogger<PluginLoadContext> _logger;
 
-        private ILogger<PluginAssemblyLoadContext> GetLogger()
+        private ILogger<PluginLoadContext> GetLogger()
         {
             // ReSharper disable once InvertIf
             if (_logger == null)
@@ -128,7 +127,7 @@ namespace Weikio.PluginFramework.Context
                     {
                         if (_options?.LoggerFactory == null)
                         {
-                            _logger = NullLogger<PluginAssemblyLoadContext>.Instance;
+                            _logger = NullLogger<PluginLoadContext>.Instance;
                         }
                         else
                         {
@@ -139,26 +138,6 @@ namespace Weikio.PluginFramework.Context
             }
 
             return _logger;
-        }
-
-        public Assembly FindAssembly(string assemblyName)
-        {
-            return Load(new AssemblyName(assemblyName));
-        }
-
-        public Type FindType(Type type)
-        {
-            var assemblyName = type.Assembly.GetName();
-            var assembly = Load(assemblyName);
-
-            if (assembly == null)
-            {
-                assembly = Assembly.Load(assemblyName);
-            }
-
-            var result = assembly.GetType(type.FullName);
-
-            return result;
         }
     }
 }

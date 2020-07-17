@@ -17,8 +17,6 @@ namespace Weikio.PluginFramework.Catalogs
         private PluginAssemblyLoadContext _pluginAssemblyLoadContext;
         private List<TypePluginCatalog> _plugins = null;
 
-        private static string _pluginLock = "lock";
-        
         // TODO: Remove the duplicate code from constructors
         public AssemblyPluginCatalog(string assemblyPath) : this(assemblyPath, options: null)
         {

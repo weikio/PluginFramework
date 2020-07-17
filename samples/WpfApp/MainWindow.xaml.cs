@@ -22,7 +22,7 @@ namespace WpfApp
                 type.Implements<IOperator>();
             });
             
-            var assemblyPluginCatalog = new AssemblyPluginCatalog(typeof(MainWindow).Assembly);
+            var assemblyPluginCatalog = new AssemblyPluginCatalog(typeof(MainWindow).Assembly, type => typeof(IOperator).IsAssignableFrom(type));
             
             var pluginCatalog = new CompositePluginCatalog(folderPluginCatalog, assemblyPluginCatalog); 
             await pluginCatalog.Initialize();

@@ -18,13 +18,19 @@ namespace Weikio.PluginFramework.Catalogs
     public class FolderPluginCatalog : IPluginCatalog
     {
         private readonly string _folderPath;
-        private readonly List<(PluginOld PluginDefinition, Assembly Assembly)> _pluginsOld = new List<(PluginOld, Assembly)>();
-        private readonly List<Plugin> _plugins = new List<Plugin>();
         private readonly FolderPluginCatalogOptions _options;
         private readonly List<PluginAssemblyLoadContext> _contexts = new List<PluginAssemblyLoadContext>();
+        private readonly List<AssemblyPluginCatalog> _catalogs = new List<AssemblyPluginCatalog>();
 
         public bool IsInitialized { get; private set; }
-
+        private List<Plugin> Plugins
+        {
+            get
+            {
+                return _catalogs.SelectMany(x => x.GetPlugins()).ToList();
+            }
+        }
+        
         public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria = null, FolderPluginCatalogOptions options = null)
         {
             _folderPath = folderPath;
@@ -52,92 +58,29 @@ namespace Weikio.PluginFramework.Catalogs
             }
         }
 
-        public Task<List<PluginOld>> GetPluginsOld()
-        {
-            if (Unloaded)
-            {
-                throw new CatalogUnloadedException();
-            }
-
-            return Task.FromResult(_pluginsOld.Select(x => x.PluginDefinition).ToList());
-        }
-
-        public Task<PluginOld> GetPlugin(string name, Version version)
-        {
-            if (Unloaded)
-            {
-                throw new CatalogUnloadedException();
-            }
-
-            foreach (var plugin in _pluginsOld)
-            {
-                if (string.Equals(name, plugin.PluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    version == plugin.PluginDefinition.Version)
-                {
-                    return Task.FromResult(plugin.PluginDefinition);
-                }
-            }
-
-            return null;
-        }
-
-        public Task<Assembly> GetAssembly(PluginOld definition)
-        {
-            foreach (var plugin in _pluginsOld)
-            {
-                if (string.Equals(definition.Name, plugin.PluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    definition.Version == plugin.PluginDefinition.Version)
-                {
-                    return Task.FromResult(plugin.Assembly);
-                }
-            }
-
-            return null;
-        }
-
-        public bool SupportsUnload { get; } = true;
-
-        public Task Unload()
-        {
-            foreach (var pluginLoadContext in _contexts)
-            {
-                pluginLoadContext.Unload();
-            }
-
-            _contexts.Clear();
-
-            Unloaded = true;
-
-            return Task.CompletedTask;
-        }
-
-        public bool Unloaded { get; private set; }
-
         public List<Plugin> GetPlugins()
         {
-            return _plugins;
+            return Plugins;
         }
 
         public Plugin Get(string name, Version version)
         {
-            if (Unloaded)
+            foreach (var assemblyPluginCatalog in _catalogs)
             {
-                throw new CatalogUnloadedException();
-            }
+                var plugin = assemblyPluginCatalog.Get(name, version);
 
-            foreach (var plugin in _plugins)
-            {
-                if (string.Equals(name, plugin.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    version == plugin.Version)
+                if (plugin == null)
                 {
-                    return plugin;
+                    continue;
                 }
+
+                return plugin;
             }
 
             return null;
         }
 
-        public Task Initialize()
+        public async Task Initialize()
         {
             var foundFiles = new List<string>();
 
@@ -160,34 +103,19 @@ namespace Weikio.PluginFramework.Catalogs
                     continue;
                 }
 
-                var loadContext = new PluginAssemblyLoadContext(assemblyPath, _options.PluginLoadContextOptions);
-                var assembly = loadContext.Load();
-                _contexts.Add(loadContext);
-
-                var finder = new TypeFinder();
-
-                foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
+                var assemblyCatalogOptions = new AssemblyPluginCatalogOptions
                 {
+                    PluginLoadContextOptions = _options.PluginLoadContextOptions, 
+                    TypeFinderCriterias = _options.TypeFinderCriterias
+                };
 
-                    var pluginTypes = finder.Find(typeFinderCriteria.Value, assembly, loadContext);
-
-                    foreach (var type in pluginTypes)
-                    {
-                        var opt = new TypePluginCatalogOptions();
-                        var version = opt.PluginVersionGenerator(opt, type);
-                        var pluginName = opt.PluginNameGenerator(opt, type);
-                        var description = opt.PluginDescriptionGenerator(opt, type);
-                        var productVersion = opt.PluginProductVersionGenerator(opt, type);
-
-                        var plugin = new Plugin(type.Assembly, type, pluginName, version, this, description, productVersion);
-                        _plugins.Add(plugin);
-                    }
-                }
+                var assemblyCatalog = new AssemblyPluginCatalog(assemblyPath, assemblyCatalogOptions);
+                await assemblyCatalog.Initialize();
+                
+                _catalogs.Add(assemblyCatalog);
             }
 
             IsInitialized = true;
-
-            return Task.CompletedTask;
         }
 
         private bool IsPluginAssembly(string assemblyPath)

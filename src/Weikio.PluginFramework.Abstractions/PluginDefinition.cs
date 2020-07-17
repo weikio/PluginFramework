@@ -32,16 +32,16 @@ namespace Weikio.PluginFramework.Abstractions
         //     return await GetPlugins(new Dictionary<string, Predicate<Type>>());
         // }
 
-        public async Task<List<Type>> GetTypes()
-        {
-            return await GetTypes(new Dictionary<string, Predicate<Type>>());
-        }
-
-        public async Task<List<Type>> GetTypes(Predicate<Type> filter)
-        {
-            var taggedFilters = new Dictionary<string, Predicate<Type>>() { { string.Empty, filter } };
-            return await GetTypes(taggedFilters);
-        }
+        // public async Task<List<Type>> GetTypes()
+        // {
+        //     return await GetTypes(new Dictionary<string, Predicate<Type>>());
+        // }
+        //
+        // public async Task<List<Type>> GetTypes(Predicate<Type> filter)
+        // {
+        //     var taggedFilters = new Dictionary<string, Predicate<Type>>() { { string.Empty, filter } };
+        //     return await GetTypes(taggedFilters);
+        // }
         
         // public async Task<Plugin> GetPlugins(Predicate<Type> filter)
         // {
@@ -79,31 +79,31 @@ namespace Weikio.PluginFramework.Abstractions
         //     return result;
         // }
         
-        public async Task<List<Type>> GetTypes(Dictionary<string, Predicate<Type>> taggedFilters)
-        {
-            var assembly = await Source.GetAssembly(this);
-
-            if (assembly == null)
-            {
-                throw new ArgumentException();
-            }
-
-            var allTypes = assembly.GetExportedTypes();
-            var taggedTypes = new List<(string Tag, Type Type)>();
-
-            if (taggedFilters?.Any() == true)
-            {
-                foreach (var taggedFilter in taggedFilters)
-                {
-                    taggedTypes.AddRange(allTypes.Where(x => taggedFilter.Value(x)).Select(x => (taggedFilter.Key, x)));
-                }
-            }
-            else
-            {
-                taggedTypes.AddRange(allTypes.Select(x => (string.Empty, x)));
-            }
-            
-            return taggedTypes.Select(x => x.Type).ToList();
-        }
+        // public async Task<List<Type>> GetTypes(Dictionary<string, Predicate<Type>> taggedFilters)
+        // {
+        //     var assembly = await Source.GetAssembly(this);
+        //
+        //     if (assembly == null)
+        //     {
+        //         throw new ArgumentException();
+        //     }
+        //
+        //     var allTypes = assembly.GetExportedTypes();
+        //     var taggedTypes = new List<(string Tag, Type Type)>();
+        //
+        //     if (taggedFilters?.Any() == true)
+        //     {
+        //         foreach (var taggedFilter in taggedFilters)
+        //         {
+        //             taggedTypes.AddRange(allTypes.Where(x => taggedFilter.Value(x)).Select(x => (taggedFilter.Key, x)));
+        //         }
+        //     }
+        //     else
+        //     {
+        //         taggedTypes.AddRange(allTypes.Select(x => (string.Empty, x)));
+        //     }
+        //     
+        //     return taggedTypes.Select(x => x.Type).ToList();
+        // }
     }
 }

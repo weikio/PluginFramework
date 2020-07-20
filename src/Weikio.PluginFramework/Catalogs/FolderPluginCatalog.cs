@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
@@ -14,80 +17,93 @@ namespace Weikio.PluginFramework.Catalogs
     public class FolderPluginCatalog : IPluginCatalog
     {
         private readonly string _folderPath;
-        private readonly List<(PluginDefinition PluginDefinition, Assembly Assembly)> _plugins = new List<(PluginDefinition, Assembly)>();
         private readonly FolderPluginCatalogOptions _options;
-        private readonly List<PluginLoadContext> _contexts = new List<PluginLoadContext>();
+        private readonly List<PluginAssemblyLoadContext> _contexts = new List<PluginAssemblyLoadContext>();
+        private readonly List<AssemblyPluginCatalog> _catalogs = new List<AssemblyPluginCatalog>();
 
         public bool IsInitialized { get; private set; }
 
-        public FolderPluginCatalog(string folderPath, FolderPluginCatalogOptions options = null)
+        private List<Plugin> Plugins
+        {
+            get
+            {
+                return _catalogs.SelectMany(x => x.GetPlugins()).ToList();
+            }
+        }
+
+        public FolderPluginCatalog(string folderPath) : this(folderPath, new FolderPluginCatalogOptions())
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, FolderPluginCatalogOptions options) : this(folderPath, null, null, options)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder) : this(folderPath, configureFinder, null, null)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria) : this(folderPath, finderCriteria, null)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options) : this(folderPath, null, finderCriteria, options)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, FolderPluginCatalogOptions options) : this(folderPath, configureFinder, null, options)
+        {
+        }
+        
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options)
         {
             _folderPath = folderPath;
             _options = options ?? new FolderPluginCatalogOptions();
-        }
 
-        public Task<List<PluginDefinition>> GetAll()
-        {
-            if (Unloaded)
+            if (configureFinder != null)
             {
-                throw new CatalogUnloadedException();
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var criteria = builder.Build();
+
+                _options.TypeFinderCriterias.Add("", criteria);
             }
             
-            return Task.FromResult(_plugins.Select(x => x.PluginDefinition).ToList());
-        }
-        
-        public Task<PluginDefinition> Get(string name, Version version)
-        {
-            if (Unloaded)
+            if (finderCriteria != null)
             {
-                throw new CatalogUnloadedException();
+                _options.TypeFinderCriterias.Add("", finderCriteria);
             }
 
-            foreach (var plugin in _plugins)
+            if (_options.TypeFinderCriteria != null)
             {
-                if (string.Equals(name, plugin.PluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    version == plugin.PluginDefinition.Version)
+                _options.TypeFinderCriterias.Add("", _options.TypeFinderCriteria);
+            }
+        }
+
+        public List<Plugin> GetPlugins()
+        {
+            return Plugins;
+        }
+
+        public Plugin Get(string name, Version version)
+        {
+            foreach (var assemblyPluginCatalog in _catalogs)
+            {
+                var plugin = assemblyPluginCatalog.Get(name, version);
+
+                if (plugin == null)
                 {
-                    return Task.FromResult(plugin.PluginDefinition);
+                    continue;
                 }
+
+                return plugin;
             }
 
             return null;
         }
 
-        public Task<Assembly> GetAssembly(PluginDefinition definition)
-        {
-            foreach (var plugin in _plugins)
-            {
-                if (string.Equals(definition.Name, plugin.PluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) &&
-                    definition.Version == plugin.PluginDefinition.Version)
-                {
-                    return Task.FromResult(plugin.Assembly);
-                }
-            }
-
-            return null;
-        }
-
-        public bool SupportsUnload { get; } = true;
-
-        public Task Unload()
-        {
-            foreach (var pluginLoadContext in _contexts)
-            {
-                pluginLoadContext.Unload();
-            }
-
-            _contexts.Clear();
-            
-            Unloaded = true;
-
-            return Task.CompletedTask;
-        }
-
-        public bool Unloaded { get; private set; }
-
-        public Task Initialize()
+        public async Task Initialize()
         {
             var foundFiles = new List<string>();
 
@@ -103,26 +119,30 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var assemblyPath in foundFiles)
             {
-                if (!IsPlugin(assemblyPath))
+                var isPluginAssembly = IsPluginAssembly(assemblyPath);
+
+                if (isPluginAssembly == false)
                 {
                     continue;
                 }
 
-                var loadContext = new PluginLoadContext(assemblyPath, _options.PluginLoadContextOptions);
-                var assembly = loadContext.Load();
-                _contexts.Add(loadContext);
+                var assemblyCatalogOptions = new AssemblyPluginCatalogOptions
+                {
+                    PluginLoadContextOptions = _options.PluginLoadContextOptions,
+                    TypeFinderCriterias = _options.TypeFinderCriterias,
+                    PluginNameOptions = _options.PluginNameOptions
+                };
 
-                var definition = AssemblyToPluginDefinitionConverter.Convert(assembly, this);
+                var assemblyCatalog = new AssemblyPluginCatalog(assemblyPath, assemblyCatalogOptions);
+                await assemblyCatalog.Initialize();
 
-                _plugins.Add((definition, assembly));
+                _catalogs.Add(assemblyCatalog);
             }
 
             IsInitialized = true;
-
-            return Task.CompletedTask;
         }
 
-        private bool IsPlugin(string assemblyPath)
+        private bool IsPluginAssembly(string assemblyPath)
         {
             using (Stream stream = File.OpenRead(assemblyPath))
             using (var reader = new PEReader(stream))
@@ -132,62 +152,52 @@ namespace Weikio.PluginFramework.Catalogs
                     return false;
                 }
 
-                // First try to resolve plugin assemblies using MetadataLoadContext
-                if (_options.AssemblyPluginResolvers?.Any() == true)
+                if (_options.TypeFinderCriterias?.Any() != true)
                 {
-                    var coreAssemblyPath = typeof(int).Assembly.Location;
-                    var corePath = Path.GetDirectoryName(coreAssemblyPath);
-
-                    var coreLocation = Path.Combine(corePath, "mscorlib.dll");
-
-                    if (!File.Exists(coreLocation))
-                    {
-                        throw new FileNotFoundException(coreLocation);
-                    }
-
-                    var referencePaths = new[] { coreLocation, assemblyPath };
-
-                    var resolver = new PathAssemblyResolver(referencePaths);
-
-                    using (var metadataContext = new MetadataLoadContext(resolver))
-                    {
-                        var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
-
-                        foreach (var assemblyPluginResolver in _options.AssemblyPluginResolvers)
-                        {
-                            if (assemblyPluginResolver(readonlyAssembly))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-
-                    if (_options.PluginResolvers.Any() != true)
-                    {
-                        // If there is assembly resolvers but no plugin resolvers, return false by default if not assembly resolver did not match.
-                        return false;
-                    }
-                }
-
-                if (_options.PluginResolvers?.Any() != true)
-                {
-                    // If there are not resolvers, assume that each DLL is a plugin
+                    // If there are no resolvers, assume that each DLL is a plugin
                     return true;
                 }
 
-                // Then using the PEReader
-                var metadata = reader.GetMetadataReader();
+                var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
+                var paths = new List<string>(runtimeAssemblies) { assemblyPath };
 
-                var publicTypes = metadata.TypeDefinitions
-                    .Select(metadata.GetTypeDefinition)
-                    .Where(t => t.Attributes.HasFlag(TypeAttributes.Public))
-                    .ToArray();
-
-                foreach (var type in publicTypes)
+                if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Always)
                 {
-                    foreach (var pluginResolver in _options.PluginResolvers)
+                    var hostApplicationPath = Environment.CurrentDirectory;
+                    var hostDlls = Directory.GetFiles(hostApplicationPath, "*.dll", SearchOption.AllDirectories);
+
+                    paths.AddRange(hostDlls);
+                }
+                else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Never)
+                {
+                    var pluginPath = Path.GetDirectoryName(assemblyPath);
+                    var dllsInPluginPath = Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories);
+
+                    paths.AddRange(dllsInPluginPath);
+                }
+                else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Selected)
+                {
+                    foreach (var hostApplicationAssembly in _options.PluginLoadContextOptions.HostApplicationAssemblies)
                     {
-                        if (pluginResolver(assemblyPath, metadata, type))
+                        var assembly = Assembly.Load(hostApplicationAssembly);
+                        paths.Add(assembly.Location);
+                    }
+                }
+
+                var resolver = new PathAssemblyResolver(paths);
+
+                using (var metadataContext = new MetadataLoadContext(resolver))
+                {
+                    var metadataPluginLoadContext = new MetadataTypeFindingContext(metadataContext);
+                    var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
+
+                    var typeFinder = new TypeFinder();
+
+                    foreach (var finderCriteria in _options.TypeFinderCriterias)
+                    {
+                        var typesFound = typeFinder.Find(finderCriteria.Value, readonlyAssembly, metadataPluginLoadContext);
+
+                        if (typesFound?.Any() == true)
                         {
                             return true;
                         }
@@ -196,6 +206,236 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             return false;
+        }
+    }
+
+    public class TypeFinder
+    {
+        public List<Type> Find(TypeFinderCriteria criteria, Assembly assembly, ITypeFindingContext typeFindingContext)
+        {
+            if (criteria == null)
+            {
+                throw new ArgumentNullException(nameof(criteria));
+            }
+
+            var result = new List<Type>();
+
+            var types = assembly.GetExportedTypes();
+
+            foreach (var type in types)
+            {
+                if (criteria.Query != null)
+                {
+                    var isMatch = criteria.Query(typeFindingContext, type);
+
+                    if (isMatch == false)
+                    {
+                        continue;
+                    }
+
+                    result.Add(type);
+
+                    continue;
+                }
+
+                if (criteria.IsAbstract != null)
+                {
+                    if (type.IsAbstract != criteria.IsAbstract.GetValueOrDefault())
+                    {
+                        continue;
+                    }
+                }
+
+                if (criteria.IsInterface != null)
+                {
+                    if (type.IsInterface != criteria.IsInterface.GetValueOrDefault())
+                    {
+                        continue;
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(criteria.Name) == false)
+                {
+                    var regEx = NameToRegex(criteria.Name);
+
+                    if (regEx.IsMatch(type.FullName) == false)
+                    {
+                        continue;
+                    }
+                }
+
+                if (criteria.Inherits != null)
+                {
+                    var inheritedType = typeFindingContext.FindType(criteria.Inherits);
+
+                    if (inheritedType.IsAssignableFrom(type) == false)
+                    {
+                        continue;
+                    }
+                }
+
+                if (criteria.Implements != null)
+                {
+                    var interfaceType = typeFindingContext.FindType(criteria.Implements);
+
+                    if (interfaceType.IsAssignableFrom(type) == false)
+                    {
+                        continue;
+                    }
+                }
+                
+                if (criteria.AssignableTo != null)
+                {
+                    var assignableToType = typeFindingContext.FindType(criteria.AssignableTo);
+
+                    if (assignableToType.IsAssignableFrom(type) == false)
+                    {
+                        continue;
+                    }
+                }
+
+                result.Add(type);
+            }
+
+            return result;
+        }
+
+        private static Regex NameToRegex(string nameFilter)
+        {
+            // https://stackoverflow.com/a/30300521/66988
+            var regex = "^" + Regex.Escape(nameFilter).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+            return new Regex(regex, RegexOptions.Compiled);
+        }
+    }
+
+    public class TypeFinderCriteria
+    {
+        public Type Inherits { get; set; }
+        public Type Implements { get; set; }
+        public Type AssignableTo { get; set; }
+        public bool? IsAbstract { get; set; }
+        public bool? IsInterface { get; set; }
+        public string Name { get; set; }
+        public Func<ITypeFindingContext, Type, bool> Query { get; set; }
+    }
+
+    public class TypeFinderCriteriaBuilder
+    {
+        private Type _inherits;
+        private Type _implements;
+        private Type _assignable;
+        private bool _isAbstract;
+        private bool _isInterface;
+        private string _name;
+
+        public TypeFinderCriteria Build()
+        {
+            var res = new TypeFinderCriteria
+            {
+                IsInterface = _isInterface,
+                Implements = _implements,
+                Inherits = _inherits,
+                AssignableTo = _assignable,
+                Name = _name,
+                IsAbstract = _isAbstract
+            };
+
+            return res;
+        }
+
+        public static implicit operator TypeFinderCriteria(TypeFinderCriteriaBuilder criteriaBuilder)
+        {
+            return criteriaBuilder.Build();
+        }
+
+        public static TypeFinderCriteriaBuilder Create()
+        {
+            return new TypeFinderCriteriaBuilder();
+        }
+
+        public TypeFinderCriteriaBuilder HasName(string name)
+        {
+            _name = name;
+
+            return this;
+        }
+
+        public TypeFinderCriteriaBuilder Implements<T>()
+        {
+            return Implements(typeof(T));
+        }
+
+        public TypeFinderCriteriaBuilder Implements(Type t)
+        {
+            _implements = t;
+
+            return this;
+        }
+
+        public TypeFinderCriteriaBuilder Inherits<T>()
+        {
+            return Inherits(typeof(T));
+        }
+
+        public TypeFinderCriteriaBuilder Inherits(Type t)
+        {
+            _inherits = t;
+
+            return this;
+        }
+
+        public TypeFinderCriteriaBuilder IsAbstract(bool isAbstract)
+        {
+            _isAbstract = isAbstract;
+
+            return this;
+        }
+
+        public TypeFinderCriteriaBuilder IsInterface(bool isInterface)
+        {
+            _isInterface = isInterface;
+
+            return this;
+        }
+        
+        public TypeFinderCriteriaBuilder AssignableTo(Type assignableTo)
+        {
+            _assignable = assignableTo;
+
+            return this;
+        }
+    }
+
+    public interface ITypeFindingContext
+    {
+        Assembly FindAssembly(string assemblyName);
+        Type FindType(Type type);
+    }
+
+    public class MetadataTypeFindingContext : ITypeFindingContext
+    {
+        private readonly MetadataLoadContext _metadataLoadContext;
+
+        public MetadataTypeFindingContext(MetadataLoadContext metadataLoadContext)
+        {
+            _metadataLoadContext = metadataLoadContext;
+        }
+
+        public Assembly FindAssembly(string assemblyName)
+        {
+            var result = _metadataLoadContext.LoadFromAssemblyName(assemblyName);
+
+            return result;
+        }
+
+        public Type FindType(Type type)
+        {
+            var assemblyName = type.Assembly.GetName();
+            var assembly = _metadataLoadContext.LoadFromAssemblyName(assemblyName);
+
+            var result = assembly.GetType(type.FullName);
+
+            return result;
         }
     }
 }

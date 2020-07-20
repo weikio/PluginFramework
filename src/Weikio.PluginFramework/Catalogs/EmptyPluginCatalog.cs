@@ -15,27 +15,14 @@ namespace Weikio.PluginFramework.Catalogs
 
         public bool IsInitialized { get; } = true;
 
-        public Task<List<PluginDefinition>> GetAll()
+        public List<Plugin> GetPlugins()
         {
-            return Task.FromResult(new List<PluginDefinition>());
+            return new List<Plugin>();
         }
 
-        public Task<PluginDefinition> Get(string name, Version version)
-        {
-            return null;
-        }
-
-        public Task<Assembly> GetAssembly(PluginDefinition definition)
+        public Plugin Get(string name, Version version)
         {
             return null;
         }
-
-        public bool SupportsUnload { get; }
-        public Task Unload()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Unloaded { get; }
     }
 }

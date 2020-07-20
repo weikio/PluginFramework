@@ -8,10 +8,10 @@ namespace Weikio.PluginFramework.Catalogs
 {
     public class AssemblyToPluginDefinitionConverter
     {
-        public static PluginDefinition Convert(Assembly assembly, IPluginCatalog source)
+        public static PluginOld Convert(Assembly assembly, IPluginCatalog source)
         {
             var versionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
-            var result = new PluginDefinition(assembly.GetName().Name, Version.Parse(versionInfo.FileVersion), source, versionInfo.Comments, versionInfo.ProductVersion);
+            var result = new PluginOld(assembly.GetName().Name, Version.Parse(versionInfo.FileVersion), source, versionInfo.Comments, versionInfo.ProductVersion);
 
             return result;
         }

@@ -17,42 +17,30 @@ namespace Weikio.PluginFramework.Tests
         {
             // Make sure that the referenced version of JSON.NET is loaded into memory
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
-
             PluginLoadContextOptions.Defaults.UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Always;
 
-            var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
-            await assemblyPluginCatalog.Initialize();
-
-            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", new FolderPluginCatalogOptions()
+            Action<TypeFinderCriteriaBuilder> configureFinder = configure =>
             {
-                AssemblyPluginResolvers = new List<Func<Assembly, bool>>()
-                {
-                    assembly =>
-                    {
-                        var result = assembly.ExportedTypes.Any(x => x.Name.EndsWith("JsonResolver"));
-
-                        return result;
-                    }
-                }
-            });
-                
+                configure.HasName("*JsonResolver");
+            };
+            
+            var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", configureFinder);
+            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
+            
+            await assemblyPluginCatalog.Initialize();
             await folderPluginCatalog.Initialize();
-
-            var assemblyPluginDefinition = (await assemblyPluginCatalog.GetAll()).Single();
-            var folderPluginDefinition = (await folderPluginCatalog.GetAll()).Single();
-
-            var pluginExporter = new PluginExporter();
-            var newPlugin = await pluginExporter.Get(assemblyPluginDefinition);
-            var oldPlugin = await pluginExporter.Get(folderPluginDefinition);
-
-            dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin.Types.First());
+            
+            var newPlugin = assemblyPluginCatalog.Single();
+            var oldPlugin = folderPluginCatalog.Single();
+            
+            dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin);
             var newPluginVersion = newPluginJsonResolver.GetVersion();
-
-            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
+            
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
-
-            Assert.Equal("10.0.0.0", newPluginVersion);
-            Assert.Equal("10.0.0.0", oldPluginVersion);
+            
+            Assert.Equal("12.0.0.0", newPluginVersion);
+            Assert.Equal("12.0.0.0", oldPluginVersion);
         }
     }
 }

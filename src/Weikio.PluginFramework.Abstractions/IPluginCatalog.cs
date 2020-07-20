@@ -7,13 +7,26 @@ namespace Weikio.PluginFramework.Abstractions
 {
     public interface IPluginCatalog
     {
+        /// <summary>
+        /// Initializes the catalog
+        /// </summary>
         Task Initialize();
+        
+        /// <summary>
+        /// Gets if the catalog is initialized
+        /// </summary>
         bool IsInitialized { get; }
-        Task<List<PluginDefinition>> GetAll();
-        Task<PluginDefinition> Get(string name, Version version);
-        Task<Assembly> GetAssembly(PluginDefinition definition);
-        bool SupportsUnload { get; }
-        Task Unload();
-        bool Unloaded { get; }
+        
+        /// <summary>
+        /// Gets all the plugins
+        /// </summary>
+        /// <returns>List of <see cref="Plugin"/></returns>
+        List<Plugin> GetPlugins();
+        
+        /// <summary>
+        /// Gets a single plugin based on its name and version
+        /// </summary>
+        /// <returns>The <see cref="Plugin"/></returns>
+        Plugin Get(string name, Version version);
     }
 }

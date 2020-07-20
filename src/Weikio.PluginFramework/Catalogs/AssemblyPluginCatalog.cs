@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
@@ -12,9 +13,18 @@ namespace Weikio.PluginFramework.Catalogs
     {
         private readonly string _assemblyPath;
         private Assembly _assembly;
-        private PluginDefinition _pluginDefinition;
         private readonly AssemblyPluginCatalogOptions _options;
-        private PluginLoadContext _pluginLoadContext;
+        private PluginAssemblyLoadContext _pluginAssemblyLoadContext;
+        private List<TypePluginCatalog> _plugins = null;
+
+        // TODO: Remove the duplicate code from constructors
+        public AssemblyPluginCatalog(string assemblyPath) : this(assemblyPath, options: null)
+        {
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly) : this(assembly, options: null)
+        {
+        }
 
         public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
         {
@@ -22,7 +32,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 throw new ArgumentNullException(nameof(assemblyPath));
             }
-            
+
             _assemblyPath = assemblyPath;
             _options = options ?? new AssemblyPluginCatalogOptions();
         }
@@ -34,7 +44,108 @@ namespace Weikio.PluginFramework.Catalogs
             _options = options ?? new AssemblyPluginCatalogOptions();
         }
 
-        public Task Initialize()
+        public AssemblyPluginCatalog(string assemblyPath, TypeFinderCriteria criteria = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
+
+            _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (criteria != null)
+            {
+                _options.TypeFinderCriterias.Add(string.Empty, criteria);
+            }
+        }
+        
+        public AssemblyPluginCatalog(string assemblyPath, Action<TypeFinderCriteriaBuilder> configureFinder = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
+
+            _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (configureFinder != null)
+            {
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var criteria = builder.Build();
+
+                _options.TypeFinderCriterias.Add("", criteria);
+            }
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
+
+            _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (filter != null)
+            {
+                var criteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
+
+                _options.TypeFinderCriterias.Add(string.Empty, criteria);
+            }
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null)
+        {
+            _assembly = assembly;
+            _assemblyPath = _assembly.Location;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (filter != null)
+            {
+                var criteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
+
+                _options.TypeFinderCriterias.Add(string.Empty, criteria);
+            }
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, Dictionary<string, Predicate<Type>> taggedFilters, AssemblyPluginCatalogOptions options = null)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
+
+            _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            SetFilters(taggedFilters);
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, Dictionary<string, Predicate<Type>> taggedFilters, AssemblyPluginCatalogOptions options = null)
+        {
+            _assembly = assembly;
+            _assemblyPath = _assembly.Location;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            SetFilters(taggedFilters);
+        }
+
+        private void SetFilters(Dictionary<string, Predicate<Type>> taggedFilters)
+        {
+            foreach (var taggedFilter in taggedFilters)
+            {
+                var criteria = new TypeFinderCriteria { Query = (context, type) => taggedFilter.Value(type) };
+
+                _options.TypeFinderCriterias.Add(taggedFilter.Key, criteria);
+            }
+        }
+
+        public async Task Initialize()
         {
             if (!string.IsNullOrWhiteSpace(_assemblyPath) && _assembly == null)
             {
@@ -43,67 +154,67 @@ namespace Weikio.PluginFramework.Catalogs
                     throw new ArgumentException($"Assembly in path {_assemblyPath} does not exist.");
                 }
 
-                _pluginLoadContext = new PluginLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
-                _assembly = _pluginLoadContext.Load();
+                _pluginAssemblyLoadContext = new PluginAssemblyLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
+                _assembly = _pluginAssemblyLoadContext.Load();
             }
-            
-            _pluginDefinition = AssemblyToPluginDefinitionConverter.Convert(_assembly, this);
+
+            _plugins = new List<TypePluginCatalog>();
+
+            var finder = new TypeFinder();
+
+            if (_options.TypeFinderCriterias?.Any() != true)
+            {
+                var findAll = new TypeFinderCriteria()
+                {
+                    Query = (context, type) => true
+                };
+
+                if (_options.TypeFinderCriterias == null)
+                {
+                    _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
+                }
+                
+                _options.TypeFinderCriterias.Add(string.Empty, findAll);
+            }
+
+            foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
+            {
+                var pluginTypes = finder.Find(typeFinderCriteria.Value, _assembly, _pluginAssemblyLoadContext);
+
+                foreach (var type in pluginTypes)
+                {
+                    var typePluginCatalog = new TypePluginCatalog(type, new TypePluginCatalogOptions() { PluginNameOptions = _options.PluginNameOptions });
+                    await typePluginCatalog.Initialize();
+
+                    _plugins.Add(typePluginCatalog);
+                }
+            }
 
             IsInitialized = true;
-
-            return Task.CompletedTask;
         }
 
         public bool IsInitialized { get; private set; }
 
-        public Task<List<PluginDefinition>> GetAll()
+        public List<Plugin> GetPlugins()
         {
-            if (Unloaded)
-            {
-                throw new CatalogUnloadedException();
-            }
-
-            var result = new List<PluginDefinition>() { _pluginDefinition };
-
-            return Task.FromResult(result);
+            return _plugins.SelectMany(x => x.GetPlugins()).ToList();
         }
 
-        public Task<PluginDefinition> Get(string name, Version version)
+        public Plugin Get(string name, Version version)
         {
-            if (Unloaded)
+            foreach (var pluginCatalog in _plugins)
             {
-                throw new CatalogUnloadedException();
+                var foundPlugin = pluginCatalog.Get(name, version);
+
+                if (foundPlugin == null)
+                {
+                    continue;
+                }
+
+                return foundPlugin;
             }
 
-            if (!string.Equals(name, _pluginDefinition.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                version != _pluginDefinition.Version)
-            {
-                return Task.FromResult<PluginDefinition>(null);
-            }
-
-            return Task.FromResult(_pluginDefinition);
+            return null;
         }
-
-        public Task<Assembly> GetAssembly(PluginDefinition definition)
-        {
-            return Task.FromResult(_assembly);
-        }
-
-        public bool SupportsUnload { get; } = true;
-        public Task Unload()
-        {
-            if (Unloaded)
-            {
-                return Task.CompletedTask;
-            }
-            
-            _pluginLoadContext.Unload();
-
-            Unloaded = true;
-
-            return Task.CompletedTask;
-        }
-
-        public bool Unloaded { get; private set; }
     }
 }

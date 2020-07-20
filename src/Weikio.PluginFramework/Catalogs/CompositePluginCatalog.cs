@@ -12,43 +12,35 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly List<IPluginCatalog> _catalogs;
         public bool IsInitialized { get; private set; }
 
-        public async Task<List<PluginDefinition>> GetAll()
+        public List<Plugin> GetPlugins()
         {
-            var result = new List<PluginDefinition>();
+            var result = new List<Plugin>();
 
             foreach (var pluginCatalog in _catalogs)
             {
-                var pluginsInCatalog = await pluginCatalog.GetAll();
+                var pluginsInCatalog = pluginCatalog.GetPlugins();
                 result.AddRange(pluginsInCatalog);
             }
 
             return result;
         }
 
-        public async Task<Assembly> GetAssembly(PluginDefinition definition)
+        public Plugin Get(string name, Version version)
         {
-            if (definition == null)
+            foreach (var pluginCatalog in _catalogs)
             {
-                throw new ArgumentNullException(nameof(definition));
+                var plugin = pluginCatalog.Get(name, version);
+
+                if (plugin == null)
+                {
+                    continue;
+                }
+
+                return plugin;
             }
 
-            if (definition.Source == null)
-            {
-                throw new ArgumentNullException(nameof(definition.Source));
-            }
-
-            var result = await definition.Source.GetAssembly(definition);
-
-            return result;
+            return null;
         }
-
-        public bool SupportsUnload { get; }
-        public Task Unload()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Unloaded { get; }
 
         public CompositePluginCatalog(params IPluginCatalog[] catalogs)
         {
@@ -58,27 +50,6 @@ namespace Weikio.PluginFramework.Catalogs
         public void AddCatalog(IPluginCatalog catalog)
         {
             _catalogs.Add(catalog);
-        }
-
-        public async Task<PluginDefinition> Get(string name, Version version)
-        {
-            PluginDefinition result = null;
-
-            foreach (var pluginCatalog in _catalogs)
-            {
-                var plugin = await pluginCatalog.Get(name, version);
-
-                if (plugin == null)
-                {
-                    continue;
-                }
-
-                result = plugin;
-
-                break;
-            }
-
-            return result;
         }
 
         public async Task Initialize()

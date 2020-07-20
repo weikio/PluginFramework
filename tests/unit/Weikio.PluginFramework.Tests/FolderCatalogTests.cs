@@ -18,137 +18,55 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanInitialize()
         {
-            var plugins = new FolderPluginCatalog(_pluginFolder);
-            await plugins.Initialize();
-
-            var dllCount = Directory.GetFiles(_pluginFolder, "*.dll").Length;
-            var pluginCount = (await plugins.GetAll()).Count;
-
-            Assert.Equal(dllCount, pluginCount);
-        }
-        
-        [Fact]
-        public async Task CanUnload()
-        {
             var catalog = new FolderPluginCatalog(_pluginFolder);
             await catalog.Initialize();
-
-            await catalog.GetAll();
-
-            await catalog.Unload();
-
-            await Assert.ThrowsAsync<CatalogUnloadedException>(async () => await catalog.GetAll());
+            
+            var plugins = catalog.GetPlugins();
+            
+            Assert.NotEmpty(plugins);
         }
 
         [Fact]
-        public async Task CanInitializeWithPluginResolver()
+        public async Task CanInitializeWithCriteria()
         {
-            var options = new FolderPluginCatalogOptions();
-
-            options.PluginResolvers.Add((assembly, metadata, type) =>
+            var catalog = new FolderPluginCatalog(_pluginFolder, configure =>
             {
-                var typeName = metadata.GetString(type.Name);
-
-                if (typeName.EndsWith("Plugin"))
-                {
-                    return true;
-                }
-
-                return false;
+                configure.HasName("*Plugin");
             });
+            
+            await catalog.Initialize();
 
-            var plugins = new FolderPluginCatalog(_pluginFolder, options);
-            await plugins.Initialize();
-
-            var pluginCount = (await plugins.GetAll()).Count;
-
-            Assert.Equal(2, pluginCount);
-        }
-
-        [Fact]
-        public async Task CanInitializeWithMultiplePluginResolver()
-        {
-            var options = new FolderPluginCatalogOptions();
-
-            options.PluginResolvers.Add((assembly, metadata, type) =>
-            {
-                var typeName = metadata.GetString(type.Name);
-
-                if (typeName.EndsWith("Plugin"))
-                {
-                    return true;
-                }
-
-                return false;
-            });
-
-            options.PluginResolvers.Add((assembly, metadata, type) => assembly.ToLowerInvariant().EndsWith("testassembly3.dll"));
-
-            var plugins = new FolderPluginCatalog(_pluginFolder, options);
-            await plugins.Initialize();
-
-            var pluginCount = (await plugins.GetAll()).Count;
-
-            Assert.Equal(3, pluginCount);
-        }
-
-        [Fact]
-        public async Task CanInitializeWithAssemblyPluginResolver()
-        {
-            var options = new FolderPluginCatalogOptions();
-
-            options.AssemblyPluginResolvers.Add(assembly =>
-            {
-                var types = assembly.GetExportedTypes();
-
-                if (types.Any(x => x.Name.EndsWith("Plugin")))
-                {
-                    return true;
-                }
-
-                return false;
-            });
-
-            var plugins = new FolderPluginCatalog(_pluginFolder, options);
-            await plugins.Initialize();
-
-            var pluginCount = (await plugins.GetAll()).Count;
-
+            var pluginCount = catalog.GetPlugins().Count;
+            
             Assert.Equal(2, pluginCount);
         }
 
         [Fact]
         public async Task CanUseReferencedDependencies()
         {
-            var options = new FolderPluginCatalogOptions();
-
-            options.AssemblyPluginResolvers.Add(assembly =>
+            PluginLoadContextOptions.Defaults.UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Never;
+            
+            Action<TypeFinderCriteriaBuilder> configureFinder = configure =>
             {
-                var result = assembly.ExportedTypes.Any(x => x.Name.EndsWith("JsonResolver"));
-
-                return result;
-            });
-
-            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0", options);
+                configure.HasName("*JsonResolver");
+            };
+            
+            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0", configureFinder);
+            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
+            
             await folder1Catalog.Initialize();
-
-            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", options);
             await folder2Catalog.Initialize();
 
-            var newPluginDefinition = (await folder1Catalog.GetAll()).Single();
-            var oldPluginDefinition = (await folder2Catalog.GetAll()).Single();
-
-            var pluginExporter = new PluginExporter();
-            var newPlugin = await pluginExporter.Get(newPluginDefinition);
-            var oldPlugin = await pluginExporter.Get(oldPluginDefinition);
-
-            dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin.Types.First());
+            var newPlugin = folder1Catalog.Single();
+            var oldPlugin = folder2Catalog.Single();
+            
+            dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin);
             var newPluginVersion = newPluginJsonResolver.GetVersion();
-
-            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
+            
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
-
-            Assert.Equal("12.0.0.0", newPluginVersion);
+            
+            Assert.Equal("10.0.0.0", newPluginVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
         }
 
@@ -160,32 +78,22 @@ namespace Weikio.PluginFramework.Tests
             // Make sure that the referenced version of Microsoft.Extensions.Logging is loaded into memory
             var logging = new Microsoft.Extensions.Logging.LoggerFactory();
 
-            var options = new FolderPluginCatalogOptions();
-            options.AssemblyPluginResolvers.Add(assembly =>
+            var options = new FolderPluginCatalogOptions
             {
-                var result = assembly.ExportedTypes.Any(x => x.Name.EndsWith("JsonResolver"));
-
-                return result;
-            });
-
-            options.PluginLoadContextOptions = new PluginLoadContextOptions()
-            {
-                UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
-                HostApplicationAssemblies = new List<AssemblyName>()
+                TypeFinderCriteria = new TypeFinderCriteria() { Name = "*JsonResolver" },
+                PluginLoadContextOptions = new PluginLoadContextOptions()
                 {
-                    typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName()
+                    UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
+                    HostApplicationAssemblies = new List<AssemblyName>() { typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName() }
                 }
             };
 
             var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", options);
             await catalog.Initialize();
 
-            var oldPluginDefinition = (await catalog.GetAll()).Single();
-
-            var pluginExporter = new PluginExporter();
-            var oldPlugin = await pluginExporter.Get(oldPluginDefinition);
-
-            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
+            var oldPlugin = catalog.Single();
+            
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
             

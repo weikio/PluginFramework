@@ -28,27 +28,8 @@ namespace WebApp
             });
 
             services.AddPluginFramework()
-                .AddPluginCatalog(folderPluginCatalog);
-            
-            services.AddTransient(sp =>
-            {
-                var result = new List<IOperator>();
-                var catalogs = sp.GetServices<IPluginCatalog>();
-
-                foreach (var catalog in catalogs)
-                {
-                    var plugins = catalog.GetPlugins();
-
-                    foreach (var plugin in plugins)
-                    {
-                        var op = plugin.Create<IOperator>(sp);
-
-                        result.Add(op);
-                    }
-                }
-
-                return result;
-            });
+                .AddPluginCatalog(folderPluginCatalog)
+                .AddPluginType<IOperator>();
             
             services.AddControllers();
         }

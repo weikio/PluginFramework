@@ -15,46 +15,32 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanConfigureDefaultOptions()
         {
-            throw new NotImplementedException();;
-            //
-            // // Make sure that the referenced version of JSON.NET is loaded into memory
-            // var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
-            //
-            // PluginLoadContextOptions.Defaults.UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Always;
-            //
-            // var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
-            // await assemblyPluginCatalog.Initialize();
-            //
-            // var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", new FolderPluginCatalogOptions()
-            // {
-            //     AssemblyPluginResolvers = new List<Func<Assembly, bool>>()
-            //     {
-            //         assembly =>
-            //         {
-            //             var result = assembly.ExportedTypes.Any(x => x.Name.EndsWith("JsonResolver"));
-            //
-            //             return result;
-            //         }
-            //     }
-            // });
-            //     
-            // await folderPluginCatalog.Initialize();
-            //
-            // var assemblyPluginDefinition = (await assemblyPluginCatalog.GetAll()).Single();
-            // var folderPluginDefinition = (await folderPluginCatalog.GetAll()).Single();
-            //
-            // var pluginExporter = new PluginExporter();
-            // var newPlugin = await pluginExporter.Get(assemblyPluginDefinition);
-            // var oldPlugin = await pluginExporter.Get(folderPluginDefinition);
-            //
-            // dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin.Types.First());
-            // var newPluginVersion = newPluginJsonResolver.GetVersion();
-            //
-            // dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
-            // var oldPluginVersion = oldPluginJsonResolver.GetVersion();
-            //
-            // Assert.Equal("10.0.0.0", newPluginVersion);
-            // Assert.Equal("10.0.0.0", oldPluginVersion);
+            // Make sure that the referenced version of JSON.NET is loaded into memory
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
+            PluginLoadContextOptions.Defaults.UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Always;
+
+            Action<TypeFinderCriteriaBuilder> configureFinder = configure =>
+            {
+                configure.HasName("*JsonResolver");
+            };
+            
+            var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", configureFinder);
+            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
+            
+            await assemblyPluginCatalog.Initialize();
+            await folderPluginCatalog.Initialize();
+            
+            var newPlugin = assemblyPluginCatalog.Single();
+            var oldPlugin = folderPluginCatalog.Single();
+            
+            dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin);
+            var newPluginVersion = newPluginJsonResolver.GetVersion();
+            
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
+            var oldPluginVersion = oldPluginJsonResolver.GetVersion();
+            
+            Assert.Equal("12.0.0.0", newPluginVersion);
+            Assert.Equal("12.0.0.0", oldPluginVersion);
         }
     }
 }

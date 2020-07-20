@@ -13,57 +13,44 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly TypePluginCatalogOptions _options;
         private Plugin _plugin;
 
-        public TypePluginCatalog(Type pluginType, PluginNameOptions nameOptions)
+        public TypePluginCatalog(Type pluginType) : this(pluginType, null, null, null)
         {
-            if (pluginType == null)
-            {
-                throw new ArgumentNullException(nameof(pluginType));
-            }
             
-            if (nameOptions == null)
-            {
-                throw new ArgumentNullException(nameof(nameOptions));
-            }
-            
-            _pluginType = pluginType;
-            _options = new TypePluginCatalogOptions()
-            {
-                PluginNameOptions = nameOptions
-            };
         }
-        
-        public TypePluginCatalog(Type pluginType, Action<PluginNameOptions> configure)
+            
+        public TypePluginCatalog(Type pluginType, PluginNameOptions nameOptions) : this (pluginType, null, nameOptions, null)
         {
-            if (pluginType == null)
-            {
-                throw new ArgumentNullException(nameof(pluginType));
-            }
-            
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
-            
-            _pluginType = pluginType;
-            
-            var nameOptions = new PluginNameOptions();
-            configure(nameOptions);
-            
-            _options = new TypePluginCatalogOptions()
-            {
-                PluginNameOptions = nameOptions
-            };
         }
-        
-        public TypePluginCatalog(Type pluginType, TypePluginCatalogOptions options = null)
+
+        public TypePluginCatalog(Type pluginType, Action<PluginNameOptions> configure) : this(pluginType, configure, null, null)
+        {
+        }
+
+        public TypePluginCatalog(Type pluginType, TypePluginCatalogOptions options) : this(pluginType, null, null, options)
+        {
+        }
+
+        public TypePluginCatalog(Type pluginType, Action<PluginNameOptions> configure, PluginNameOptions nameOptions, TypePluginCatalogOptions options)
         {
             if (pluginType == null)
             {
                 throw new ArgumentNullException(nameof(pluginType));
             }
-            
+
             _pluginType = pluginType;
             _options = options ?? new TypePluginCatalogOptions();
+
+            if (nameOptions == null)
+            {
+                nameOptions = new PluginNameOptions();
+            }
+
+            if (configure != null)
+            {
+                configure(nameOptions);
+            }
+
+            _options.PluginNameOptions = nameOptions;
         }
 
         public Task Initialize()
@@ -83,39 +70,9 @@ namespace Weikio.PluginFramework.Catalogs
 
         public bool IsInitialized { get; private set; }
 
-        public Task<List<PluginOld>> GetPluginsOld()
-        {
-            var result = new List<PluginOld>() { _pluginOld };
-
-            return Task.FromResult(result);
-        }
-
-        public Task<PluginOld> GetPlugin(string name, Version version)
-        {
-            if (!string.Equals(name, _pluginOld.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                version != _pluginOld.Version)
-            {
-                return Task.FromResult<PluginOld>(null);
-            }
-
-            return Task.FromResult(_pluginOld);
-        }
-
-        public Task<Assembly> GetAssembly(PluginOld definition)
-        {
-            return Task.FromResult(_pluginType.Assembly);
-        }
-
-        public bool SupportsUnload { get; }
-        public Task Unload()
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool Unloaded { get; }
         public List<Plugin> GetPlugins()
         {
-            return new List<Plugin>(){_plugin};
+            return new List<Plugin>() { _plugin };
         }
 
         public Plugin Get(string name, Version version)

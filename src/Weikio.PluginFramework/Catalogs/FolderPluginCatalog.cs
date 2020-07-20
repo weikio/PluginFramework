@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
-using AssemblyExtensions = System.Reflection.AssemblyExtensions;
 
 namespace Weikio.PluginFramework.Catalogs
 {
@@ -23,6 +22,7 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly List<AssemblyPluginCatalog> _catalogs = new List<AssemblyPluginCatalog>();
 
         public bool IsInitialized { get; private set; }
+
         private List<Plugin> Plugins
         {
             get
@@ -30,19 +30,28 @@ namespace Weikio.PluginFramework.Catalogs
                 return _catalogs.SelectMany(x => x.GetPlugins()).ToList();
             }
         }
-        
-        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria = null, FolderPluginCatalogOptions options = null)
-        {
-            _folderPath = folderPath;
-            _options = options ?? new FolderPluginCatalogOptions();
 
-            if (finderCriteria != null)
-            {
-                _options.TypeFinderCriterias.Add("", finderCriteria);
-            }
+        public FolderPluginCatalog(string folderPath) : this(folderPath, new FolderPluginCatalogOptions())
+        {
         }
 
-        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder = null, FolderPluginCatalogOptions options = null)
+        public FolderPluginCatalog(string folderPath, FolderPluginCatalogOptions options) : this(folderPath, null, null, options)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder) : this(folderPath, configureFinder, null, null)
+        {
+        }
+        
+        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options) : this(folderPath, null, finderCriteria, options)
+        {
+        }
+
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, FolderPluginCatalogOptions options) : this(folderPath, configureFinder, null, options)
+        {
+        }
+        
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options)
         {
             _folderPath = folderPath;
             _options = options ?? new FolderPluginCatalogOptions();
@@ -55,6 +64,16 @@ namespace Weikio.PluginFramework.Catalogs
                 var criteria = builder.Build();
 
                 _options.TypeFinderCriterias.Add("", criteria);
+            }
+            
+            if (finderCriteria != null)
+            {
+                _options.TypeFinderCriterias.Add("", finderCriteria);
+            }
+
+            if (_options.TypeFinderCriteria != null)
+            {
+                _options.TypeFinderCriterias.Add("", _options.TypeFinderCriteria);
             }
         }
 
@@ -105,14 +124,14 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var assemblyCatalogOptions = new AssemblyPluginCatalogOptions
                 {
-                    PluginLoadContextOptions = _options.PluginLoadContextOptions, 
+                    PluginLoadContextOptions = _options.PluginLoadContextOptions,
                     TypeFinderCriterias = _options.TypeFinderCriterias,
                     PluginNameOptions = _options.PluginNameOptions
                 };
 
                 var assemblyCatalog = new AssemblyPluginCatalog(assemblyPath, assemblyCatalogOptions);
                 await assemblyCatalog.Initialize();
-                
+
                 _catalogs.Add(assemblyCatalog);
             }
 
@@ -129,92 +148,52 @@ namespace Weikio.PluginFramework.Catalogs
                     return false;
                 }
 
-                // First try to resolve plugin assemblies using MetadataLoadContext
-                if (_options.TypeFinderCriterias?.Any() == true)
-                {
-                    var coreAssemblyPath = typeof(int).Assembly.Location;
-                    var corePath = Path.GetDirectoryName(coreAssemblyPath);
-
-                    var coreLocation = Path.Combine(corePath, "mscorlib.dll");
-
-                    if (!File.Exists(coreLocation))
-                    {
-                        throw new FileNotFoundException(coreLocation);
-                    }
-
-                    var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
-                    var paths = new List<string>(runtimeAssemblies);
-                    paths.Add(assemblyPath);
-
-                    if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Always)
-                    {
-                        var hostApplicationPath = Environment.CurrentDirectory;
-                        var hostDlls = Directory.GetFiles(hostApplicationPath, "*.dll", SearchOption.AllDirectories);
-
-                        paths.AddRange(hostDlls);
-                    }
-                    else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Never)
-                    {
-                        var pluginPath = Path.GetDirectoryName(assemblyPath);
-                        var dllsInPluginPath = Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories);
-
-                        paths.AddRange(dllsInPluginPath);
-                    }
-                    else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Selected)
-                    {
-                        foreach (var hostApplicationAssembly in _options.PluginLoadContextOptions.HostApplicationAssemblies)
-                        {
-                            var assembly = Assembly.Load(hostApplicationAssembly);
-                            paths.Add(assembly.Location);
-                        }
-                    }
-
-                    var resolver = new PathAssemblyResolver(paths);
-
-                    using (var metadataContext = new MetadataLoadContext(resolver))
-                    {
-                        var metadataPluginLoadContext = new MetadataTypeFindingContext(metadataContext);
-                        var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
-
-                        var typeFinder = new TypeFinder();
-
-                        foreach (var finderCriteria in _options.TypeFinderCriterias)
-                        {
-                            var typesFound = typeFinder.Find(finderCriteria.Value, readonlyAssembly, metadataPluginLoadContext);
-
-                            if (typesFound?.Any() == true)
-                            {
-                                return true;
-                            }
-                        }
-                    }
-
-                    if (_options.PluginResolvers.Any() != true)
-                    {
-                        // If there is assembly resolvers but no plugin resolvers, return false by default if not assembly resolver did not match.
-                        return false;
-                    }
-                }
-
-                if (_options.PluginResolvers?.Any() != true)
+                if (_options.TypeFinderCriterias?.Any() != true)
                 {
                     // If there are no resolvers, assume that each DLL is a plugin
                     return true;
                 }
 
-                // Then using the PEReader
-                var metadata = reader.GetMetadataReader();
+                var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
+                var paths = new List<string>(runtimeAssemblies) { assemblyPath };
 
-                var publicTypes = metadata.TypeDefinitions
-                    .Select(metadata.GetTypeDefinition)
-                    .Where(t => t.Attributes.HasFlag(TypeAttributes.Public))
-                    .ToArray();
-
-                foreach (var type in publicTypes)
+                if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Always)
                 {
-                    foreach (var pluginResolver in _options.PluginResolvers)
+                    var hostApplicationPath = Environment.CurrentDirectory;
+                    var hostDlls = Directory.GetFiles(hostApplicationPath, "*.dll", SearchOption.AllDirectories);
+
+                    paths.AddRange(hostDlls);
+                }
+                else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Never)
+                {
+                    var pluginPath = Path.GetDirectoryName(assemblyPath);
+                    var dllsInPluginPath = Directory.GetFiles(pluginPath, "*.dll", SearchOption.AllDirectories);
+
+                    paths.AddRange(dllsInPluginPath);
+                }
+                else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Selected)
+                {
+                    foreach (var hostApplicationAssembly in _options.PluginLoadContextOptions.HostApplicationAssemblies)
                     {
-                        if (pluginResolver(assemblyPath, metadata, type))
+                        var assembly = Assembly.Load(hostApplicationAssembly);
+                        paths.Add(assembly.Location);
+                    }
+                }
+
+                var resolver = new PathAssemblyResolver(paths);
+
+                using (var metadataContext = new MetadataLoadContext(resolver))
+                {
+                    var metadataPluginLoadContext = new MetadataTypeFindingContext(metadataContext);
+                    var readonlyAssembly = metadataContext.LoadFromAssemblyPath(assemblyPath);
+
+                    var typeFinder = new TypeFinder();
+
+                    foreach (var finderCriteria in _options.TypeFinderCriterias)
+                    {
+                        var typesFound = typeFinder.Find(finderCriteria.Value, readonlyAssembly, metadataPluginLoadContext);
+
+                        if (typesFound?.Any() == true)
                         {
                             return true;
                         }
@@ -236,6 +215,7 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             var result = new List<Type>();
+
             var types = assembly.GetExportedTypes();
 
             foreach (var type in types)
@@ -272,7 +252,7 @@ namespace Weikio.PluginFramework.Catalogs
 
                 if (string.IsNullOrWhiteSpace(criteria.Name) == false)
                 {
-                    var regEx = new Regex(criteria.Name, RegexOptions.Compiled);
+                    var regEx = NameToRegex(criteria.Name);
 
                     if (regEx.IsMatch(type.FullName) == false)
                     {
@@ -304,6 +284,13 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             return result;
+        }
+
+        private static Regex NameToRegex(string nameFilter)
+        {
+            // https://stackoverflow.com/a/30300521/66988
+            var regex = "^" + Regex.Escape(nameFilter).Replace("\\?", ".").Replace("\\*", ".*") + "$";
+            return new Regex(regex, RegexOptions.Compiled);
         }
     }
 

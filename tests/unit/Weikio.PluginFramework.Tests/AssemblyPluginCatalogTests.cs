@@ -75,7 +75,7 @@ namespace Weikio.PluginFramework.Tests
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
 
-            Assert.Equal("12.0.0.0", newPluginVersion);
+            Assert.Equal("10.0.0.0", newPluginVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
         }
 
@@ -106,47 +106,39 @@ namespace Weikio.PluginFramework.Tests
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             
-            Assert.Equal("10.0.0.0", newPluginVersion);
-            Assert.Equal("10.0.0.0", oldPluginVersion);
+            Assert.Equal("12.0.0.0", newPluginVersion);
+            Assert.Equal("12.0.0.0", oldPluginVersion);
         }
 
         [Fact]
         public async Task CanUseSelectedHoststDependencies()
         {
-            throw new NotImplementedException();
-
-            ;
-
-            //
-            // // Make sure that the referenced version of JSON.NET is loaded into memory
-            // var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
-            // // Make sure that the referenced version of Microsoft.Extensions.Logging is loaded into memory
-            // var logging = new Microsoft.Extensions.Logging.LoggerFactory();
-            //
-            // var options = new AssemblyPluginCatalogOptions();;
-            // options.PluginLoadContextOptions = new PluginLoadContextOptions()
-            // {
-            //     UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
-            //     HostApplicationAssemblies = new List<AssemblyName>()
-            //     {
-            //         typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName()
-            //     }
-            // };
-            //
-            // var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
-            // await catalog.Initialize();
-            //
-            // var oldPluginDefinition = (await catalog.GetAll()).Single();
-            //
-            // var pluginExporter = new PluginExporter();
-            // var oldPlugin = await pluginExporter.Get(oldPluginDefinition);
-            //
-            // dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin.Types.First());
-            // var oldPluginVersion = oldPluginJsonResolver.GetVersion();
-            // var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
-            //
-            // Assert.Equal("3.1.2.0", loggerVersion);
-            // Assert.Equal("9.0.0.0", oldPluginVersion);
+            // Make sure that the referenced version of JSON.NET is loaded into memory
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
+            // Make sure that the referenced version of Microsoft.Extensions.Logging is loaded into memory
+            var logging = new Microsoft.Extensions.Logging.LoggerFactory();
+            
+            var options = new AssemblyPluginCatalogOptions();;
+            options.PluginLoadContextOptions = new PluginLoadContextOptions()
+            {
+                UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
+                HostApplicationAssemblies = new List<AssemblyName>()
+                {
+                    typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName()
+                }
+            };
+            
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
+            await catalog.Initialize();
+            
+            var oldPlugin = catalog.Single();
+            
+            dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
+            var oldPluginVersion = oldPluginJsonResolver.GetVersion();
+            var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
+            
+            Assert.Equal("3.1.2.0", loggerVersion);
+            Assert.Equal("9.0.0.0", oldPluginVersion);
         }
     }
 }

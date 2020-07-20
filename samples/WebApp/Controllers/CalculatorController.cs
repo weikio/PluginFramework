@@ -9,10 +9,10 @@ namespace WebApp.Controllers
     [Route("[controller]")]
     public class CalculatorController : ControllerBase
     {
-        private readonly List<IOperator> _operators;
+        private readonly IEnumerable<IOperator> _operators;
         private readonly IEnumerable<Plugin> _plugins;
 
-        public CalculatorController(List<IOperator> operators, IEnumerable<Plugin> plugins)
+        public CalculatorController(IEnumerable<IOperator> operators, IEnumerable<Plugin> plugins, IOperator myOperator)
         {
             _operators = operators;
             _plugins = plugins;

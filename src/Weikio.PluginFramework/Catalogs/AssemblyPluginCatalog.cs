@@ -59,6 +59,27 @@ namespace Weikio.PluginFramework.Catalogs
                 _options.TypeFinderCriterias.Add(string.Empty, criteria);
             }
         }
+        
+        public AssemblyPluginCatalog(string assemblyPath, Action<TypeFinderCriteriaBuilder> configureFinder = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                throw new ArgumentNullException(nameof(assemblyPath));
+            }
+
+            _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (configureFinder != null)
+            {
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var criteria = builder.Build();
+
+                _options.TypeFinderCriterias.Add("", criteria);
+            }
+        }
 
         public AssemblyPluginCatalog(string assemblyPath, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null)
         {

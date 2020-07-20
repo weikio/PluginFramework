@@ -4,13 +4,14 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.AspNetCore;
+using Weikio.PluginFramework.Catalogs;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddPluginFramework(this IServiceCollection services)
+        public static IServiceCollection AddPluginFramework(this IServiceCollection services, Action<TypeFinderCriteriaBuilder> configureTypeFinder = null, string folderPath = "")
         {
             services.AddHostedService<PluginFrameworkInitializer>();
 
@@ -29,6 +30,34 @@ namespace Microsoft.Extensions.DependencyInjection
                 return result.AsEnumerable();
             });
 
+            if (configureTypeFinder == null)
+            {
+                return services;
+            }
+            
+            
+            
+            return services;
+        }
+        
+        public static IServiceCollection AddPluginFramework<TType>(this IServiceCollection services, string dllPath = "") where TType : class
+        {
+            services.AddPluginFramework();
+
+            if (string.IsNullOrWhiteSpace(dllPath))
+            {
+                dllPath = Environment.CurrentDirectory;
+            }
+
+            var typeFinderCriteria = TypeFinderCriteriaBuilder.Create()
+                .AssignableTo(typeof(TType))
+                .Build();
+
+            var catalog = new FolderPluginCatalog(dllPath, typeFinderCriteria);
+            services.AddPluginCatalog(catalog);
+
+            services.AddPluginType<TType>();
+            
             return services;
         }
 

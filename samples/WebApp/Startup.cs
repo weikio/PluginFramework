@@ -30,7 +30,10 @@ namespace WebApp
             services.AddPluginFramework()
                 .AddPluginCatalog(folderPluginCatalog)
                 .AddPluginType<IOperator>();
-            
+
+            // Alternatively
+            // services.AddPluginFramework<IOperator>(@"..\SharedPlugins\bin\debug\netcoreapp3.1");
+
             services.AddControllers();
         }
 

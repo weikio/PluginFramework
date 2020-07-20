@@ -42,7 +42,11 @@ namespace Weikio.PluginFramework.Catalogs
         public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder) : this(folderPath, configureFinder, null, null)
         {
         }
-        
+
+        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria) : this(folderPath, finderCriteria, null)
+        {
+        }
+
         public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options) : this(folderPath, null, finderCriteria, options)
         {
         }
@@ -279,6 +283,16 @@ namespace Weikio.PluginFramework.Catalogs
                         continue;
                     }
                 }
+                
+                if (criteria.AssignableTo != null)
+                {
+                    var assignableToType = typeFindingContext.FindType(criteria.AssignableTo);
+
+                    if (assignableToType.IsAssignableFrom(type) == false)
+                    {
+                        continue;
+                    }
+                }
 
                 result.Add(type);
             }
@@ -298,6 +312,7 @@ namespace Weikio.PluginFramework.Catalogs
     {
         public Type Inherits { get; set; }
         public Type Implements { get; set; }
+        public Type AssignableTo { get; set; }
         public bool? IsAbstract { get; set; }
         public bool? IsInterface { get; set; }
         public string Name { get; set; }
@@ -308,6 +323,7 @@ namespace Weikio.PluginFramework.Catalogs
     {
         private Type _inherits;
         private Type _implements;
+        private Type _assignable;
         private bool _isAbstract;
         private bool _isInterface;
         private string _name;
@@ -319,6 +335,7 @@ namespace Weikio.PluginFramework.Catalogs
                 IsInterface = _isInterface,
                 Implements = _implements,
                 Inherits = _inherits,
+                AssignableTo = _assignable,
                 Name = _name,
                 IsAbstract = _isAbstract
             };
@@ -377,6 +394,13 @@ namespace Weikio.PluginFramework.Catalogs
         public TypeFinderCriteriaBuilder IsInterface(bool isInterface)
         {
             _isInterface = isInterface;
+
+            return this;
+        }
+        
+        public TypeFinderCriteriaBuilder AssignableTo(Type assignableTo)
+        {
+            _assignable = assignableTo;
 
             return this;
         }

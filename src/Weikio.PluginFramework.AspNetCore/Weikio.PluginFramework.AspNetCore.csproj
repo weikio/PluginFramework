@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
+    <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
   </ItemGroup>
   
 </Project>

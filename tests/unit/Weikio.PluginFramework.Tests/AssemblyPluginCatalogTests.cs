@@ -28,7 +28,51 @@ namespace Weikio.PluginFramework.Tests
 
             var allPlugins = catalog.GetPlugins();
 
+            Assert.NotEmpty(allPlugins);
+        }
+        
+        [Fact]
+        public async Task CanInitializeWithCriteria()
+        {
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", configure =>
+            {
+                configure.HasName("*Plugin");
+            });
+            
+            await catalog.Initialize();
+
+            var allPlugins = catalog.GetPlugins();
+
             Assert.Single(allPlugins);
+        }
+        
+        [Fact]
+        public async Task ByDefaultOnlyContainsPublicNonAbstractClasses()
+        {
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            await catalog.Initialize();
+
+            var allPlugins = catalog.GetPlugins();
+
+            var plugin = allPlugins.Single();
+            Assert.False(plugin.Type.IsAbstract);
+            Assert.False(plugin.Type.IsInterface);
+        }
+        
+        [Fact]
+        public async Task CanIncludeAbstractClassesUsingCriteria()
+        {
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", builder =>
+            {
+                builder.IsAbstract(true);
+            });
+            
+            await catalog.Initialize();
+
+            var allPlugins = catalog.GetPlugins();
+
+            var plugin = allPlugins.Single();
+            Assert.True(plugin.Type.IsAbstract);
         }
 
         [Fact]

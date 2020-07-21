@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
+using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs
 {
@@ -68,6 +69,28 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             _assemblyPath = assemblyPath;
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            if (configureFinder != null)
+            {
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var criteria = builder.Build();
+
+                _options.TypeFinderCriterias.Add("", criteria);
+            }
+        }
+        
+        public AssemblyPluginCatalog(Assembly assembly, Action<TypeFinderCriteriaBuilder> configureFinder = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (assembly == null)
+            {
+                throw new ArgumentNullException(nameof(assembly));
+            }
+                
+            _assembly = assembly;
+            _assemblyPath = _assembly.Location;
             _options = options ?? new AssemblyPluginCatalogOptions();
 
             if (configureFinder != null)
@@ -164,10 +187,9 @@ namespace Weikio.PluginFramework.Catalogs
 
             if (_options.TypeFinderCriterias?.Any() != true)
             {
-                var findAll = new TypeFinderCriteria()
-                {
-                    Query = (context, type) => true
-                };
+                var findAll = TypeFinderCriteriaBuilder
+                    .Create()
+                    .Build();
 
                 if (_options.TypeFinderCriterias == null)
                 {

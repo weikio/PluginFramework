@@ -6,6 +6,7 @@ using System.Runtime.Loader;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Context
 {

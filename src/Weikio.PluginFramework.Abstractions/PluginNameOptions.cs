@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Weikio.PluginFramework.Catalogs
+namespace Weikio.PluginFramework.Abstractions
 {
     public class PluginNameOptions
     {

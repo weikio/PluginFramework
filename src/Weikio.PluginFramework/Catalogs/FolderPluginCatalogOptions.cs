@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Metadata;
+using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
+using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs
 {

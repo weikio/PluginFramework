@@ -1,4 +1,6 @@
-﻿namespace Weikio.PluginFramework.Catalogs
+﻿using Weikio.PluginFramework.Abstractions;
+
+namespace Weikio.PluginFramework.Catalogs
 {
     public class TypePluginCatalogOptions
     {

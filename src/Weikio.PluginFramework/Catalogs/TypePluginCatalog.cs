@@ -9,7 +9,6 @@ namespace Weikio.PluginFramework.Catalogs
     public class TypePluginCatalog : IPluginCatalog
     {
         private readonly Type _pluginType;
-        private PluginOld _pluginOld;
         private readonly TypePluginCatalogOptions _options;
         private Plugin _plugin;
 
@@ -61,7 +60,6 @@ namespace Weikio.PluginFramework.Catalogs
             var description = namingOptions.PluginDescriptionGenerator(namingOptions, _pluginType);
             var productVersion = namingOptions.PluginProductVersionGenerator(namingOptions, _pluginType);
 
-            _pluginOld = new PluginOld(pluginName, version, this, description, productVersion);
             _plugin = new Plugin(_pluginType.Assembly, _pluginType, pluginName, version, this, description, productVersion);
             IsInitialized = true;
 
@@ -77,8 +75,8 @@ namespace Weikio.PluginFramework.Catalogs
 
         public Plugin Get(string name, Version version)
         {
-            if (!string.Equals(name, _pluginOld.Name, StringComparison.InvariantCultureIgnoreCase) ||
-                version != _pluginOld.Version)
+            if (!string.Equals(name, _plugin.Name, StringComparison.InvariantCultureIgnoreCase) ||
+                version != _plugin.Version)
             {
                 return null;
             }

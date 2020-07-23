@@ -39,17 +39,15 @@ namespace Weikio.PluginFramework.Catalogs
             _pluginType = pluginType;
             _options = options ?? new TypePluginCatalogOptions();
 
-            if (nameOptions == null)
+            if (configure == null && nameOptions == null)
             {
-                nameOptions = new PluginNameOptions();
+                return;
             }
 
-            if (configure != null)
-            {
-                configure(nameOptions);
-            }
-
-            _options.PluginNameOptions = nameOptions;
+            var naming = nameOptions ?? new PluginNameOptions();
+            configure?.Invoke(naming);
+                
+            _options.PluginNameOptions = naming;
         }
 
         public Task Initialize()

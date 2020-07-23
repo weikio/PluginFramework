@@ -56,8 +56,10 @@ namespace Weikio.PluginFramework.TypeFinding
 
                     if (regEx.IsMatch(type.FullName) == false)
                     {
-                        if (string.Equals(criteria.Name, type.Name, StringComparison.InvariantCultureIgnoreCase) == false &&
-                            string.Equals(criteria.Name, type.FullName, StringComparison.InvariantCultureIgnoreCase))
+                        var hasDirectNamingMatch = string.Equals(criteria.Name, type.Name, StringComparison.InvariantCultureIgnoreCase) ||
+                                string.Equals(criteria.Name, type.FullName, StringComparison.InvariantCultureIgnoreCase);
+
+                        if (hasDirectNamingMatch == false)
                         {
                             continue;
                         }

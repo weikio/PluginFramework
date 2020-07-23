@@ -47,6 +47,29 @@ namespace Weikio.PluginFramework.Tests
         }
         
         [Fact]
+        public async Task CanConfigureNamingOptions()
+        {
+            var options = new AssemblyPluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+                }
+            };
+            
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", options);
+            
+            await catalog.Initialize();
+
+            var allPlugins = catalog.GetPlugins();
+
+            foreach (var plugin in allPlugins)
+            {
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+        }
+        
+        [Fact]
         public async Task ByDefaultOnlyContainsPublicNonAbstractClasses()
         {
             var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");

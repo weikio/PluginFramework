@@ -10,11 +10,24 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
     {
         private AssemblyPluginCatalog _catalog;
         private readonly MulticastDelegate _multicastDelegate;
-        private readonly List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> _conversionRules;
-        private readonly PluginNameOptions _nameOptions;
 
-        public DelegatePluginCatalog(MulticastDelegate multicastDelegate, List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> conversionRules = null, 
-            PluginNameOptions nameOptions = null)
+        private readonly DelegatePluginCatalogOptions _options;
+
+        public DelegatePluginCatalog(MulticastDelegate multicastDelegate) : this(multicastDelegate, pluginName: null)
+        {
+        }
+        public DelegatePluginCatalog(MulticastDelegate multicastDelegate, string pluginName = "") : this(multicastDelegate, null, null, null, pluginName)
+        {
+        }
+
+        public DelegatePluginCatalog(MulticastDelegate multicastDelegate, DelegatePluginCatalogOptions options) : this(multicastDelegate, 
+            options?.ConversionRules, options?.NameOptions, options)
+        {
+        }
+
+        public DelegatePluginCatalog(MulticastDelegate multicastDelegate,
+            List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> conversionRules = null,
+            PluginNameOptions nameOptions = null, DelegatePluginCatalogOptions options = null, string pluginName = null)
         {
             if (multicastDelegate == null)
             {
@@ -28,33 +41,45 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
                 conversionRules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>();
             }
 
-            _conversionRules = conversionRules;
+            if (options != null)
+            {
+                _options = options;
+            }
+            else
+            {
+                _options = new DelegatePluginCatalogOptions();
+            }
+
+            _options.ConversionRules = conversionRules;
 
             if (nameOptions == null)
             {
                 nameOptions = new PluginNameOptions();
             }
-            
-            _nameOptions = nameOptions;
+
+            _options.NameOptions = nameOptions;
+
+            if (!string.IsNullOrWhiteSpace(pluginName))
+            {
+                _options.NameOptions.PluginNameGenerator = (pluginNameOptions, type) => pluginName;
+            }
         }
 
         public async Task Initialize()
         {
             var converter = new DelegateToAssemblyConverter();
-            var assembly = converter.CreateAssembly(_multicastDelegate, _conversionRules);
+            var assembly = converter.CreateAssembly(_multicastDelegate, _options);
 
-            var options = new AssemblyPluginCatalogOptions()
-            {
-                PluginNameOptions = _nameOptions
-            };
-            
+            var options = new AssemblyPluginCatalogOptions() { PluginNameOptions = _options.NameOptions };
+
             _catalog = new AssemblyPluginCatalog(assembly, options);
             await _catalog.Initialize();
-            
+
             IsInitialized = true;
         }
 
         public bool IsInitialized { get; set; }
+
         public List<Plugin> GetPlugins()
         {
             return _catalog.GetPlugins();

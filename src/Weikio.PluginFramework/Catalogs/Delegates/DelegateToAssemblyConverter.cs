@@ -10,7 +10,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
     public class DelegateToAssemblyConverter
     {
         public Assembly CreateAssembly(MulticastDelegate multicastDelegate,
-            List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> conversionRules)
+            DelegatePluginCatalogOptions options)
         {
             var id = DelegateCache.Add(multicastDelegate);
 
@@ -72,6 +72,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
             // var propertyNames = new List<string>();
             var delegateMethodParameters = new List<string>();
 
+            var conversionRules = options?.ConversionRules;
             if (conversionRules == null)
             {
                 conversionRules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>();
@@ -152,9 +153,9 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
             }
 
             code.AppendLine();
-            code.AppendLine("namespace MyFuncTestNs");
+            code.AppendLine($"namespace {GetNamespace(options)}");
             code.AppendLine("{");
-            code.AppendLine("public class MyFuncTestClass");
+            code.AppendLine($"public class {GetTypeName(options)}");
             code.AppendLine("{");
 
             if (constructorParameterNames?.Any() == true)
@@ -164,7 +165,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
                     code.AppendLine($"private {fieldNameWithType};");
                 }
 
-                code.AppendLine($"public MyFuncTestClass({string.Join(", ", constructorParameterNamesWithTypes)})");
+                code.AppendLine($"public {GetTypeName(options)}({string.Join(", ", constructorParameterNamesWithTypes)})");
                 code.AppendLine("{");
 
                 foreach (var constructorParameterName in constructorParameterNames)
@@ -187,13 +188,30 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
                 code.AppendLine();
             }
 
-            code.AppendLine(
-                $"public {GetFriendlyName(returnType)} Run ({string.Join(", ", methodParameterNamesWithTypes)})");
+            if (typeof(void) != returnType)
+            {
+                code.AppendLine(
+                    $"public {GetFriendlyName(returnType)} {GetMethodName(options)} ({string.Join(", ", methodParameterNamesWithTypes)})");
+            }
+            else
+            {
+                code.AppendLine(
+                    $"public void Run ({string.Join(", ", methodParameterNamesWithTypes)})");
+            }
             code.AppendLine("{");
-            code.AppendLine($"var deleg = ConsoleApp31.DelegateCache.Get(System.Guid.Parse(\"{id.ToString()}\"));");
+            code.AppendLine($"var deleg = Weikio.PluginFramework.Catalogs.Delegates.DelegateCache.Get(System.Guid.Parse(\"{id.ToString()}\"));");
 
-            code.AppendLine(
-                $"return ({GetFriendlyName(returnType)}) deleg.DynamicInvoke({string.Join(", ", delegateMethodParameters)});");
+            if (typeof(void) != returnType)
+            {
+                code.AppendLine(
+                    $"return ({GetFriendlyName(returnType)}) deleg.DynamicInvoke({string.Join(", ", delegateMethodParameters)});");
+            }
+            else
+            {
+                code.AppendLine(
+                    $"deleg.DynamicInvoke({string.Join(", ", delegateMethodParameters)});");
+            }
+
             code.AppendLine("}"); // Close method
             code.AppendLine("}"); // Close class
             code.AppendLine("}"); // Close namespace
@@ -204,6 +222,36 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
             return result;
         }
 
+        private static string GetMethodName(DelegatePluginCatalogOptions options)
+        {
+            if (options?.MethodNameGenerator != null)
+            {
+                return options.MethodNameGenerator(options);
+            }
+
+            return "Run";
+        }
+        
+        private static string GetNamespace(DelegatePluginCatalogOptions options)
+        {
+            if (options?.NamespaceNameGenerator != null)
+            {
+                return options.NamespaceNameGenerator(options);
+            }
+
+            return "GeneratedNamespace";
+        }
+        
+        private static string GetTypeName(DelegatePluginCatalogOptions options)
+        {
+            if (options?.TypeNameGenerator != null)
+            {
+                return options.TypeNameGenerator(options);
+            }
+
+            return "GeneratedType";
+        }
+        
         public List<Type> GetGenericTypes(Type type, List<Type> types)
         {
             if (types == null)

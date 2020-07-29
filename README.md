@@ -1,6 +1,6 @@
 <img align="right" alt="Plugin Framework Logo" src="docs/logo_transparent_color_256.png">
 
-# Plugin Framework for .NET Core [![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.svg?style=flat)](https://www.nuget.org/packages/Weikio.PluginFramework/)
+# Plugin Framework for .NET Core [![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.svg?style=flat&label=Weikio.PluginFramework)](https://www.nuget.org/packages/Weikio.PluginFramework/)
 
 With Plugin Framework for .NET Core, everything is a plugin! Plugin Framework is a **plugin platform** for .NET Core applications, including **ASP.NET Core, Blazor, WPF, Windows Forms and Console apps**. It is light-weight and easy to integrate and supports multiple different plugin catalogs, including .NET assemblies, **Nuget packages** and **Roslyn scripts**.
 
@@ -17,7 +17,7 @@ Here are some of the main features of Plugin Framework:
 
 Plugin Framework is available from Nuget as a .NET Core 3.1 package. There's a separate package which makes it easier to work with plugins in an ASP.NET Core app:
 
-[![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.AspNetCore.svg?style=flat)](https://www.nuget.org/packages/Weikio.PluginFramework.AspNetCore/)
+[![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.AspNetCore.svg?style=flat&label=Weikio.PluginFramework.AspNetCore)](https://www.nuget.org/packages/Weikio.PluginFramework.AspNetCore/)
 
 ```
 Install-Package Weikio.PluginFramework.AspNetCore
@@ -57,9 +57,46 @@ services.AddPluginFramework()
     .AddPluginType<IOperator>();
 ```
 
-## Plugin catalogs
+## Samples
 
-Plugin Framework contains a concept called "Catalog". A single assembly can be a catalog. A .NET type can be a catalog. Folders with dlls are often used as catalogs and Plugin Framework also supports Nuget packages, Nuget feeds and Roslyn scripts as Plugin catalogs. Multiple catalogs are often combined into a singe Composite catalog.
+The following Plugin Framework samples are available from GitHub:
+
+#### [Plugin Framework & .NET Console Application](https://github.com/weikio/PluginFramework/tree/master/samples/ConsoleApp)
+
+#### [Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebApp)
+
+#### [Plugin Framework & WPF App](https://github.com/weikio/PluginFramework/tree/master/samples/WpfApp)
+
+## Main concepts
+
+Using Plugin Framework concentrates mainly around two concepts: **Plugins** and **Plugin Catalogs**.
+
+### Plugin
+
+Plugins are software programs, which provide extensions to an application. Plugins are designed to work with a single application. This app is often called the **host application**. The host application is designed in such a way that it can locate and run plugins dynamically, runtime. **The application works without the plugins, the plugins can't work without the host application.**
+
+The host application defines the specifications for the plugins. In some applications a plugin can add new functionality into the UI. In other apps, plugins are used to distribute logs into multiple different systems. The host application defines what kind of extensions it supports.
+
+Plugin-based software architecture can help in the following scenarios:
+
+* Adding new features to application after the release
+* Splitting large systems into smaller parts
+* Updating always-on software system without restarting it
+
+Plugins are dynamic, and they are often only loaded when the application needs them. Plugins are not usually compiled as part of the system but distributed as separate packages (assemblies, Nuget packages).
+
+In the context of the Plugin Framework, **plugin is a single .NET Type**. What makes a plugin? As described previously, it depends on the host application. For some applications a plugin is a type which implements a specific interface. In some applications a plugin is a type which has a single public method called Run. Attributes are often used to indicate the plugins and that is also supported by Plugin Framework. From the Plugin Framework's point of view anything or everything can be a plugin. 
+
+As mentioned, in Plugin Framework a single plugin is a .NET Type. Even though Plugin Framework's ASP.NET Core support makes it easy to instantiate and use plugins in services and controllers through dependency injection (IServiceProvider), Plugin Framework itself doesn't provide any built-in mechanisms for creating instances (objects) from the plugins (types). In some cases Activator.CreateInstance is all that is needed and in some cases it is best to hook Plugin Framework with the app's DI-system. The requirements are host application specific.
+
+In Plugin Framework, each Plugin is composed of the following information:
+* Type
+* Plugin name
+* Plugin version
+
+### Plugin Catalogs
+
+Plugin Framework contains a concept called "Catalog". A single assembly can be a catalog. A .NET type can be a catalog. Folders with dlls are often used as catalogs and Plugin Framework also supports Nuget packages, Nuget feeds and Roslyn scripts as Plugin catalogs. Multiple catalogs are often combined into a single Composite catalog.
 
 Each catalog contains 0-n plugins. 
 
@@ -69,9 +106,10 @@ Plugin Framework provides the following officially supported catalogs:
 * Assembly
 * Folder
 * Delegate (Action or a Func)
-* Roslyn script
-* Nuget package
-* Nuget feed
+* Roslyn script ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Roslyn/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Roslyn))
+* Nuget package ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Nuget))
+* Nuget feed ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Nuget))
+
 
 ## Source code
 

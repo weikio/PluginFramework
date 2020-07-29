@@ -1,7 +1,12 @@
-# Introduction 
-Plugin Framework adds easy-to-use and lightweight support for Plugins into ASP.NET Core and Windows Forms / WPF / Console applications. 
+<img align="right" alt="Plugin Framework Logo" src="docs/logo_transparent_color_256.png">
 
-Main features:
+# Plugin Framework for .NET Core [![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.svg?style=flat)](https://www.nuget.org/packages/Weikio.PluginFramework/)
+
+With Plugin Framework for .NET Core, everything is a plugin! Plugin Framework is a **plugin platform** for .NET Core applications, including **ASP.NET Core, Blazor, WPF, Windows Forms and Console apps**. It is light-weight and easy to integrate and supports multiple different plugin catalogs, including .NET assemblies, **Nuget packages** and **Roslyn scripts**.
+
+### Main Features 
+
+Here are some of the main features of Plugin Framework: 
 
 * Everything is a plugin! Deliver plugins as Nuget-packages, .NET assemblies, Roslyn scripts and more.
 * Easy integration into a new or an existing .NET Core application.
@@ -12,6 +17,8 @@ Main features:
 
 Plugin Framework is available from Nuget as a .NET Core 3.1 package. There's a separate package which makes it easier to work with plugins in an ASP.NET Core app:
 
+[![NuGet Version](https://img.shields.io/nuget/v/Weikio.PluginFramework.AspNetCore.svg?style=flat)](https://www.nuget.org/packages/Weikio.PluginFramework.AspNetCore/)
+
 ```
 Install-Package Weikio.PluginFramework.AspNetCore
 ```
@@ -19,13 +26,13 @@ Install-Package Weikio.PluginFramework.AspNetCore
 Using Plugin Framework can be as easy as adding a single new line into ConfigureServices:
 
 ```
-services.AddPluginFramework<IOperator>(@".\mypluginsFolder");
+services.AddPluginFramework<IOperator>(@".\myplugins");
 ```
 
-The code finds all the plugins (types that implement the custom IOperator-interface) from the mypluginsFolder. The plugins can be used in a controller using constructor injection:
+The code finds all the plugins (types that implement the custom IOperator-interface) from the myplugins-folder. The plugins can be used in a controller using constructor injection:
 
 ```
-public CalculatorController(IEnumerable<Plugin> plugins)
+public CalculatorController(IEnumerable<IOperator> operator)
 {
 	_operators = operators;
 }
@@ -34,7 +41,7 @@ public CalculatorController(IEnumerable<Plugin> plugins)
 Alternatively, you can provide multiple plugin locations using catalogs:
 
 ```
-var folderPluginCatalog = new FolderPluginCatalog(@".\mypluginsFolder", type =>
+var folderPluginCatalog = new FolderPluginCatalog(@".\myplugins", type =>
 {
     type.Implements<IOperator>();
 });
@@ -54,31 +61,30 @@ services.AddPluginFramework()
 
 Plugin Framework contains a concept called "Catalog". A single assembly can be a catalog. A .NET type can be a catalog. Folders with dlls are often used as catalogs and Plugin Framework also supports Nuget packages, Nuget feeds and Roslyn scripts as Plugin catalogs. Multiple catalogs are often combined into a singe Composite catalog.
 
+Each catalog contains 0-n plugins. 
+
 Plugin Framework provides the following officially supported catalogs:
 
-* Delegate (Action or a Func)
 * Type
 * Assembly
 * Folder
+* Delegate (Action or a Func)
 * Roslyn script
 * Nuget package
 * Nuget feed
 
+## Source code
 
-# Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+Source code for Plugin Framework is available from [GitHub](https://github.com/weikio/PluginFramework).
 
-# Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Support
 
-# Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+Commercial support for Plugin Framework is provided by [Adafy](https://adafy.com).
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://docs.microsoft.com/en-us/azure/devops/repos/git/create-a-readme?view=azure-devops). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+![Adafy Logo](docs/Adafy_logo_256.png)
+
+Adafy is a Finnish software development house, focusing on Microsoft technologies.
+
+## License
+
+Plugin Framework is available as an open source, MIT-licensed project. 

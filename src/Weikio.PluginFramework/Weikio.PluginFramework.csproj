@@ -6,10 +6,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Weik.io</Authors>
     <Company>Weik.io</Company>
-    <Description>Plugin Framework is a powerful plugin SDK for your .NET Core applications.</Description>
+    <Description>Plugin Framework is a powerful plugin platform for your .NET Core applications.</Description>
     <PackageDescription>Everything is a plugin! Use assemblies, NuGet packages and C# Scripts as plugins in your .NET Core Applications.</PackageDescription>
     <PackageProjectUrl>https://www.pluginframework.com</PackageProjectUrl>
-    <Copyright>©2019 Weik.io</Copyright>
+    <Copyright>©2020 Weik.io</Copyright>
     <PackageId>Weikio.PluginFramework</PackageId>
     <Product>Weikio.PluginFramework</Product>
     <AssemblyName>Weikio.PluginFramework</AssemblyName>

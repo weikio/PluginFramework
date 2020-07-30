@@ -1,4 +1,4 @@
-﻿using Shared;
+﻿using Weikio.PluginFramework.Samples.Shared;
 
 namespace WpfApp
 {

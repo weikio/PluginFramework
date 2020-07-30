@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Shared
+namespace Weikio.PluginFramework.Samples.Shared
 {
     public interface IPlugin
     {

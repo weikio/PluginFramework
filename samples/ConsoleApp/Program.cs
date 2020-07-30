@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Shared;
+using Weikio.PluginFramework.Samples.Shared;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
 

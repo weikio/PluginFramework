@@ -4,25 +4,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Weik.io</Authors>
-    <Company>Weik.io</Company>
     <Description>Abstractions for Plugin Framework.</Description>
     <PackageDescription>Abstractions for Plugin Framework.</PackageDescription>
-    <PackageProjectUrl>https://www.pluginframework.com</PackageProjectUrl>
-    <Copyright>©2019 Weik.io</Copyright>
     <PackageId>Weikio.PluginFramework.Abstractions</PackageId>
     <Product>Weikio.PluginFramework.Abstractions</Product>
     <AssemblyName>Weikio.PluginFramework.Abstractions</AssemblyName>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/weikio/PluginFramework</RepositoryUrl>
     <PackageTags>plugins;addons;extensions;plugin framework</PackageTags>
-    <PackageIcon>logo_256.png</PackageIcon>
+    <PackageIcon>logo_transparent_color_256.png</PackageIcon>
     <Title>Plugin Framework Abstractions</Title>
-    <MinVerMinimumMajorMinor>1.0</MinVerMinimumMajorMinor>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

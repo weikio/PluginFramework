@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Plugin Framework shared sample</Description>
+    <PackageDescription>Plugin Framework shared sample</PackageDescription>
+    <Title>Plugin Framework shared sample</Title>
+    <PackageId>Weikio.PluginFramework.Samples.Shared</PackageId>
+    <Product>Weikio.PluginFramework.Samples.Shared</Product>
+    <AssemblyName>Weikio.PluginFramework.Samples.Shared</AssemblyName>
+    <PackageTags>plugins;addons;plugin framework;samples</PackageTags>
+  </PropertyGroup>
+
+</Project>

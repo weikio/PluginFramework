@@ -1,6 +1,6 @@
-﻿using Shared;
+﻿using Weikio.PluginFramework.Samples.Shared;
 
-namespace SharedPlugins
+namespace Weikio.PluginFramework.Samples.SharedPlugins
 {
     public class SumOperator : IOperator
     {

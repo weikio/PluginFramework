@@ -1,4 +1,4 @@
-﻿namespace Shared
+﻿namespace Weikio.PluginFramework.Samples.Shared
 {
     public interface IMyPlugin
     {

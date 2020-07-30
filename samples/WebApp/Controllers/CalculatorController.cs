@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
+using Weikio.PluginFramework.Samples.Shared;
 using Weikio.PluginFramework.Abstractions;
 
 namespace WebApp.Controllers

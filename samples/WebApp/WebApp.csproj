@@ -8,8 +8,8 @@
       <ProjectReference Include="..\..\src\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
       <ProjectReference Include="..\..\src\Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj" />
       <ProjectReference Include="..\..\src\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
-      <ProjectReference Include="..\SharedPlugins\SharedPlugins.csproj" />
-      <ProjectReference Include="..\Shared\Shared.csproj" />
+      <ProjectReference Include="..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\Weikio.PluginFramework.Samples.SharedPlugins.csproj" />
+      <ProjectReference Include="..\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj" />
     </ItemGroup>
 
 

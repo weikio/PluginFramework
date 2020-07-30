@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using Shared;
+using Weikio.PluginFramework.Samples.Shared;
 
-namespace SharedPlugins
+namespace Weikio.PluginFramework.Samples.SharedPlugins
 {
     [DisplayName("The multiplier plugin")]
     public class MultiplyOperator : IOperator

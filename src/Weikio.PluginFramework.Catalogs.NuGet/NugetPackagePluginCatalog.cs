@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
+using Weikio.PluginFramework.TypeFinding;
+
+// ReSharper disable once CheckNamespace
+namespace Weikio.PluginFramework.Catalogs
+{
+    public class NugetPackagePluginCatalog : IPluginCatalog
+    {
+        private readonly NuGetFeed _packageFeed;
+        private readonly string _packageName;
+        private readonly string _packageVersion;
+        private readonly bool _includePrerelease;
+
+        private readonly HashSet<string> _pluginAssemblyFilePaths = new HashSet<string>();
+        private readonly List<AssemblyPluginCatalog> _pluginCatalogs = new List<AssemblyPluginCatalog>();
+        private readonly Dictionary<string, TypeFinderCriteria> _typeFinderCriterias;
+
+        public string PackagesFolder { get; }
+
+        public NugetPackagePluginCatalog(string packageName, string packageVersion = null, bool includePrerelease = false, NuGetFeed packageFeed = null,
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null)
+        {
+            _packageName = packageName;
+            _packageVersion = packageVersion;
+            _includePrerelease = includePrerelease;
+            _packageFeed = packageFeed;
+
+            PackagesFolder = packagesFolder ?? Path.Combine(Path.GetTempPath(), "NugetPackagePluginCatalog", Path.GetRandomFileName());
+
+            if (!Directory.Exists(PackagesFolder))
+            {
+                Directory.CreateDirectory(PackagesFolder);
+            }
+
+            if (criterias == null)
+            {
+                criterias = new Dictionary<string, TypeFinderCriteria>();
+            }
+
+            _typeFinderCriterias = criterias;
+
+            if (configureFinder != null)
+            {
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var criteria = builder.Build();
+
+                _typeFinderCriterias.Add("", criteria);
+            }
+        }
+
+        public bool IsInitialized { get; private set; }
+
+        public List<Plugin> GetPlugins()
+        {
+            return _pluginCatalogs.SelectMany(x => x.GetPlugins()).ToList();
+        }
+
+        public Plugin Get(string name, Version version)
+        {
+            foreach (var assemblyPluginCatalog in _pluginCatalogs)
+            {
+                var result = assemblyPluginCatalog.Get(name, version);
+
+                if (result == null)
+                {
+                    continue;
+                }
+
+                return result;
+            }
+
+            return null;
+        }
+
+        public async Task Initialize()
+        {
+            var nuGetDownloader = new NuGetDownloader();
+            var pluginAssemblyFileNames = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed);
+
+            foreach (var f in pluginAssemblyFileNames)
+            {
+                _pluginAssemblyFilePaths.Add(Path.Combine(PackagesFolder, f));
+            }
+
+            foreach (var pluginAssemblyFilePath in _pluginAssemblyFilePaths)
+            {
+                var options = new AssemblyPluginCatalogOptions { TypeFinderCriterias = _typeFinderCriterias };
+
+                var assemblyCatalog = new AssemblyPluginCatalog(pluginAssemblyFilePath, options);
+                await assemblyCatalog.Initialize();
+
+                _pluginCatalogs.Add(assemblyCatalog);
+            }
+        }
+    }
+}

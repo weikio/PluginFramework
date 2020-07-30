@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>NuGet catalog for Plugin Framework allows you to use NuGet packages as plugins with Plugin Framework.</Description>
+    <PackageDescription>NuGet catalog for Plugin Framework allows you to use NuGet packages as plugins with Plugin Framework.</PackageDescription>
+    <PackageId>Weikio.PluginFramework.Catalogs.NuGet</PackageId>
+    <Product>Weikio.PluginFramework.Catalogs.NuGet</Product>
+    <AssemblyName>Weikio.PluginFramework.Catalogs.NuGet</AssemblyName>
+    <PackageTags>nuget;plugins;addons;extensions;plugin framework</PackageTags>
+    <PackageIcon>logo_256.png</PackageIcon>
+    <Title>NuGet Catalog for Plugin Framework</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGet.PackageManagement.NetStandard" Version="4.9.2" />
+    <PackageReference Include="NuGet.Packaging.Core" Version="5.3.1" />
+    <PackageReference Include="NuGet.ProjectModel" Version="5.3.1" />
+    <PackageReference Include="NuGet.Protocol" Version="5.3.1" />
+    <PackageReference Include="NuGet.Resolver" Version="5.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
+    <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+</Project>

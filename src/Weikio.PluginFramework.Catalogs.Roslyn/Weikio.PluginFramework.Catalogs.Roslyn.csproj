@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Roslyn catalog for Plugin Framework allows you to use Roslyn scripts as plugins with Plugin Framework.</Description>
+    <PackageDescription>Roslyn catalog for Plugin Framework allows you to use Roslyn scripts as plugins with Plugin Framework.</PackageDescription>
+    <PackageId>Weikio.PluginFramework.Catalogs.Roslyn</PackageId>
+    <Product>Weikio.PluginFramework.Catalogs.Roslyn</Product>
+    <AssemblyName>Weikio.PluginFramework.Catalogs.Roslyn</AssemblyName>
+    <PackageTags>roslyn;plugins;addons;extensions;plugin framework</PackageTags>
+    <PackageIcon>logo_256.png</PackageIcon>
+    <Title>Roslyn Catalog for Plugin Framework</Title>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer" Version="2.0.*" />
+    <PackageReference Include="Dotnet.Script.Core" Version="0.50.*" />
+    <PackageReference Include="LamarCompiler" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
+    <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+</Project>

@@ -67,6 +67,10 @@ The following Plugin Framework samples are available from GitHub:
 
 #### [Plugin Framework & WPF App](https://github.com/weikio/PluginFramework/tree/master/samples/WpfApp)
 
+#### [Nuget & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithNuget)
+
+#### [Roslyn & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithRoslyn)
+
 ## Main concepts
 
 Using Plugin Framework concentrates mainly around two concepts: **Plugins** and **Plugin Catalogs**.
@@ -106,10 +110,9 @@ Plugin Framework provides the following officially supported catalogs:
 * Assembly
 * Folder
 * Delegate (Action or a Func)
-* Roslyn script ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Roslyn/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Roslyn))
-* Nuget package ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Nuget))
-* Nuget feed ([NuGet](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/), [Source](https://github.com/weikio/PluginFramework.Catalogs.Nuget))
-
+* Roslyn script
+* Nuget package
+* Nuget feed
 
 ## Source code
 

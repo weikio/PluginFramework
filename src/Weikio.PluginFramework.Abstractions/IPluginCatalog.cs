@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Weikio.PluginFramework.Abstractions
 {
+    /// <summary>
+    /// Represents a single Plugin Catalog. Can contain 0-n plugins.
+    /// </summary>
     public interface IPluginCatalog
     {
         /// <summary>

@@ -5,6 +5,11 @@ namespace Weikio.PluginFramework.Abstractions
 {
     public static class IPluginCatalogExtensions
     {
+        /// <summary>
+        /// Gets the only plugin inside the catalog. Throws if there is none or multiple.
+        /// </summary>
+        /// <param name="catalog">The catalog from which the plugin is retrieved.</param>
+        /// <returns>The plugin</returns>
         public static Plugin Single(this IPluginCatalog catalog)
         {
             var plugins = catalog.GetPlugins();
@@ -12,6 +17,11 @@ namespace Weikio.PluginFramework.Abstractions
             return plugins.Single();
         }
         
+        /// <summary>
+        /// Gets the only plugin inside the catalog. Throws if there is none or multiple.
+        /// </summary>
+        /// <param name="catalog">The catalog from which the plugin is retrieved.</param>
+        /// <returns>The plugin</returns>
         public static Plugin Get(this IPluginCatalog catalog)
         {
             return catalog.Single();

@@ -6,6 +6,9 @@ using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Catalogs
 {
+    /// <summary>
+    /// Plugin Catalog for a single .NET Type.
+    /// </summary>
     public class TypePluginCatalog : IPluginCatalog
     {
         private readonly Type _pluginType;
@@ -14,7 +17,6 @@ namespace Weikio.PluginFramework.Catalogs
 
         public TypePluginCatalog(Type pluginType) : this(pluginType, null, null, null)
         {
-            
         }
             
         public TypePluginCatalog(Type pluginType, PluginNameOptions nameOptions) : this (pluginType, null, nameOptions, null)
@@ -64,13 +66,16 @@ namespace Weikio.PluginFramework.Catalogs
             return Task.CompletedTask;
         }
 
+        /// <inheritdoc />
         public bool IsInitialized { get; private set; }
 
+        /// <inheritdoc />
         public List<Plugin> GetPlugins()
         {
             return new List<Plugin>() { _plugin };
         }
 
+        /// <inheritdoc />
         public Plugin Get(string name, Version version)
         {
             if (!string.Equals(name, _plugin.Name, StringComparison.InvariantCultureIgnoreCase) ||

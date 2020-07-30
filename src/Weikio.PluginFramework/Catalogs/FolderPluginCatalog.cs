@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -14,13 +12,16 @@ using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs
 {
+    /// <summary>
+    /// Plugin folder for a single folder (including or excluding subfolders). Locates the plugins from the assemblies (by default this means dll-files).
+    /// </summary>
     public class FolderPluginCatalog : IPluginCatalog
     {
         private readonly string _folderPath;
         private readonly FolderPluginCatalogOptions _options;
-        private readonly List<PluginAssemblyLoadContext> _contexts = new List<PluginAssemblyLoadContext>();
         private readonly List<AssemblyPluginCatalog> _catalogs = new List<AssemblyPluginCatalog>();
 
+        /// <inheritdoc />
         public bool IsInitialized { get; private set; }
 
         private List<Plugin> Plugins
@@ -57,6 +58,11 @@ namespace Weikio.PluginFramework.Catalogs
         
         public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options)
         {
+            if (string.IsNullOrWhiteSpace(folderPath))
+            {
+                throw new ArgumentNullException(nameof(folderPath));
+            }
+            
             _folderPath = folderPath;
             _options = options ?? new FolderPluginCatalogOptions();
 
@@ -81,11 +87,13 @@ namespace Weikio.PluginFramework.Catalogs
             }
         }
 
+        /// <inheritdoc />
         public List<Plugin> GetPlugins()
         {
             return Plugins;
         }
 
+        /// <inheritdoc />
         public Plugin Get(string name, Version version)
         {
             foreach (var assemblyPluginCatalog in _catalogs)
@@ -103,6 +111,7 @@ namespace Weikio.PluginFramework.Catalogs
             return null;
         }
 
+        /// <inheritdoc />
         public async Task Initialize()
         {
             var foundFiles = new List<string>();
@@ -110,7 +119,7 @@ namespace Weikio.PluginFramework.Catalogs
             foreach (var searchPattern in _options.SearchPatterns)
             {
                 var dllFiles = Directory.GetFiles(_folderPath, searchPattern,
-                    _options.IncludSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                    _options.IncludeSubfolders ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
 
                 foundFiles.AddRange(dllFiles);
             }
@@ -119,6 +128,7 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var assemblyPath in foundFiles)
             {
+                // Assemblies are treated as readonly as long as possible
                 var isPluginAssembly = IsPluginAssembly(assemblyPath);
 
                 if (isPluginAssembly == false)
@@ -133,6 +143,7 @@ namespace Weikio.PluginFramework.Catalogs
                     PluginNameOptions = _options.PluginNameOptions
                 };
 
+                // We are actually just delegating the responsibility from FolderPluginCatalog to AssemblyPluginCatalog. 
                 var assemblyCatalog = new AssemblyPluginCatalog(assemblyPath, assemblyCatalogOptions);
                 await assemblyCatalog.Initialize();
 
@@ -186,6 +197,7 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var resolver = new PathAssemblyResolver(paths);
 
+                // We use the metadata (readonly) versions of the assemblies before loading them
                 using (var metadataContext = new MetadataLoadContext(resolver))
                 {
                     var metadataPluginLoadContext = new MetadataTypeFindingContext(metadataContext);

@@ -5,8 +5,15 @@ using System.Reflection;
 
 namespace Weikio.PluginFramework.Abstractions
 {
+    /// <summary>
+    /// Configuration options for defining how the plugin name and plugin version are generated.
+    /// </summary>
     public class PluginNameOptions
     {
+        /// <summary>
+        /// Gets or sets the func which defines how the plugin's name is deducted. By default tries to find the plugin's name from <see cref="DisplayNameAttribute"/>.
+        /// If that is missing, type's full name is used. 
+        /// </summary>
         public Func<PluginNameOptions, Type, string> PluginNameGenerator { get; set; } = (options, type) =>
         {
             var displayNameAttribute = type.GetCustomAttribute(typeof(DisplayNameAttribute), true) as DisplayNameAttribute;
@@ -24,6 +31,9 @@ namespace Weikio.PluginFramework.Abstractions
             return displayNameAttribute.DisplayName;
         };
 
+        /// <summary>
+        /// Gets or sets the func which defines how the plugin's version is deducted. By default tries to find the plugin's assembly and its FileVersion.
+        /// </summary>
         public Func<PluginNameOptions, Type, Version> PluginVersionGenerator { get; set; } = (options, type) =>
         {
             var assemblyLocation = type.Assembly.Location;
@@ -43,6 +53,9 @@ namespace Weikio.PluginFramework.Abstractions
             return version;
         };
 
+        /// <summary>
+        /// Gets or sets the func which defines how the plugin's description is deducted. By default tries to find the plugin's assembly and its Comments.
+        /// </summary>
         public Func<PluginNameOptions, Type, string> PluginDescriptionGenerator { get; set; } = (options, type) =>
         {
             var assemblyLocation = type.Assembly.Location;
@@ -57,6 +70,9 @@ namespace Weikio.PluginFramework.Abstractions
             return versionInfo.Comments;
         };
 
+        /// <summary>
+        /// Gets or sets the func which defines how the plugin's product version is deducted. By default tries to find the plugin's assembly and its ProductVersion.
+        /// </summary>
         public Func<PluginNameOptions, Type, string> PluginProductVersionGenerator { get; set; } = (options, type) =>
         {
             var assemblyLocation = type.Assembly.Location;

@@ -6,8 +6,9 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Weikio.PluginFramework.Catalogs.Delegates;
 
-namespace Weikio.PluginFramework.Catalogs.Delegates
+namespace Weikio.PluginFramework.Tools
 {
     /// <summary>
     ///     Note: Heavily based on the work done by Jeremy Miller in Lamar: https://github.com/jasperfx/Lamar

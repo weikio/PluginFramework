@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using LamarCodeGeneration;
-using LamarCompiler;
+using Weikio.PluginFramework.Tools;
 
 namespace Weikio.PluginFramework.Catalogs.Roslyn
 {
@@ -30,7 +30,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
         {
             try
             {
-                var generator = new AssemblyGenerator();
+                var generator = new CodeToAssemblyGenerator();
                 generator.ReferenceAssemblyContainingType<Action>();
 
                 if (_options.AdditionalReferences?.Any() == true)
@@ -41,29 +41,24 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
                     }
                 }
 
-                string assemblySourceCode;
-
-                using (var sourceWriter = new SourceWriter())
+                var code = new StringBuilder();
+                code.AppendLine("using System;");
+                code.AppendLine("using System.Diagnostics;");
+                code.AppendLine("using System.Threading.Tasks;");
+                code.AppendLine("using System.Text;");
+                code.AppendLine("using System.Collections;");
+                code.AppendLine("using System.Collections.Generic;");
+                
+                if (_options.AdditionalNamespaces?.Any() == true)
                 {
-                    sourceWriter.UsingNamespace("System");
-                    sourceWriter.UsingNamespace("System.Diagnostics");
-                    sourceWriter.UsingNamespace("System.Threading.Tasks");
-                    sourceWriter.UsingNamespace("System.Text");
-                    sourceWriter.UsingNamespace("System.Collections");
-                    sourceWriter.UsingNamespace("System.Collections.Generic");
-
-                    if (_options.AdditionalNamespaces?.Any() == true)
+                    foreach (var ns in _options.AdditionalNamespaces)
                     {
-                        foreach (var ns in _options.AdditionalNamespaces)
-                        {
-                            sourceWriter.UsingNamespace(ns);
-                        }
+                        code.AppendLine($"using {ns};");
                     }
-
-                    sourceWriter.Write(_code);
-
-                    assemblySourceCode = sourceWriter.Code();
                 }
+
+                code.AppendLine(_code);
+                var assemblySourceCode = code.ToString();
 
                 var result = generator.Generate(assemblySourceCode);
 

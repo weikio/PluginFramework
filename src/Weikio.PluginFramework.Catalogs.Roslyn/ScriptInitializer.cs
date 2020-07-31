@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
-using LamarCodeGeneration;
-using LamarCompiler;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Scripting;
+using Weikio.PluginFramework.Tools;
 
 namespace Weikio.PluginFramework.Catalogs.Roslyn
 {
@@ -57,53 +57,59 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
                 var parameters = await GetParameters();
                 var updatedScript = await RemoveProperties(_code);
 
-                var generator = new AssemblyGenerator();
+                var generator = new CodeToAssemblyGenerator();
                 generator.ReferenceAssemblyContainingType<Action>();
-                string assemblySourceCode;
 
-                using (var sourceWriter = new SourceWriter())
+                var code = new StringBuilder();
+                code.AppendLine("using System;");
+                code.AppendLine("using System.Diagnostics;");
+                code.AppendLine("using System.Threading.Tasks;");
+                code.AppendLine("using System.Text;");
+                code.AppendLine("using System.Collections;");
+                code.AppendLine("using System.Collections.Generic;");
+                
+                if (_options.AdditionalNamespaces?.Any() == true)
                 {
-                    sourceWriter.UsingNamespace("System");
-                    sourceWriter.UsingNamespace("System.Diagnostics");
-                    sourceWriter.UsingNamespace("System.Threading.Tasks");
-                    sourceWriter.UsingNamespace("System.Text");
-                    sourceWriter.UsingNamespace("System.Collections");
-                    sourceWriter.UsingNamespace("System.Collections.Generic");
-
-                    sourceWriter.Namespace(_options.NamespaceNameGenerator(_options));
-                    sourceWriter.StartClass(_options.TypeNameGenerator(_options));
-
-                    if (returnType == null)
+                    foreach (var ns in _options.AdditionalNamespaces)
                     {
-                        if (_options.ReturnsTask)
-                        {
-                            sourceWriter.Write($"BLOCK:public async Task {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
-                        }
-                        else
-                        {
-                            sourceWriter.Write($"BLOCK:public void {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
-                        }
+                        code.AppendLine($"using {ns};");
+                    }
+                }
+
+                code.AppendLine($"namespace {_options.NamespaceNameGenerator(_options)}");
+                code.AppendLine("{");
+                code.AppendLine($"public class {_options.TypeNameGenerator(_options)}");
+                code.AppendLine("{");
+                if (returnType == null)
+                {
+                    if (_options.ReturnsTask)
+                    {
+                        code.AppendLine($"public async Task {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
                     }
                     else
                     {
-                        if (_options.ReturnsTask)
-                        {
-                            sourceWriter.Write($"BLOCK:public async Task<{returnType.FullName}> {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
-                        }
-                        else
-                        {
-                            sourceWriter.Write($"BLOCK:public {returnType.FullName} {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
-                        }
+                        code.AppendLine($"public void {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
                     }
-
-                    sourceWriter.Write(updatedScript);
-
-                    sourceWriter.FinishBlock(); // Finish the method
-                    sourceWriter.FinishBlock(); // Finish the class
-                    sourceWriter.FinishBlock(); // Finish the namespace
-
-                    assemblySourceCode = sourceWriter.Code();
                 }
+                else
+                {
+                    if (_options.ReturnsTask)
+                    {
+                        code.AppendLine($"public async Task<{returnType.FullName}> {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
+                    }
+                    else
+                    {
+                        code.AppendLine($"public {returnType.FullName} {_options.MethodNameGenerator(_options)}({GetParametersString(parameters)})");
+                    }
+                }
+
+                code.AppendLine("{"); // Start method
+                code.AppendLine(updatedScript);
+                code.AppendLine("}"); // End method
+                code.AppendLine("}"); // End class
+                code.AppendLine("}"); // End namespace
+
+                var assemblySourceCode = code.ToString();
 
                 var result = generator.Generate(assemblySourceCode);
 

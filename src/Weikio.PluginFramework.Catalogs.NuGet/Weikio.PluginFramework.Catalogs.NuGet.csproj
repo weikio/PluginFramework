@@ -10,7 +10,7 @@
     <Product>Weikio.PluginFramework.Catalogs.NuGet</Product>
     <AssemblyName>Weikio.PluginFramework.Catalogs.NuGet</AssemblyName>
     <PackageTags>nuget;plugins;addons;extensions;plugin framework</PackageTags>
-    <PackageIcon>logo_256.png</PackageIcon>
+    <PackageIcon>logo_transparent_color_256.png</PackageIcon>
     <Title>NuGet Catalog for Plugin Framework</Title>
   </PropertyGroup>
 
@@ -20,6 +20,7 @@
     <PackageReference Include="NuGet.ProjectModel" Version="5.3.1" />
     <PackageReference Include="NuGet.Protocol" Version="5.3.1" />
     <PackageReference Include="NuGet.Resolver" Version="5.3.1" />
+    <PackageReference Include="MinVer" Version="2.0.*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="../../docs/logo_256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

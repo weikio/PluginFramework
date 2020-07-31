@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 
@@ -16,6 +15,11 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
         public DelegatePluginCatalog(MulticastDelegate multicastDelegate) : this(multicastDelegate, pluginName: null)
         {
         }
+        /// <summary>
+        /// Creates an instance of DelegatePluginCatalog 
+        /// </summary>
+        /// <param name="multicastDelegate">Plugin's delegate</param>
+        /// <param name="pluginName">Name of the plugin</param>
         public DelegatePluginCatalog(MulticastDelegate multicastDelegate, string pluginName = "") : this(multicastDelegate, null, null, null, pluginName)
         {
         }
@@ -26,7 +30,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
         }
 
         public DelegatePluginCatalog(MulticastDelegate multicastDelegate,
-            List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> conversionRules = null,
+            List<DelegateConversionRule> conversionRules = null,
             PluginNameOptions nameOptions = null, DelegatePluginCatalogOptions options = null, string pluginName = null)
         {
             if (multicastDelegate == null)
@@ -38,7 +42,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
 
             if (conversionRules == null)
             {
-                conversionRules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>();
+                conversionRules = new List<DelegateConversionRule>();
             }
 
             if (options != null)

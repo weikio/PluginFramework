@@ -8,7 +8,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
     public class DelegatePluginCatalogOptions
     {
         public PluginNameOptions NameOptions { get; set; } = new PluginNameOptions();
-        public List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)> ConversionRules { get; set; } = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>();
+        public List<DelegateConversionRule> ConversionRules { get; set; } = new List<DelegateConversionRule>();
         public string MethodName { get; set; } = "Run";
         public string TypeName { get; set; } = "GeneratedType";
         public string NamespaceName { get; set; } = "GeneratedNamespace";

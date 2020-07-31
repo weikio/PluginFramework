@@ -319,9 +319,9 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanConvertParameterToProperty()
         {
-            var rules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>
+            var rules = new List<DelegateConversionRule>()
             {
-                (info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToPublicProperty = true })
+                new DelegateConversionRule(info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToPublicProperty = true }),
             };
 
             var catalog = new DelegatePluginCatalog(new Func<int, Task<bool>>(async i =>
@@ -341,9 +341,9 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanConvertParameterToConstructorParameter()
         {
-            var rules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>
+            var rules = new List<DelegateConversionRule>()
             {
-                (info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToConstructor = true })
+                new DelegateConversionRule(info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToConstructor = true })
             };
 
             var catalog = new DelegatePluginCatalog(new Func<int, Task<bool>>(async i =>
@@ -364,12 +364,12 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanConvertMultipleParametersToConstructorAndPropertyParameters()
         {
-            var rules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>
+            var rules = new List<DelegateConversionRule>()
             {
-                (info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToConstructor = true }),
-                (info => info.ParameterType == typeof(string), nfo => new ParameterConversion() { ToPublicProperty = true }),
-                (info => info.ParameterType == typeof(bool), nfo => new ParameterConversion() { ToPublicProperty = true }),
-                (info => info.ParameterType == typeof(decimal), nfo => new ParameterConversion() { ToConstructor = true }),
+                new DelegateConversionRule(info => info.ParameterType == typeof(int), nfo => new ParameterConversion() { ToConstructor = true }),
+                new DelegateConversionRule(info => info.ParameterType == typeof(string), nfo => new ParameterConversion() { ToPublicProperty = true }),
+                new DelegateConversionRule(info => info.ParameterType == typeof(bool), nfo => new ParameterConversion() { ToPublicProperty = true }),
+                new DelegateConversionRule(info => info.ParameterType == typeof(decimal), nfo => new ParameterConversion() { ToConstructor = true }),
             };
 
             var catalog = new DelegatePluginCatalog(new Func<int, string, bool, decimal, char, bool>( (i, s, arg3, arg4, c) => 

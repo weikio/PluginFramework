@@ -75,7 +75,7 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
             var conversionRules = options?.ConversionRules;
             if (conversionRules == null)
             {
-                conversionRules = new List<(Predicate<ParameterInfo>, Func<ParameterInfo, ParameterConversion>)>();
+                conversionRules = new List<DelegateConversionRule>();
             }
 
             for (var index = 0; index < parameters.Length; index++)
@@ -90,11 +90,11 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
 
                 foreach (var conversionRule in conversionRules)
                 {
-                    var shouldRun = conversionRule.Item1(parameterInfo);
+                    var canHandle = conversionRule.CanHandle(parameterInfo);
 
-                    if (shouldRun)
+                    if (canHandle)
                     {
-                        var conversionResult = conversionRule.Item2(parameterInfo);
+                        var conversionResult = conversionRule.Handle(parameterInfo);
 
                         if (!string.IsNullOrWhiteSpace(conversionResult.Name))
                         {

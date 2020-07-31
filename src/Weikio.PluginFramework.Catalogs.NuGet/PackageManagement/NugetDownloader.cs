@@ -26,12 +26,12 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
     {
         private readonly ILogger _logger;
 
-        public NuGetDownloader()
+        public NuGetDownloader(ILogger logger = null)
         {
-            _logger = new ConsoleLogger();
+            _logger = logger ?? new ConsoleLogger();
         }
 
-  public async Task<string[]> DownloadAsync(string packageFolder, string packageName, string packageVersion = null, bool includePrerelease = false,
+        public async Task<string[]> DownloadAsync(string packageFolder, string packageName, string packageVersion = null, bool includePrerelease = false,
             NuGetFeed packageFeed = null, bool onlyDownload = false)
         {
             if (!Directory.Exists(packageFolder))
@@ -160,7 +160,7 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
             var nuGetFramework = NuGetFramework.ParseFrameworkName(dotNetFramework, frameworkNameProvider);
 
             var project = new PluginFolderNugetProject(downloadFolder, packageIdentity, nuGetFramework, onlyDownload);
-            
+
             var packageManager = new NuGetPackageManager(sourceRepositoryProvider, settings, downloadFolder) { PackagesFolderNuGetProject = project };
 
             var clientPolicyContext = ClientPolicyContext.GetClientPolicy(settings, _logger);
@@ -223,7 +223,8 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
             return sourceRepo;
         }
 
-        public async IAsyncEnumerable<(SourceRepository Repository, IPackageSearchMetadata Package)> SearchPackagesAsync(string searchTerm, int maxResults = 128, 
+        public async IAsyncEnumerable<(SourceRepository Repository, IPackageSearchMetadata Package)> SearchPackagesAsync(string searchTerm,
+            int maxResults = 128,
             bool includePrerelease = false,
             string nugetConfigFilePath = "")
         {
@@ -276,7 +277,8 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
             }
         }
 
-        public async Task<IEnumerable<(SourceRepository Repository, IPackageSearchMetadata Package)>> SearchPackagesAsync(NuGetFeed packageFeed, string searchTerm, int maxResults = 128,
+        public async Task<IEnumerable<(SourceRepository Repository, IPackageSearchMetadata Package)>> SearchPackagesAsync(NuGetFeed packageFeed,
+            string searchTerm, int maxResults = 128,
             bool includePrerelease = false)
         {
             var providers = GetNugetResourceProviders();
@@ -293,7 +295,7 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
             {
                 searchFilter = new SearchFilter(includePrerelease);
             }
-            
+
             var packages = await packageSearchResource.SearchAsync(searchTerm, searchFilter, 0, maxResults, _logger, CancellationToken.None);
 
             return packages.Select(x => (sourceRepo, x));
@@ -322,13 +324,14 @@ namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement
             }
             else
             {
-                var searchResults = await packageMetadataResource.GetMetadataAsync(
+                // Can't use await as we seem to lose the thread
+                var searchResults = packageMetadataResource.GetMetadataAsync(
                     packageName,
                     includePrerelease,
                     includeUnlisted: false,
                     sourceCacheContext,
                     _logger,
-                    CancellationToken.None);
+                    CancellationToken.None).Result;
 
                 searchResults = searchResults
                     .OrderByDescending(p => p.Identity.Version);

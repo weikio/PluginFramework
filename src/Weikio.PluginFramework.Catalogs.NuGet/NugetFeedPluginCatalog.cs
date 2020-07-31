@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
 using Weikio.PluginFramework.TypeFinding;
 
+// ReSharper disable once CheckNamespace
 namespace Weikio.PluginFramework.Catalogs
 {
     public class NugetFeedPluginCatalog : IPluginCatalog
@@ -22,12 +21,13 @@ namespace Weikio.PluginFramework.Catalogs
 
         private List<NugetPackagePluginCatalog> _pluginCatalogs = new List<NugetPackagePluginCatalog>();
         private Dictionary<string, TypeFinderCriteria> _typeFinderCriterias;
-        
+        private readonly NugetPluginCatalogOptions _options;
+
         public string PackagesFolder { get; }
 
-        public NugetFeedPluginCatalog(NuGetFeed packageFeed, string searchTerm = null, 
-            bool includePrereleases = false, int maxPackages = 128,  
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null)
+        public NugetFeedPluginCatalog(NuGetFeed packageFeed, string searchTerm = null,
+            bool includePrereleases = false, int maxPackages = 128,
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, NugetPluginCatalogOptions options = null)
         {
             _packageFeed = packageFeed;
             _searchTerm = searchTerm;
@@ -47,6 +47,7 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             _typeFinderCriterias = criterias;
+            _options = options ?? new NugetPluginCatalogOptions();
 
             if (configureFinder != null)
             {
@@ -72,7 +73,7 @@ namespace Weikio.PluginFramework.Catalogs
 
                 return result;
             }
-            
+
             return null;
         }
 
@@ -80,17 +81,17 @@ namespace Weikio.PluginFramework.Catalogs
 
         public async Task Initialize()
         {
-            var nuGetDownloader = new NuGetDownloader();
+            var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
 
             var packages = await nuGetDownloader.SearchPackagesAsync(_packageFeed, _searchTerm, maxResults: _maxPackages);
 
             foreach (var packageAndRepo in packages)
             {
-                var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(), 
+                var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(),
                     _includePrereleases, _packageFeed, PackagesFolder, criterias: _typeFinderCriterias);
 
                 await packageCatalog.Initialize();
-                
+
                 _pluginCatalogs.Add(packageCatalog);
             }
 

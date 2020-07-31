@@ -1,14 +1,20 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using BlazorApp.Data;
+using Microsoft.CodeAnalysis;
 using Weikio.PluginFramework.Samples.Shared;
-using Weikio.PluginFramework.Abstractions;
-using Weikio.PluginFramework.Catalogs;
 
-namespace WebApp
+namespace BlazorApp
 {
     public class Startup
     {
@@ -20,21 +26,14 @@ namespace WebApp
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var folderPluginCatalog = new FolderPluginCatalog(@"..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1", type =>
-            {
-                type.Implements<IOperator>();
-            });
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddSingleton<WeatherForecastService>();
 
-            services.AddPluginFramework()
-                .AddPluginCatalog(folderPluginCatalog)
-                .AddPluginType<IOperator>();
-
-            // Alternatively
-            // services.AddPluginFramework<IOperator>(@"..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1");
-
-            services.AddControllers();
+            services.AddPluginFramework<IWidget>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -44,16 +43,23 @@ namespace WebApp
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }

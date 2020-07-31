@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
@@ -169,8 +170,18 @@ namespace Weikio.PluginFramework.Catalogs
                     return true;
                 }
 
-                var runtimeAssemblies = Directory.GetFiles(RuntimeEnvironment.GetRuntimeDirectory(), "*.dll");
+                var runtimeDirectory = RuntimeEnvironment.GetRuntimeDirectory();
+                var runtimeAssemblies = Directory.GetFiles(runtimeDirectory, "*.dll");
                 var paths = new List<string>(runtimeAssemblies) { assemblyPath };
+
+                if (_options.PluginLoadContextOptions.AdditionalRuntimePaths?.Any() == true)
+                {
+                    foreach (var additionalRuntimePath in _options.PluginLoadContextOptions.AdditionalRuntimePaths)
+                    {
+                        var dlls = Directory.GetFiles(additionalRuntimePath, "*.dll");
+                        paths.AddRange(dlls);
+                    }
+                }
 
                 if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Always)
                 {

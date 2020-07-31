@@ -9,7 +9,8 @@ namespace WpfApp
 {
     public partial class MainWindow : Window
     {
-        private ObservableCollection<Plugin> _plugins = new ObservableCollection<Plugin>();
+        private readonly ObservableCollection<Plugin> _plugins = new ObservableCollection<Plugin>();
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -17,15 +18,14 @@ namespace WpfApp
 
         private async void MainWindow_OnLoaded(object sender, RoutedEventArgs e)
         {
-            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1", type =>
+            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1", type =>
             {
                 type.Implements<IOperator>();
             });
             
             var assemblyPluginCatalog = new AssemblyPluginCatalog(typeof(MainWindow).Assembly, type => typeof(IOperator).IsAssignableFrom(type));
-            var typePluginCatalog = new TypePluginCatalog(typeof(RemainderOperator));
             
-            var pluginCatalog = new CompositePluginCatalog(folderPluginCatalog, assemblyPluginCatalog, typePluginCatalog); 
+            var pluginCatalog = new CompositePluginCatalog(folderPluginCatalog, assemblyPluginCatalog); 
             await pluginCatalog.Initialize();
 
             var allPlugins = pluginCatalog.GetPlugins();

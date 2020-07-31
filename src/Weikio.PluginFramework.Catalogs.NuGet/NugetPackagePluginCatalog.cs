@@ -20,11 +20,13 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly HashSet<string> _pluginAssemblyFilePaths = new HashSet<string>();
         private readonly List<AssemblyPluginCatalog> _pluginCatalogs = new List<AssemblyPluginCatalog>();
         private readonly Dictionary<string, TypeFinderCriteria> _typeFinderCriterias;
+        private readonly NugetPluginCatalogOptions _options;
 
         public string PackagesFolder { get; }
 
         public NugetPackagePluginCatalog(string packageName, string packageVersion = null, bool includePrerelease = false, NuGetFeed packageFeed = null,
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null)
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, 
+            NugetPluginCatalogOptions options = null)
         {
             _packageName = packageName;
             _packageVersion = packageVersion;
@@ -44,6 +46,7 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             _typeFinderCriterias = criterias;
+            _options = options ?? new NugetPluginCatalogOptions();
 
             if (configureFinder != null)
             {
@@ -82,7 +85,7 @@ namespace Weikio.PluginFramework.Catalogs
 
         public async Task Initialize()
         {
-            var nuGetDownloader = new NuGetDownloader();
+            var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
             var pluginAssemblyFileNames = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed);
 
             foreach (var f in pluginAssemblyFileNames)
@@ -99,6 +102,8 @@ namespace Weikio.PluginFramework.Catalogs
 
                 _pluginCatalogs.Add(assemblyCatalog);
             }
+
+            IsInitialized = true;
         }
     }
 }

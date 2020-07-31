@@ -1,0 +1,34 @@
+﻿@page "/"
+@using Weikio.PluginFramework.Samples.Shared
+
+
+<h1>Widget dashboard</h1>
+<div class="row">
+
+    @foreach (var widget in Widgets)
+    {
+        <div class="col-6">
+            <div class="widget">
+                <h1>@widget.Title</h1>
+                <hr/>
+                @RenderWidget(widget)
+            </div>
+        </div>
+    }
+</div>
+
+@code{
+
+    [Inject]
+    public IEnumerable<IWidget> Widgets { get; set; }
+
+    private RenderFragment RenderWidget(IWidget widget)
+    {
+        return new RenderFragment(builder =>
+        {
+            builder.OpenComponent(0, widget.GetType());
+            builder.CloseComponent();
+        });
+    }
+
+}

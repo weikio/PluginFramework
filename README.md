@@ -65,11 +65,15 @@ The following Plugin Framework samples are available from GitHub:
 
 #### [Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebApp)
 
+#### [Plugin Framework & Blazor](https://github.com/weikio/PluginFramework/tree/master/samples/BlazorApp)
+
 #### [Plugin Framework & WPF App](https://github.com/weikio/PluginFramework/tree/master/samples/WpfApp)
 
 #### [Nuget & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithNuget)
 
 #### [Roslyn & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithRoslyn)
+
+#### [Delegates & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithDelegate)
 
 ## Main concepts
 

@@ -1,8 +1,5 @@
 using NuGet.Common;
-using NuGet.ProjectManagement;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Weikio.PluginFramework.Catalogs.NuGet.PackageManagement

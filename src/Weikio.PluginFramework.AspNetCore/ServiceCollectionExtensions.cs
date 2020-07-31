@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
 
 // ReSharper disable once CheckNamespace
@@ -12,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddPluginFramework(this IServiceCollection services, Action<TypeFinderCriteriaBuilder> configureTypeFinder = null, string folderPath = "")
+        public static IServiceCollection AddPluginFramework(this IServiceCollection services)
         {
             services.AddHostedService<PluginFrameworkInitializer>();
 
@@ -31,13 +35,25 @@ namespace Microsoft.Extensions.DependencyInjection
                 return result.AsEnumerable();
             });
 
-            if (configureTypeFinder == null)
+            var aspNetCoreControllerAssemblyLocation = typeof(Controller).Assembly.Location;
+
+            if (string.IsNullOrWhiteSpace(aspNetCoreControllerAssemblyLocation))
             {
                 return services;
             }
+
+            var aspNetCoreLocation = Path.GetDirectoryName(aspNetCoreControllerAssemblyLocation);
             
-            
-            
+            if (PluginLoadContextOptions.Defaults.AdditionalRuntimePaths == null)
+            {
+                PluginLoadContextOptions.Defaults.AdditionalRuntimePaths = new List<string>();
+            }
+
+            if (!PluginLoadContextOptions.Defaults.AdditionalRuntimePaths.Contains(aspNetCoreLocation))
+            {
+                PluginLoadContextOptions.Defaults.AdditionalRuntimePaths.Add(aspNetCoreLocation);
+            }
+
             return services;
         }
         
@@ -47,7 +63,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (string.IsNullOrWhiteSpace(dllPath))
             {
-                dllPath = Environment.CurrentDirectory;
+                var entryAssembly = Assembly.GetEntryAssembly();
+
+                if (entryAssembly == null)
+                {
+                    dllPath = Environment.CurrentDirectory;
+                }
+                else
+                {
+                    dllPath = Path.GetDirectoryName(entryAssembly.Location);
+                }
             }
 
             var typeFinderCriteria = TypeFinderCriteriaBuilder.Create()

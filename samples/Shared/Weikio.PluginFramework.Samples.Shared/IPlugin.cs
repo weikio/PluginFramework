@@ -11,4 +11,9 @@ namespace Weikio.PluginFramework.Samples.Shared
     {
         string Get();
     }
+
+    public interface IWidget
+    {
+        string Title { get; }
+    }
 }

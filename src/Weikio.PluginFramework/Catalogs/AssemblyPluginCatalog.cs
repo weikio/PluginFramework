@@ -18,153 +18,130 @@ namespace Weikio.PluginFramework.Catalogs
         private PluginAssemblyLoadContext _pluginAssemblyLoadContext;
         private List<TypePluginCatalog> _plugins = null;
 
-        // TODO: Remove the duplicate code from constructors
-        public AssemblyPluginCatalog(string assemblyPath) : this(assemblyPath, options: null)
+        public AssemblyPluginCatalog(string assemblyPath) : this(assemblyPath, null, null, null)
         {
         }
 
-        public AssemblyPluginCatalog(Assembly assembly) : this(assembly, options: null)
+        public AssemblyPluginCatalog(Assembly assembly) : this(null, assembly)
         {
         }
 
-        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null)
+        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, null, null, null, options)
         {
-            if (string.IsNullOrWhiteSpace(assemblyPath))
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, AssemblyPluginCatalogOptions options = null) : this(null, assembly, null, null, null, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, TypeFinderCriteria criteria = null, AssemblyPluginCatalogOptions options = null) : this(assemblyPath,
+            null, null, null,
+            null, criteria, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, Action<TypeFinderCriteriaBuilder> configureFinder = null,
+            AssemblyPluginCatalogOptions options = null) : this(assemblyPath,
+            null, null, null, configureFinder, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, Action<TypeFinderCriteriaBuilder> configureFinder = null,
+            AssemblyPluginCatalogOptions options = null) : this(null,
+            assembly, null, null, configureFinder, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null,
+            filter, null, null, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null) : this(null, assembly,
+            filter, null, null, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath, Dictionary<string, Predicate<Type>> taggedFilters,
+            AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, taggedFilters, null, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(Assembly assembly, Dictionary<string, Predicate<Type>> taggedFilters,
+            AssemblyPluginCatalogOptions options = null) : this(null, assembly, null, taggedFilters, null, null, options)
+        {
+        }
+
+        public AssemblyPluginCatalog(string assemblyPath = null, Assembly assembly = null, Predicate<Type> filter = null,
+            Dictionary<string, Predicate<Type>> taggedFilters = null, Action<TypeFinderCriteriaBuilder> configureFinder = null,
+            TypeFinderCriteria criteria = null, AssemblyPluginCatalogOptions options = null)
+        {
+            if (assembly != null)
             {
-                throw new ArgumentNullException(nameof(assemblyPath));
+                _assembly = assembly;
+                _assemblyPath = _assembly.Location;
+            }
+            else if (!string.IsNullOrWhiteSpace(assemblyPath))
+            {
+                _assemblyPath = assemblyPath;
+            }
+            else
+            {
+                throw new ArgumentNullException($"{nameof(assembly)} or {nameof(assemblyPath)} must be set.");
+            }
+                
+            _options = options ?? new AssemblyPluginCatalogOptions();
+
+            SetFilters(filter, taggedFilters, criteria, configureFinder);
+        }
+
+        private void SetFilters(Predicate<Type> filter, Dictionary<string, Predicate<Type>> taggedFilters, TypeFinderCriteria criteria,
+            Action<TypeFinderCriteriaBuilder> configureFinder)
+        {
+            if (_options.TypeFinderCriterias == null)
+            {
+                _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
+            }
+            
+            if (filter != null)
+            {
+                var filterCriteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
+
+                _options.TypeFinderCriterias.Add(string.Empty, filterCriteria);
             }
 
-            _assemblyPath = assemblyPath;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-        }
-
-        public AssemblyPluginCatalog(Assembly assembly, AssemblyPluginCatalogOptions options = null)
-        {
-            _assembly = assembly;
-            _assemblyPath = _assembly.Location;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-        }
-
-        public AssemblyPluginCatalog(string assemblyPath, TypeFinderCriteria criteria = null, AssemblyPluginCatalogOptions options = null)
-        {
-            if (string.IsNullOrWhiteSpace(assemblyPath))
+            if (taggedFilters?.Any() == true)
             {
-                throw new ArgumentNullException(nameof(assemblyPath));
+                foreach (var taggedFilter in taggedFilters)
+                {
+                    var taggedCriteria = new TypeFinderCriteria { Query = (context, type) => taggedFilter.Value(type) };
+
+                    _options.TypeFinderCriterias.Add(taggedFilter.Key, taggedCriteria);
+                }
             }
 
-            _assemblyPath = assemblyPath;
-            _options = options ?? new AssemblyPluginCatalogOptions();
+            if (configureFinder != null)
+            {
+                var builder = new TypeFinderCriteriaBuilder();
+                configureFinder(builder);
+
+                var configuredCriteria = builder.Build();
+
+                _options.TypeFinderCriterias.Add("", configuredCriteria);
+            }
 
             if (criteria != null)
             {
-                _options.TypeFinderCriterias.Add(string.Empty, criteria);
-            }
-        }
-        
-        public AssemblyPluginCatalog(string assemblyPath, Action<TypeFinderCriteriaBuilder> configureFinder = null, AssemblyPluginCatalogOptions options = null)
-        {
-            if (string.IsNullOrWhiteSpace(assemblyPath))
-            {
-                throw new ArgumentNullException(nameof(assemblyPath));
-            }
-
-            _assemblyPath = assemblyPath;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-
-            if (configureFinder != null)
-            {
-                var builder = new TypeFinderCriteriaBuilder();
-                configureFinder(builder);
-
-                var criteria = builder.Build();
-
                 _options.TypeFinderCriterias.Add("", criteria);
             }
-        }
-        
-        public AssemblyPluginCatalog(Assembly assembly, Action<TypeFinderCriteriaBuilder> configureFinder = null, AssemblyPluginCatalogOptions options = null)
-        {
-            if (assembly == null)
+            
+            if (_options.TypeFinderCriterias?.Any() != true)
             {
-                throw new ArgumentNullException(nameof(assembly));
-            }
-                
-            _assembly = assembly;
-            _assemblyPath = _assembly.Location;
-            _options = options ?? new AssemblyPluginCatalogOptions();
+                var findAll = TypeFinderCriteriaBuilder
+                    .Create()
+                    .Build();
 
-            if (configureFinder != null)
-            {
-                var builder = new TypeFinderCriteriaBuilder();
-                configureFinder(builder);
-
-                var criteria = builder.Build();
-
-                _options.TypeFinderCriterias.Add("", criteria);
-            }
-        }
-
-        public AssemblyPluginCatalog(string assemblyPath, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null)
-        {
-            if (string.IsNullOrWhiteSpace(assemblyPath))
-            {
-                throw new ArgumentNullException(nameof(assemblyPath));
-            }
-
-            _assemblyPath = assemblyPath;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-
-            if (filter != null)
-            {
-                var criteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
-
-                _options.TypeFinderCriterias.Add(string.Empty, criteria);
-            }
-        }
-
-        public AssemblyPluginCatalog(Assembly assembly, Predicate<Type> filter = null, AssemblyPluginCatalogOptions options = null)
-        {
-            _assembly = assembly;
-            _assemblyPath = _assembly.Location;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-
-            if (filter != null)
-            {
-                var criteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
-
-                _options.TypeFinderCriterias.Add(string.Empty, criteria);
-            }
-        }
-
-        public AssemblyPluginCatalog(string assemblyPath, Dictionary<string, Predicate<Type>> taggedFilters, AssemblyPluginCatalogOptions options = null)
-        {
-            if (string.IsNullOrWhiteSpace(assemblyPath))
-            {
-                throw new ArgumentNullException(nameof(assemblyPath));
-            }
-
-            _assemblyPath = assemblyPath;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-
-            SetFilters(taggedFilters);
-        }
-
-        public AssemblyPluginCatalog(Assembly assembly, Dictionary<string, Predicate<Type>> taggedFilters, AssemblyPluginCatalogOptions options = null)
-        {
-            _assembly = assembly;
-            _assemblyPath = _assembly.Location;
-            _options = options ?? new AssemblyPluginCatalogOptions();
-
-            SetFilters(taggedFilters);
-        }
-
-        private void SetFilters(Dictionary<string, Predicate<Type>> taggedFilters)
-        {
-            foreach (var taggedFilter in taggedFilters)
-            {
-                var criteria = new TypeFinderCriteria { Query = (context, type) => taggedFilter.Value(type) };
-
-                _options.TypeFinderCriterias.Add(taggedFilter.Key, criteria);
+                _options.TypeFinderCriterias.Add(string.Empty, findAll);
             }
         }
 
@@ -184,20 +161,6 @@ namespace Weikio.PluginFramework.Catalogs
             _plugins = new List<TypePluginCatalog>();
 
             var finder = new TypeFinder();
-
-            if (_options.TypeFinderCriterias?.Any() != true)
-            {
-                var findAll = TypeFinderCriteriaBuilder
-                    .Create()
-                    .Build();
-
-                if (_options.TypeFinderCriterias == null)
-                {
-                    _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
-                }
-                
-                _options.TypeFinderCriterias.Add(string.Empty, findAll);
-            }
 
             foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
             {

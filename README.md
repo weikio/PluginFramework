@@ -115,7 +115,7 @@ Plugin Framework provides the following officially supported catalogs:
 * Type
 * Assembly
 * Folder
-* Delegate (Action or a Func)
+* Delegate (Action or a Func) ([Documentation](https://github.com/weikio/PluginFramework/wiki/Delegate-Plugin-Catalog))
 * Roslyn script ([Nuget: Weikio.PluginFramework.Catalogs.Roslyn](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Roslyn/), [Documentation](https://github.com/weikio/PluginFramework/wiki/Roslyn-Plugin-Catalog))
 * Nuget package ([Nuget: Weikio.PluginFramework.Catalogs.Nuget](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/))
 * Nuget feed ([Nuget: Weikio.PluginFramework.Catalogs.Nuget](https://www.nuget.org/packages/Weikio.PluginFramework.Catalogs.Nuget/))

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Weikio.PluginFramework.TypeFinding;
 
@@ -23,7 +24,14 @@ namespace Weikio.PluginFramework.Context
         public Type FindType(Type type)
         {
             var assemblyName = type.Assembly.GetName();
-            var assembly = _metadataLoadContext.LoadFromAssemblyName(assemblyName);
+            var assemblies = _metadataLoadContext.GetAssemblies();
+
+            var assembly = assemblies.FirstOrDefault(x => string.Equals(x.FullName, assemblyName.FullName));
+
+            if (assembly == null)
+            {
+                assembly = _metadataLoadContext.LoadFromAssemblyName(assemblyName);
+            }
 
             var result = assembly.GetType(type.FullName);
 

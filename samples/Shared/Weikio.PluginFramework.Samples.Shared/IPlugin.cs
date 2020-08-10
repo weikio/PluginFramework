@@ -16,4 +16,9 @@ namespace Weikio.PluginFramework.Samples.Shared
     {
         string Title { get; }
     }
+
+    public interface IDialog
+    {
+        void Show();
+    }
 }

@@ -16,8 +16,6 @@ namespace WinFormsApp
         [STAThread]
         static void Main()
         {
-            PluginLoadContextOptions.Defaults.AdditionalRuntimePaths.Add(Path.GetDirectoryName(typeof(Button).Assembly.Location));
-
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

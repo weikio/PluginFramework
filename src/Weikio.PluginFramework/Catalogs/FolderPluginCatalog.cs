@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Weikio.PluginFramework.Abstractions;
@@ -49,21 +50,24 @@ namespace Weikio.PluginFramework.Catalogs
         {
         }
 
-        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options) : this(folderPath, null, finderCriteria, options)
+        public FolderPluginCatalog(string folderPath, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options) : this(folderPath, null,
+            finderCriteria, options)
         {
         }
 
-        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, FolderPluginCatalogOptions options) : this(folderPath, configureFinder, null, options)
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, FolderPluginCatalogOptions options) : this(folderPath,
+            configureFinder, null, options)
         {
         }
-        
-        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, TypeFinderCriteria finderCriteria, FolderPluginCatalogOptions options)
+
+        public FolderPluginCatalog(string folderPath, Action<TypeFinderCriteriaBuilder> configureFinder, TypeFinderCriteria finderCriteria,
+            FolderPluginCatalogOptions options)
         {
             if (string.IsNullOrWhiteSpace(folderPath))
             {
                 throw new ArgumentNullException(nameof(folderPath));
             }
-            
+
             _folderPath = folderPath;
             _options = options ?? new FolderPluginCatalogOptions();
 
@@ -76,7 +80,7 @@ namespace Weikio.PluginFramework.Catalogs
 
                 _options.TypeFinderCriterias.Add("", criteria);
             }
-            
+
             if (finderCriteria != null)
             {
                 _options.TypeFinderCriterias.Add("", finderCriteria);
@@ -189,6 +193,8 @@ namespace Weikio.PluginFramework.Catalogs
                     var hostDlls = Directory.GetFiles(hostApplicationPath, "*.dll", SearchOption.AllDirectories);
 
                     paths.AddRange(hostDlls);
+
+                    AddSharedFrameworkDlls(hostApplicationPath, runtimeDirectory, paths);
                 }
                 else if (_options.PluginLoadContextOptions.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Never)
                 {
@@ -205,6 +211,8 @@ namespace Weikio.PluginFramework.Catalogs
                         paths.Add(assembly.Location);
                     }
                 }
+
+                paths = paths.Distinct().ToList();
 
                 var resolver = new PathAssemblyResolver(paths);
 
@@ -229,6 +237,39 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             return false;
+        }
+
+        private void AddSharedFrameworkDlls(string hostApplicationPath, string runtimeDirectory, List<string> paths)
+        {
+            // Fixing #23. If the main application references a shared framework (for example WinForms), we want to add these dlls also
+            var defaultAssemblies = AssemblyLoadContext.Default.Assemblies.ToList();
+            var defaultAssemblyDirectories = defaultAssemblies.Where(x => x.IsDynamic == false).Where(x => string.IsNullOrWhiteSpace(x.Location) == false).GroupBy(x => Path.GetDirectoryName(x.Location)).Select(x => x.Key).ToList();
+
+            foreach (var assemblyDirectory in defaultAssemblyDirectories)
+            {
+                if (string.Equals(assemblyDirectory.TrimEnd('\\').TrimEnd('/'), hostApplicationPath.TrimEnd('\\').TrimEnd('/')))
+                {
+                    continue;
+                }
+
+                if (string.Equals(assemblyDirectory.TrimEnd('\\').TrimEnd('/'), runtimeDirectory.TrimEnd('\\').TrimEnd('/')))
+                {
+                    continue;
+                }
+
+                if (_options.PluginLoadContextOptions.AdditionalRuntimePaths == null)
+                {
+                    _options.PluginLoadContextOptions.AdditionalRuntimePaths = new List<string>();
+                }
+
+                if (_options.PluginLoadContextOptions.AdditionalRuntimePaths.Contains(assemblyDirectory) == false)
+                {
+                    _options.PluginLoadContextOptions.AdditionalRuntimePaths.Add(assemblyDirectory);
+                }
+
+                var dlls = Directory.GetFiles(assemblyDirectory, "*.dll");
+                paths.AddRange(dlls);
+            }
         }
     }
 }

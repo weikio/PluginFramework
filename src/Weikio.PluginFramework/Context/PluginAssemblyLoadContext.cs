@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Weikio.PluginFramework.Catalogs;
@@ -45,12 +46,16 @@ namespace Weikio.PluginFramework.Context
                 {
                     var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);
 
-                    Log(LogLevel.Debug, "Assembly {AssemblyName} is available through host application's AssemblyLoadContext. Use it. ", ex: null, assemblyName);
+                    Log(LogLevel.Debug, "Assembly {AssemblyName} is available through host application's AssemblyLoadContext. Use it. ", ex: null,
+                        assemblyName);
+
                     return null;
                 }
                 catch
                 {
-                    Log(LogLevel.Debug, "Host application's AssemblyLoadContext doesn't contain {AssemblyName}. Try to resolve it through the plugin's references.", ex: null, assemblyName);
+                    Log(LogLevel.Debug,
+                        "Host application's AssemblyLoadContext doesn't contain {AssemblyName}. Try to resolve it through the plugin's references.", ex: null,
+                        assemblyName);
                 }
             }
 
@@ -60,8 +65,33 @@ namespace Weikio.PluginFramework.Context
             {
                 Log(LogLevel.Debug, "Loading {AssemblyName} into AssemblyLoadContext from {Path}", ex: null, assemblyName, assemblyPath);
 
-                return LoadFromAssemblyPath(assemblyPath);
+                var result = LoadFromAssemblyPath(assemblyPath);
+                return result;
             }
+
+            if (_options.AdditionalRuntimePaths?.Any() != true)
+            {
+                Log(LogLevel.Warning, "Couldn't locate assembly using {AssemblyName}. Please try adding AdditionalRuntimePaths using " + nameof(PluginLoadContextOptions.Defaults.AdditionalRuntimePaths), ex: null, assemblyName);
+
+                return null;
+            }
+
+            // Solving issue 23. The project doesn't reference WinForms but the plugin does.
+            // Try to locate the required dll using AdditionalRuntimePaths
+            foreach (var runtimePath in _options.AdditionalRuntimePaths)
+            {
+                var fileName = assemblyName.Name + ".dll";
+                var filePath = Directory.GetFiles(runtimePath, fileName, SearchOption.AllDirectories).FirstOrDefault();
+
+                if (filePath != null)
+                {
+                    Log(LogLevel.Debug, "Located {AssemblyName} to {AssemblyPath} using {AdditionalRuntimePath}", ex: null, assemblyName, filePath, runtimePath);
+
+                    return LoadFromAssemblyPath(filePath);
+                }
+            }
+
+            Log(LogLevel.Warning, "Couldn't locate assembly using {AssemblyName}. Didn't find the assembly from AdditionalRuntimePaths. Please try adding AdditionalRuntimePaths using " + nameof(PluginLoadContextOptions.Defaults.AdditionalRuntimePaths), ex: null, assemblyName);
 
             return null;
         }

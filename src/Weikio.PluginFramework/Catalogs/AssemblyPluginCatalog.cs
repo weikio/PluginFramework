@@ -26,7 +26,8 @@ namespace Weikio.PluginFramework.Catalogs
         {
         }
 
-        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, null, null, null, options)
+        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, null, null, null,
+            options)
         {
         }
 
@@ -89,7 +90,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 throw new ArgumentNullException($"{nameof(assembly)} or {nameof(assemblyPath)} must be set.");
             }
-                
+
             _options = options ?? new AssemblyPluginCatalogOptions();
 
             SetFilters(filter, taggedFilters, criteria, configureFinder);
@@ -102,7 +103,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
             }
-            
+
             if (filter != null)
             {
                 var filterCriteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
@@ -134,7 +135,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 _options.TypeFinderCriterias.Add("", criteria);
             }
-            
+
             if (_options.TypeFinderCriterias?.Any() != true)
             {
                 var findAll = TypeFinderCriteriaBuilder
@@ -168,7 +169,14 @@ namespace Weikio.PluginFramework.Catalogs
 
                 foreach (var type in pluginTypes)
                 {
-                    var typePluginCatalog = new TypePluginCatalog(type, new TypePluginCatalogOptions() { PluginNameOptions = _options.PluginNameOptions });
+                    var typePluginCatalog = new TypePluginCatalog(type,
+                        new TypePluginCatalogOptions()
+                        {
+                            PluginNameOptions = _options.PluginNameOptions,
+                            TypeFinderCriterias = _options.TypeFinderCriterias,
+                            TypeFindingContext = _pluginAssemblyLoadContext
+                        });
+                    
                     await typePluginCatalog.Initialize();
 
                     _plugins.Add(typePluginCatalog);

@@ -15,5 +15,6 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
         public Func<DelegatePluginCatalogOptions, string> MethodNameGenerator { get; set; } = options => options.MethodName;
         public Func<DelegatePluginCatalogOptions, string> TypeNameGenerator { get; set; } = options => options.TypeName;
         public Func<DelegatePluginCatalogOptions, string> NamespaceNameGenerator { get; set; } = options => options.NamespaceName;
+        public List<string> Tags { get; set; } = new List<string>();
     }
 }

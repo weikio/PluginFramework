@@ -48,10 +48,21 @@ namespace Weikio.PluginFramework.Abstractions
         /// <summary>
         /// Gets the tag of the plugin
         /// </summary>
-        public string Tag { get; }
+        public string Tag
+        {
+            get
+            {
+                return Tags.FirstOrDefault();
+            }
+        }
 
+        /// <summary>
+        /// Gets the tags of the plugin
+        /// </summary>
+        public List<string> Tags { get; }
+        
         public Plugin(Assembly assembly, Type type, string name, Version version, IPluginCatalog source, string description = "", string productVersion = "",
-            string tag = "")
+            string tag = "", List<string> tags = null)
         {
             Assembly = assembly;
             Type = type;
@@ -60,7 +71,17 @@ namespace Weikio.PluginFramework.Abstractions
             Source = source;
             Description = description;
             ProductVersion = productVersion;
-            Tag = tag;
+            Tags = tags;
+
+            if (Tags == null)
+            {
+                Tags = new List<string>();
+            }
+
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                Tags.Add(tag);
+            }
         }
 
         public static implicit operator Type(Plugin plugin)

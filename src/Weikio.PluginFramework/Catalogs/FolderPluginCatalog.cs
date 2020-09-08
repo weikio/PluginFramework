@@ -71,6 +71,16 @@ namespace Weikio.PluginFramework.Catalogs
             _folderPath = folderPath;
             _options = options ?? new FolderPluginCatalogOptions();
 
+            if (_options.TypeFinderOptions == null)
+            {
+                _options.TypeFinderOptions = new TypeFinderOptions();
+            }
+
+            if (_options.TypeFinderOptions.TypeFinderCriterias == null)
+            {
+                _options.TypeFinderOptions.TypeFinderCriterias = new List<TypeFinderCriteria>();
+            }
+
             if (configureFinder != null)
             {
                 var builder = new TypeFinderCriteriaBuilder();
@@ -78,17 +88,28 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var criteria = builder.Build();
 
-                _options.TypeFinderCriterias.Add("", criteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(criteria);
             }
 
             if (finderCriteria != null)
             {
-                _options.TypeFinderCriterias.Add("", finderCriteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(finderCriteria);
             }
 
             if (_options.TypeFinderCriteria != null)
             {
-                _options.TypeFinderCriterias.Add("", _options.TypeFinderCriteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(_options.TypeFinderCriteria);
+            }
+
+            if (_options.TypeFinderCriterias?.Any() == true)
+            {
+                foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
+                {
+                    var crit = typeFinderCriteria.Value;
+                    crit.Tags = new List<string>() { typeFinderCriteria.Key };
+
+                    _options.TypeFinderOptions.TypeFinderCriterias.Add(crit);
+                }
             }
         }
 
@@ -144,7 +165,7 @@ namespace Weikio.PluginFramework.Catalogs
                 var assemblyCatalogOptions = new AssemblyPluginCatalogOptions
                 {
                     PluginLoadContextOptions = _options.PluginLoadContextOptions,
-                    TypeFinderCriterias = _options.TypeFinderCriterias,
+                    TypeFinderOptions = _options.TypeFinderOptions,
                     PluginNameOptions = _options.PluginNameOptions
                 };
 
@@ -243,7 +264,9 @@ namespace Weikio.PluginFramework.Catalogs
         {
             // Fixing #23. If the main application references a shared framework (for example WinForms), we want to add these dlls also
             var defaultAssemblies = AssemblyLoadContext.Default.Assemblies.ToList();
-            var defaultAssemblyDirectories = defaultAssemblies.Where(x => x.IsDynamic == false).Where(x => string.IsNullOrWhiteSpace(x.Location) == false).GroupBy(x => Path.GetDirectoryName(x.Location)).Select(x => x.Key).ToList();
+
+            var defaultAssemblyDirectories = defaultAssemblies.Where(x => x.IsDynamic == false).Where(x => string.IsNullOrWhiteSpace(x.Location) == false)
+                .GroupBy(x => Path.GetDirectoryName(x.Location)).Select(x => x.Key).ToList();
 
             foreach (var assemblyDirectory in defaultAssemblyDirectories)
             {

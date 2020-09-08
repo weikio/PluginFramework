@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
@@ -28,16 +29,24 @@ namespace Weikio.PluginFramework.Catalogs
         /// <summary>
         /// Gets or sets a single type finder criteria
         /// </summary>
+        [Obsolete("Please use TypeFinderOptions. This will be removed in a future release.")]
         public TypeFinderCriteria TypeFinderCriteria { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of type finder criteria. The key is used to "tag" found plugins.
         /// </summary>
+        [Obsolete("Please use TypeFinderOptions. This will be removed in a future release.")]
         public Dictionary<string, TypeFinderCriteria> TypeFinderCriterias { get; set; } = new Dictionary<string, TypeFinderCriteria>();
+
+        /// <summary>
+        /// Gets or sets the <see cref="TypeFinderOptions"/>.
+        /// </summary>
+        public TypeFinderOptions TypeFinderOptions { get; set; } = new TypeFinderOptions();
 
         /// <summary>
         /// Gets or sets how the plugin names and version should be defined. <seealso cref="PluginNameOptions"/>
         /// </summary>
         public PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        
     }
 }

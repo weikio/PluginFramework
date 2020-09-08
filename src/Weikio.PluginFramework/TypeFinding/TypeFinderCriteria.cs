@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Weikio.PluginFramework.TypeFinding
 {
@@ -12,5 +13,6 @@ namespace Weikio.PluginFramework.TypeFinding
         public string Name { get; set; }
         public Func<ITypeFindingContext, Type, bool> Query { get; set; }
         public Type HasAttribute { get; set; }
+        public List<string> Tags { get; set; } = new List<string>();
     }
 }

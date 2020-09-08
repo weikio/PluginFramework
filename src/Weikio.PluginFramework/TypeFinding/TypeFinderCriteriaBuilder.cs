@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Weikio.PluginFramework.TypeFinding
 {
@@ -11,6 +12,7 @@ namespace Weikio.PluginFramework.TypeFinding
         private bool? _isInterface = false;
         private string _name;
         private Type _attribute;
+        private List<string> _tags = new List<string>();
 
         public TypeFinderCriteria Build()
         {
@@ -22,7 +24,8 @@ namespace Weikio.PluginFramework.TypeFinding
                 AssignableTo = _assignable,
                 Name = _name,
                 IsAbstract = _isAbstract,
-                HasAttribute = _attribute
+                HasAttribute = _attribute,
+                Tags = _tags
             };
 
             return res;
@@ -93,6 +96,44 @@ namespace Weikio.PluginFramework.TypeFinding
         public TypeFinderCriteriaBuilder HasAttribute(Type attribute)
         {
             _attribute = attribute;
+
+            return this;
+        }
+
+        public TypeFinderCriteriaBuilder Tag(string tag)
+        {
+            if (_tags == null)
+            {
+                _tags = new List<string>();
+            }
+            
+            if (_tags.Contains(tag))
+            {
+                return this;
+            }
+            
+            _tags.Add(tag);
+
+            return this;
+        }
+        
+        public TypeFinderCriteriaBuilder Tag(params string[] tags)
+        {
+            if (_tags == null)
+            {
+                _tags = new List<string>();
+            }
+
+            foreach (var tag in tags)
+            {
+                if (_tags.Contains(tag))
+                {
+                    continue;
+                }
+            
+                _tags.Add(tag);
+            }
+
 
             return this;
         }

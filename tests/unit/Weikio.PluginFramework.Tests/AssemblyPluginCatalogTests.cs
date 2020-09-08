@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
 using Weikio.PluginFramework.Context;
+using Weikio.PluginFramework.TypeFinding;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -160,12 +161,13 @@ namespace Weikio.PluginFramework.Tests
 
             var folder1Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", options);
             await folder1Catalog.Initialize();
-            
+
             var folder2Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
             await folder2Catalog.Initialize();
 
             var newPlugin = folder1Catalog.Single();
             var oldPlugin = folder2Catalog.Single();
+            
             
             dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin);
             var newPluginVersion = newPluginJsonResolver.GetVersion();

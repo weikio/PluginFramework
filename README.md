@@ -77,6 +77,12 @@ The following Plugin Framework samples are available from GitHub:
 
 #### [Delegates & Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithDelegate)
 
+#### [Tagging & WinForms App](https://github.com/weikio/PluginFramework/tree/master/samples/WinFormsApp)
+
+## Background and introduction
+
+For more details related to Plugin Framework's background, please see the following [introduction article from InfoQ](https://www.infoq.com/articles/Plugin-Framework-DotNet/).
+
 ## Main concepts
 
 Using Plugin Framework concentrates mainly around two concepts: **Plugins** and **Plugin Catalogs**.

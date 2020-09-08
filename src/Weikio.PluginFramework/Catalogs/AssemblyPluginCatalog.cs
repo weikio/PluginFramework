@@ -26,7 +26,8 @@ namespace Weikio.PluginFramework.Catalogs
         {
         }
 
-        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, null, null, null, options)
+        public AssemblyPluginCatalog(string assemblyPath, AssemblyPluginCatalogOptions options = null) : this(assemblyPath, null, null, null, null, null,
+            options)
         {
         }
 
@@ -89,7 +90,7 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 throw new ArgumentNullException($"{nameof(assembly)} or {nameof(assemblyPath)} must be set.");
             }
-                
+
             _options = options ?? new AssemblyPluginCatalogOptions();
 
             SetFilters(filter, taggedFilters, criteria, configureFinder);
@@ -98,16 +99,22 @@ namespace Weikio.PluginFramework.Catalogs
         private void SetFilters(Predicate<Type> filter, Dictionary<string, Predicate<Type>> taggedFilters, TypeFinderCriteria criteria,
             Action<TypeFinderCriteriaBuilder> configureFinder)
         {
-            if (_options.TypeFinderCriterias == null)
+            if (_options.TypeFinderOptions == null)
             {
-                _options.TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
+                _options.TypeFinderOptions = new TypeFinderOptions();
             }
-            
+
+            if (_options.TypeFinderOptions.TypeFinderCriterias == null)
+            {
+                _options.TypeFinderOptions.TypeFinderCriterias = new List<TypeFinderCriteria>();
+            }
+
             if (filter != null)
             {
                 var filterCriteria = new TypeFinderCriteria { Query = (context, type) => filter(type) };
+                filterCriteria.Tags.Add(string.Empty);
 
-                _options.TypeFinderCriterias.Add(string.Empty, filterCriteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(filterCriteria);
             }
 
             if (taggedFilters?.Any() == true)
@@ -115,8 +122,9 @@ namespace Weikio.PluginFramework.Catalogs
                 foreach (var taggedFilter in taggedFilters)
                 {
                     var taggedCriteria = new TypeFinderCriteria { Query = (context, type) => taggedFilter.Value(type) };
+                    taggedCriteria.Tags.Add(taggedFilter.Key);
 
-                    _options.TypeFinderCriterias.Add(taggedFilter.Key, taggedCriteria);
+                    _options.TypeFinderOptions.TypeFinderCriterias.Add(taggedCriteria);
                 }
             }
 
@@ -127,21 +135,33 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var configuredCriteria = builder.Build();
 
-                _options.TypeFinderCriterias.Add("", configuredCriteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(configuredCriteria);
             }
 
             if (criteria != null)
             {
-                _options.TypeFinderCriterias.Add("", criteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(criteria);
+            }
+
+            if (_options.TypeFinderCriterias?.Any() == true)
+            {
+                foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
+                {
+                    var crit = typeFinderCriteria.Value;
+                    crit.Tags = new List<string>() { typeFinderCriteria.Key };
+
+                    _options.TypeFinderOptions.TypeFinderCriterias.Add(crit);
+                }
             }
             
-            if (_options.TypeFinderCriterias?.Any() != true)
+            if (_options.TypeFinderOptions.TypeFinderCriterias.Any() != true)
             {
                 var findAll = TypeFinderCriteriaBuilder
                     .Create()
+                    .Tag(string.Empty)
                     .Build();
 
-                _options.TypeFinderCriterias.Add(string.Empty, findAll);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(findAll);
             }
         }
 
@@ -153,7 +173,10 @@ namespace Weikio.PluginFramework.Catalogs
                 {
                     throw new ArgumentException($"Assembly in path {_assemblyPath} does not exist.");
                 }
+            }
 
+            if (_assembly == null && File.Exists(_assemblyPath) || File.Exists(_assemblyPath) && _pluginAssemblyLoadContext == null)
+            {
                 _pluginAssemblyLoadContext = new PluginAssemblyLoadContext(_assemblyPath, _options.PluginLoadContextOptions);
                 _assembly = _pluginAssemblyLoadContext.Load();
             }
@@ -162,13 +185,20 @@ namespace Weikio.PluginFramework.Catalogs
 
             var finder = new TypeFinder();
 
-            foreach (var typeFinderCriteria in _options.TypeFinderCriterias)
+            foreach (var typeFinderCriteria in _options.TypeFinderOptions.TypeFinderCriterias)
             {
-                var pluginTypes = finder.Find(typeFinderCriteria.Value, _assembly, _pluginAssemblyLoadContext);
+                var pluginTypes = finder.Find(typeFinderCriteria, _assembly, _pluginAssemblyLoadContext);
 
                 foreach (var type in pluginTypes)
                 {
-                    var typePluginCatalog = new TypePluginCatalog(type, new TypePluginCatalogOptions() { PluginNameOptions = _options.PluginNameOptions });
+                    var typePluginCatalog = new TypePluginCatalog(type,
+                        new TypePluginCatalogOptions()
+                        {
+                            PluginNameOptions = _options.PluginNameOptions,
+                            TypeFindingContext = _pluginAssemblyLoadContext,
+                            TypeFinderOptions = _options.TypeFinderOptions
+                        });
+
                     await typePluginCatalog.Initialize();
 
                     _plugins.Add(typePluginCatalog);

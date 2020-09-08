@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs.Delegates
 {
@@ -76,6 +78,14 @@ namespace Weikio.PluginFramework.Catalogs.Delegates
 
             var options = new AssemblyPluginCatalogOptions() { PluginNameOptions = _options.NameOptions };
 
+            if (_options.Tags?.Any() == true)
+            {
+                options.TypeFinderOptions = new TypeFinderOptions
+                {
+                    TypeFinderCriterias = new List<TypeFinderCriteria> { TypeFinderCriteriaBuilder.Create().Tag(_options.Tags.ToArray()) }
+                };
+            }
+            
             _catalog = new AssemblyPluginCatalog(assembly, options);
             await _catalog.Initialize();
 

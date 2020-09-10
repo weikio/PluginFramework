@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Catalogs.NuGet;
 using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
 using Weikio.PluginFramework.TypeFinding;
 
@@ -19,13 +20,12 @@ namespace Weikio.PluginFramework.Catalogs
 
         private readonly HashSet<string> _pluginAssemblyFilePaths = new HashSet<string>();
         private readonly List<AssemblyPluginCatalog> _pluginCatalogs = new List<AssemblyPluginCatalog>();
-        private readonly Dictionary<string, TypeFinderCriteria> _typeFinderCriterias;
         private readonly NugetPluginCatalogOptions _options;
 
         public string PackagesFolder { get; }
 
         public NugetPackagePluginCatalog(string packageName, string packageVersion = null, bool includePrerelease = false, NuGetFeed packageFeed = null,
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, 
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null,
             NugetPluginCatalogOptions options = null)
         {
             _packageName = packageName;
@@ -45,7 +45,6 @@ namespace Weikio.PluginFramework.Catalogs
                 criterias = new Dictionary<string, TypeFinderCriteria>();
             }
 
-            _typeFinderCriterias = criterias;
             _options = options ?? new NugetPluginCatalogOptions();
 
             if (configureFinder != null)
@@ -55,7 +54,14 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var criteria = builder.Build();
 
-                _typeFinderCriterias.Add("", criteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(criteria);
+            }
+
+            foreach (var finderCriteria in criterias)
+            {
+                finderCriteria.Value.Tags = new List<string>() { finderCriteria.Key };
+                
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(finderCriteria.Value);
             }
         }
 
@@ -95,7 +101,7 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var pluginAssemblyFilePath in _pluginAssemblyFilePaths)
             {
-                var options = new AssemblyPluginCatalogOptions { TypeFinderCriterias = _typeFinderCriterias };
+                var options = new AssemblyPluginCatalogOptions { TypeFinderOptions = _options.TypeFinderOptions };
 
                 var assemblyCatalog = new AssemblyPluginCatalog(pluginAssemblyFilePath, options);
                 await assemblyCatalog.Initialize();

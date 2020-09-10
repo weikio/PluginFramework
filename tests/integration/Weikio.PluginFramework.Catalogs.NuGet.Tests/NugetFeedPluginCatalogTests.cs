@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
+using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
 using Xunit;
 
@@ -49,6 +50,25 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             Assert.Equal("Moq.Range", plugins[0].Name);
             Assert.StartsWith("4.", plugins[0].Version.ToString());
             AssertAssemblyFrameWork(".NETStandard,Version=v2.0", plugins.Single().Assembly);
+        }
+        
+        [Fact]
+        public async Task CanTag()
+        {
+            // Arrange
+            var feed = new NuGetFeed("nuget.org", "https://api.nuget.org/v3/index.json");
+            var catalog = new NugetFeedPluginCatalog(feed, searchTerm: "tags:mocking", maxPackages: 1, configureFinder: configure =>
+            {
+                configure.HasName("Moq.Range")
+                    .Tag("MockSolutions");
+            });
+
+            // Act
+            await catalog.Initialize();
+            var plugin = catalog.Single();
+
+            // Assert
+            Assert.Equal("MockSolutions", plugin.Tag);
         }
     }
 }

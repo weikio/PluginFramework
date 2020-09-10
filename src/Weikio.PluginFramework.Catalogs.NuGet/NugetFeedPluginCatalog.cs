@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Catalogs.NuGet;
 using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
 using Weikio.PluginFramework.TypeFinding;
 
@@ -20,7 +21,6 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly HashSet<string> _pluginAssemblyNames = new HashSet<string>();
 
         private List<NugetPackagePluginCatalog> _pluginCatalogs = new List<NugetPackagePluginCatalog>();
-        private Dictionary<string, TypeFinderCriteria> _typeFinderCriterias;
         private readonly NugetPluginCatalogOptions _options;
 
         public string PackagesFolder { get; }
@@ -46,7 +46,6 @@ namespace Weikio.PluginFramework.Catalogs
                 criterias = new Dictionary<string, TypeFinderCriteria>();
             }
 
-            _typeFinderCriterias = criterias;
             _options = options ?? new NugetPluginCatalogOptions();
 
             if (configureFinder != null)
@@ -56,8 +55,15 @@ namespace Weikio.PluginFramework.Catalogs
 
                 var criteria = builder.Build();
 
-                _typeFinderCriterias.Add("", criteria);
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(criteria);
             }
+            
+            foreach (var finderCriteria in criterias)
+            {
+                finderCriteria.Value.Tags = new List<string>() { finderCriteria.Key };
+                
+                _options.TypeFinderOptions.TypeFinderCriterias.Add(finderCriteria.Value);
+            }            
         }
 
         Plugin IPluginCatalog.Get(string name, Version version)
@@ -87,8 +93,10 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var packageAndRepo in packages)
             {
+                var options = new NugetPluginCatalogOptions() { TypeFinderOptions = _options.TypeFinderOptions };
+                
                 var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(),
-                    _includePrereleases, _packageFeed, PackagesFolder, criterias: _typeFinderCriterias);
+                    _includePrereleases, _packageFeed, PackagesFolder, options: options);
 
                 await packageCatalog.Initialize();
 

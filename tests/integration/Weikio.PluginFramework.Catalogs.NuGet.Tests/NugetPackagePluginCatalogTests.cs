@@ -50,6 +50,24 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             Assert.StartsWith("2.9.0", plugins[0].Version.ToString());
             AssertAssemblyFrameWork(".NETStandard,Version=v2.0", catalog.Single().Assembly);
         }
+        
+        [Fact]
+        public async Task CanTag()
+        {
+            // Arrange
+            var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", configureFinder: configure =>
+            {
+                configure.HasName("Serilog.Core.Logger")
+                    .Tag("CustomTag");
+            });
+
+            // Act
+            await catalog.Initialize();
+            var plugin = catalog.Single();
+
+            // Assert
+            Assert.Equal("CustomTag", plugin.Tag);
+        }
 
         [Fact]
         public async Task InstallPackageWithDepencencies()

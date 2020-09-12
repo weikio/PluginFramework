@@ -101,106 +101,65 @@ namespace Microsoft.Extensions.DependencyInjection
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            return services.AddPluginFramework(
-                configuration,
-                new PluginCatalogConfigurationProvider(),
-                null);
-        }
+            // Register the default implementation of IPluginCatalogConfigurationLoader with the provided configuration.
+            services.AddTransient<IPluginCatalogConfigurationLoader>(serviceProvider =>
+                new PluginCatalogConfigurationLoader(configuration));
 
-        /// <summary>
-        /// Add plugins from the provided <see cref="IConfiguration"/> object.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> on which the plugins will be added.</param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> object that contains the plugin configurations.</param>
-        /// <param name="provider">An implementation of <see cref="IPluginCatalogConfigurationProvider"/></param>
-        /// <returns>This <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddPluginFramework(
-            this IServiceCollection services,
-            IConfiguration configuration,
-            IPluginCatalogConfigurationProvider provider)
-        {
-            return services.AddPluginFramework(
-                configuration,
-                provider,
-                null);
-        }
-
-        /// <summary>
-        /// Add plugins from the provided <see cref="IConfiguration"/> object.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> on which the plugins will be added.</param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> object that contains the plugin configurations.</param>
-        /// <param name="converter">An implementation of <see cref="IConfigurationToCatalogConverter"/> to handle custom PluginCatalogs.</param>
-        /// <returns>This <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddPluginFramework(
-            this IServiceCollection services,
-            IConfiguration configuration,
-            IConfigurationToCatalogConverter converter)
-        {
-            return services.AddPluginFramework(
-                configuration,
-                new PluginCatalogConfigurationProvider(),
-                converter);
-        }
-
-        /// <summary>
-        /// Add plugins from the provided <see cref="IConfiguration"/> object.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> on which the plugins will be added.</param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> object that contains the plugin configurations.</param>
-        /// <param name="provider"></param>
-        /// <param name="converter">An implmenetation of <see cref="IConfigurationToCatalogConverter"/> to handle custom PluginCatalogs.</param>
-        /// <returns>This <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddPluginFramework(
-            this IServiceCollection services,
-            IConfiguration configuration,
-            IPluginCatalogConfigurationProvider provider,
-            IConfigurationToCatalogConverter converter = null)
-        {
-            // Extract the Catalogs from the configuration.
-            var catalogs = provider.GetCatalogConfigurations(configuration);
-
-            // Decide what to do if the settings contain no catalogs.
-            if (catalogs is null || catalogs.Count == 0)
-                throw new ArgumentException("Can't load PluginFramework configuration because Catalogs list is not provided");
-
-            // Get the PluginCatalogs and add them to the services.
-            for (var i = 0; i < catalogs.Count; i++)
+            services.TryAddSingleton((Func<IServiceProvider, IPluginCatalog>)(serviceProvider =>
             {
-                IPluginCatalog catalog;
-                var item = catalogs[i];
-                var key = $"{provider.SectionKey}:{provider.CatalogsKey}:{i}";
+                // Grab all the IPluginCatalogConfigurationLoader implementations to laod catalog configurations.
+                var loaders = serviceProvider
+                    .GetServices<IPluginCatalogConfigurationLoader>()
+                    .ToList();
 
-                // Check if a type is provided.
-                var type = string.IsNullOrWhiteSpace(item.Type)
-                    ? throw new ArgumentException($"A type must be provided for catalog at position {i + 1}")
-                    : item.Type;
+                var converters = serviceProvider.GetServices<IConfigurationToCatalogConverter>();
+                var catalogs = new List<IPluginCatalog>();
 
-                // Check if a converter was provided and if yes if it can convert the type.
-                // If not we proceed with the build in type converters.
-                if (converter != null && converter.CanConvert(type))
+                foreach (var loader in loaders)
                 {
-                    catalog = converter.Convert(configuration.GetSection(key));
+                    // Load the catalog configurations.
+                    var catalogConfigs = loader.GetCatalogConfigurations();
+
+                    if (catalogConfigs == null || catalogConfigs.Count == 0)
+                    {
+                        // if no configurations were provided continue.
+                        continue;
+                    }
+
+                    for (var i = 0; i < catalogConfigs.Count; i++)
+                    {
+                        var item = catalogConfigs[i];
+                        var key = $"{loader.SectionKey}:{loader.CatalogsKey}:{i}";
+
+                        // Check if a type is provided.
+                        var type = string.IsNullOrWhiteSpace(item.Type)
+                               ? throw new ArgumentException($"A type must be provided for catalog at position {i + 1}")
+                               : item.Type;
+
+                        // Try to find any registered converter that can convert the specified type.
+                        var foundConverter = converters.FirstOrDefault(converter => converter.CanConvert(type));
+
+                        // Add a catalog to the list of catalogs.
+                        catalogs.Add(foundConverter != null
+                            // If a converter was found we call it's convert method.
+                            ? foundConverter.Convert(loader.Configuration.GetSection(key))
+                            // If no converter was found (it's null) we proceed with the built-in type converters.
+                            : type switch
+                            {
+                                // Assembly type.
+                                CatalogTypes.Assembly => new AssemblyCatalogConfigurationCoverter().Convert(configuration.GetSection(key)),
+
+                                // Folder type.
+                                CatalogTypes.Folder => new FolderCatalogConfigurationConverter().Convert(configuration.GetSection(key)),
+
+                                // Unkown type.
+                                _ => throw new ArgumentException($"The type provided for catalog at position {i + 1} is unknown.")
+                            });
+                    }
                 }
-                // Assembly type.
-                else if (item.Type == CatalogTypes.Assembly)
-                {
-                    catalog = new AssemblyCatalogConfigurationCoverter()
-                        .Convert(configuration.GetSection(key));
-                }
-                // Folder type.
-                else if (item.Type == CatalogTypes.Folder)
-                {
-                    catalog = new FolderCatalogConfigurationConverter()
-                        .Convert(configuration.GetSection(key));
-                }
-                // Unkown type.
-                else
-                {
-                    throw new ArgumentException($"The type provided for catalog at position {i + 1} is unknown.");
-                }
-                services.AddPluginCatalog(catalog);
-            }
+
+                return new CompositePluginCatalog(catalogs.ToArray());
+            }));
 
             services.AddPluginFramework();
             return services;

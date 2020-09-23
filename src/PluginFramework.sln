@@ -1,62 +1,67 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework", "Weikio.PluginFramework\Weikio.PluginFramework.csproj", "{BB67695B-1CDF-4FEC-8627-82FD349D1403}"
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30330.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework", "Weikio.PluginFramework\Weikio.PluginFramework.csproj", "{BB67695B-1CDF-4FEC-8627-82FD349D1403}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Abstractions", "Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj", "{5C264288-C384-48A3-AF94-850D98830E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Abstractions", "Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj", "{5C264288-C384-48A3-AF94-850D98830E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Tests", "..\tests\unit\Weikio.PluginFramework.Tests\Weikio.PluginFramework.Tests.csproj", "{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Tests", "..\tests\unit\Weikio.PluginFramework.Tests\Weikio.PluginFramework.Tests.csproj", "{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DE041517-4760-4748-97F6-DB71D6AFFF5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly1", "..\tests\Assemblies\TestAssembly1\TestAssembly1.csproj", "{DB21DEFB-37D4-4006-A6B9-735671151D29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly1", "..\tests\Assemblies\TestAssembly1\TestAssembly1.csproj", "{DB21DEFB-37D4-4006-A6B9-735671151D29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly2", "..\tests\Assemblies\TestAssembly2\TestAssembly2.csproj", "{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly2", "..\tests\Assemblies\TestAssembly2\TestAssembly2.csproj", "{F2987B1B-2FBD-4F1A-B95D-7F14618B2971}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestAssembly3", "..\tests\Assemblies\TestAssembly3\TestAssembly3.csproj", "{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestAssembly3", "..\tests\Assemblies\TestAssembly3\TestAssembly3.csproj", "{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIntefaces", "..\tests\Assemblies\TestIntefaces\TestIntefaces.csproj", "{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestIntefaces", "..\tests\Assemblies\TestIntefaces\TestIntefaces.csproj", "{044D3F05-A2F2-4D4A-A3FE-360F57BB765D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonNetOld", "..\tests\Assemblies\JsonNetOld\JsonNetOld.csproj", "{8653C860-AF1B-42E6-8DAD-AEBC08D676B2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonNetOld", "..\tests\Assemblies\JsonNetOld\JsonNetOld.csproj", "{8653C860-AF1B-42E6-8DAD-AEBC08D676B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonNetNew", "..\tests\Assemblies\JsonNetNew\JsonNetNew.csproj", "{6FB33F21-3C1B-4BB0-AFC6-E512EE9F5928}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JsonNetNew", "..\tests\Assemblies\JsonNetNew\JsonNetNew.csproj", "{6FB33F21-3C1B-4BB0-AFC6-E512EE9F5928}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{FF3A507D-D242-44F6-8940-49E0B51B6F02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "..\samples\ConsoleApp\ConsoleApp.csproj", "{C161BE3A-99A1-4A89-A2CE-79A5A1994FFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "..\samples\ConsoleApp\ConsoleApp.csproj", "{C161BE3A-99A1-4A89-A2CE-79A5A1994FFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Samples.Shared", "..\samples\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj", "{DBC0AD60-7261-4CEB-BE4F-3AD12C39F813}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Samples.Shared", "..\samples\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj", "{DBC0AD60-7261-4CEB-BE4F-3AD12C39F813}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "..\samples\WpfApp\WpfApp.csproj", "{91A58039-85B5-4B2C-8F25-10DD6033F3AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp", "..\samples\WpfApp\WpfApp.csproj", "{91A58039-85B5-4B2C-8F25-10DD6033F3AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Samples.SharedPlugins", "..\samples\Shared\Weikio.PluginFramework.Samples.SharedPlugins\Weikio.PluginFramework.Samples.SharedPlugins.csproj", "{6E19B5B2-9106-4EB3-8B0E-1C735FB4C815}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Samples.SharedPlugins", "..\samples\Shared\Weikio.PluginFramework.Samples.SharedPlugins\Weikio.PluginFramework.Samples.SharedPlugins.csproj", "{6E19B5B2-9106-4EB3-8B0E-1C735FB4C815}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "..\samples\WebApp\WebApp.csproj", "{30C02979-E0C0-4AD0-B88F-23EF28807473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "..\samples\WebApp\WebApp.csproj", "{30C02979-E0C0-4AD0-B88F-23EF28807473}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.AspNetCore", "Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj", "{E4F3E21D-653A-4AE7-B1DA-63B3F041367C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.AspNetCore", "Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj", "{E4F3E21D-653A-4AE7-B1DA-63B3F041367C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{E24D3F2A-4080-475B-92D3-C80B9BD20A70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Catalogs.NuGet", "Weikio.PluginFramework.Catalogs.NuGet\Weikio.PluginFramework.Catalogs.NuGet.csproj", "{4BCDAB59-F231-4241-B6BE-93BDC047C86F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Catalogs.NuGet", "Weikio.PluginFramework.Catalogs.NuGet\Weikio.PluginFramework.Catalogs.NuGet.csproj", "{4BCDAB59-F231-4241-B6BE-93BDC047C86F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Catalogs.Roslyn", "Weikio.PluginFramework.Catalogs.Roslyn\Weikio.PluginFramework.Catalogs.Roslyn.csproj", "{74D03415-F262-4DA2-B319-6A88F3278CC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Catalogs.Roslyn", "Weikio.PluginFramework.Catalogs.Roslyn\Weikio.PluginFramework.Catalogs.Roslyn.csproj", "{74D03415-F262-4DA2-B319-6A88F3278CC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Catalogs.Roslyn.Tests", "..\tests\unit\Weikio.PluginFramework.Catalogs.Roslyn.Tests\Weikio.PluginFramework.Catalogs.Roslyn.Tests.csproj", "{E7600CAB-94DC-4A17-ABB2-B789A6409E02}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Catalogs.Roslyn.Tests", "..\tests\unit\Weikio.PluginFramework.Catalogs.Roslyn.Tests\Weikio.PluginFramework.Catalogs.Roslyn.Tests.csproj", "{E7600CAB-94DC-4A17-ABB2-B789A6409E02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Catalogs.NuGet.Tests", "..\tests\integration\Weikio.PluginFramework.Catalogs.NuGet.Tests\Weikio.PluginFramework.Catalogs.NuGet.Tests.csproj", "{174C5479-712A-46DB-BD91-C031F6B3A55D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Catalogs.NuGet.Tests", "..\tests\integration\Weikio.PluginFramework.Catalogs.NuGet.Tests\Weikio.PluginFramework.Catalogs.NuGet.Tests.csproj", "{174C5479-712A-46DB-BD91-C031F6B3A55D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithNuget", "..\samples\WebAppWithNuget\WebAppWithNuget.csproj", "{0FFD32D3-3A4F-453E-B7A2-8891F77F03D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithNuget", "..\samples\WebAppWithNuget\WebAppWithNuget.csproj", "{0FFD32D3-3A4F-453E-B7A2-8891F77F03D0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithRoslyn", "..\samples\WebAppWithRoslyn\WebAppWithRoslyn.csproj", "{9C46DA92-CB56-45FA-A904-0A7330C71C2C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithRoslyn", "..\samples\WebAppWithRoslyn\WebAppWithRoslyn.csproj", "{9C46DA92-CB56-45FA-A904-0A7330C71C2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithDelegate", "..\samples\WebAppWithDelegate\WebAppWithDelegate.csproj", "{C2DD5D1C-2F8A-4EC9-BE90-66418A8602AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithDelegate", "..\samples\WebAppWithDelegate\WebAppWithDelegate.csproj", "{C2DD5D1C-2F8A-4EC9-BE90-66418A8602AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp", "..\Samples\BlazorApp\BlazorApp.csproj", "{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp", "..\Samples\BlazorApp\BlazorApp.csproj", "{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp", "..\samples\WinFormsApp\WinFormsApp.csproj", "{6D392453-FC9E-45AD-A9A7-7596A93B3E6C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsApp", "..\samples\WinFormsApp\WinFormsApp.csproj", "{6D392453-FC9E-45AD-A9A7-7596A93B3E6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsPluginsLibrary", "..\samples\WinFormsPluginsLibrary\WinFormsPluginsLibrary.csproj", "{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsPluginsLibrary", "..\samples\WinFormsPluginsLibrary\WinFormsPluginsLibrary.csproj", "{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Configuration", "Weikio.PluginFramework.Configuration\Weikio.PluginFramework.Configuration.csproj", "{882BB58E-D256-4BBF-8C5F-80C4FA39B775}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,10 +125,6 @@ Global
 		{30C02979-E0C0-4AD0-B88F-23EF28807473}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C02979-E0C0-4AD0-B88F-23EF28807473}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30C02979-E0C0-4AD0-B88F-23EF28807473}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7FAF2032-2445-42BF-BB0C-A2ECBAEAE56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FAF2032-2445-42BF-BB0C-A2ECBAEAE56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7FAF2032-2445-42BF-BB0C-A2ECBAEAE56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FAF2032-2445-42BF-BB0C-A2ECBAEAE56A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E4F3E21D-653A-4AE7-B1DA-63B3F041367C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E4F3E21D-653A-4AE7-B1DA-63B3F041367C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4F3E21D-653A-4AE7-B1DA-63B3F041367C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -168,22 +169,29 @@ Global
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6CDBFF3C-932B-4A66-8779-B5C72B33AF7F} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
-		{B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
-		{6FB33F21-3C1B-4BB0-AFC6-E512EE9F5928} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
-		{8653C860-AF1B-42E6-8DAD-AEBC08D676B2} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
 		{DB21DEFB-37D4-4006-A6B9-735671151D29} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
 		{F2987B1B-2FBD-4F1A-B95D-7F14618B2971} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
 		{BB7D0751-895E-4820-9F52-CE4ECEE0F1FD} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
 		{044D3F05-A2F2-4D4A-A3FE-360F57BB765D} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
+		{8653C860-AF1B-42E6-8DAD-AEBC08D676B2} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
+		{6FB33F21-3C1B-4BB0-AFC6-E512EE9F5928} = {B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A}
+		{B2BA1C10-1130-45ED-83F1-32BF8FBF4D4A} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
 		{C161BE3A-99A1-4A89-A2CE-79A5A1994FFC} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{DBC0AD60-7261-4CEB-BE4F-3AD12C39F813} = {E24D3F2A-4080-475B-92D3-C80B9BD20A70}
 		{91A58039-85B5-4B2C-8F25-10DD6033F3AA} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{6E19B5B2-9106-4EB3-8B0E-1C735FB4C815} = {E24D3F2A-4080-475B-92D3-C80B9BD20A70}
 		{30C02979-E0C0-4AD0-B88F-23EF28807473} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{E24D3F2A-4080-475B-92D3-C80B9BD20A70} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
-		{DBC0AD60-7261-4CEB-BE4F-3AD12C39F813} = {E24D3F2A-4080-475B-92D3-C80B9BD20A70}
-		{6E19B5B2-9106-4EB3-8B0E-1C735FB4C815} = {E24D3F2A-4080-475B-92D3-C80B9BD20A70}
 		{E7600CAB-94DC-4A17-ABB2-B789A6409E02} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
 		{174C5479-712A-46DB-BD91-C031F6B3A55D} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
 		{0FFD32D3-3A4F-453E-B7A2-8891F77F03D0} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
@@ -192,5 +200,8 @@ Global
 		{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{6D392453-FC9E-45AD-A9A7-7596A93B3E6C} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AAEBC2B4-FB52-4272-8C25-571FB3CA01E5}
 	EndGlobalSection
 EndGlobal

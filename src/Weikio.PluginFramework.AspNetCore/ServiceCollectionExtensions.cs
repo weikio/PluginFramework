@@ -1,13 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Configuration;
+using Weikio.PluginFramework.Configuration.Converters;
+using Weikio.PluginFramework.Configuration.Providers;
 using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
 
@@ -84,6 +88,80 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddPluginType<TType>();
             
+            return services;
+        }
+
+        /// <summary>
+        /// Add plugins from the provided <see cref="IConfiguration"/> object.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> on which the plugins will be added.</param>
+        /// <param name="configuration">The <see cref="IConfiguration"/> object that contains the plugin configurations.</param>
+        /// <returns>This <see cref="IServiceCollection"/>.</returns>
+        public static IServiceCollection AddPluginFramework(
+            this IServiceCollection services,
+            IConfiguration configuration)
+        {
+            // Register the default implementation of IPluginCatalogConfigurationLoader with the provided configuration.
+            services.AddTransient<IPluginCatalogConfigurationLoader>(serviceProvider =>
+                new PluginCatalogConfigurationLoader(configuration));
+
+            services.TryAddSingleton((Func<IServiceProvider, IPluginCatalog>)(serviceProvider =>
+            {
+                // Grab all the IPluginCatalogConfigurationLoader implementations to laod catalog configurations.
+                var loaders = serviceProvider
+                    .GetServices<IPluginCatalogConfigurationLoader>()
+                    .ToList();
+
+                var converters = serviceProvider.GetServices<IConfigurationToCatalogConverter>();
+                var catalogs = new List<IPluginCatalog>();
+
+                foreach (var loader in loaders)
+                {
+                    // Load the catalog configurations.
+                    var catalogConfigs = loader.GetCatalogConfigurations();
+
+                    if (catalogConfigs == null || catalogConfigs.Count == 0)
+                    {
+                        // if no configurations were provided continue.
+                        continue;
+                    }
+
+                    for (var i = 0; i < catalogConfigs.Count; i++)
+                    {
+                        var item = catalogConfigs[i];
+                        var key = $"{loader.SectionKey}:{loader.CatalogsKey}:{i}";
+
+                        // Check if a type is provided.
+                        var type = string.IsNullOrWhiteSpace(item.Type)
+                               ? throw new ArgumentException($"A type must be provided for catalog at position {i + 1}")
+                               : item.Type;
+
+                        // Try to find any registered converter that can convert the specified type.
+                        var foundConverter = converters.FirstOrDefault(converter => converter.CanConvert(type));
+
+                        // Add a catalog to the list of catalogs.
+                        catalogs.Add(foundConverter != null
+                            // If a converter was found we call it's convert method.
+                            ? foundConverter.Convert(loader.Configuration.GetSection(key))
+                            // If no converter was found (it's null) we proceed with the built-in type converters.
+                            : type switch
+                            {
+                                // Assembly type.
+                                CatalogTypes.Assembly => new AssemblyCatalogConfigurationCoverter().Convert(configuration.GetSection(key)),
+
+                                // Folder type.
+                                CatalogTypes.Folder => new FolderCatalogConfigurationConverter().Convert(configuration.GetSection(key)),
+
+                                // Unkown type.
+                                _ => throw new ArgumentException($"The type provided for catalog at position {i + 1} is unknown.")
+                            });
+                    }
+                }
+
+                return new CompositePluginCatalog(catalogs.ToArray());
+            }));
+
+            services.AddPluginFramework();
             return services;
         }
 

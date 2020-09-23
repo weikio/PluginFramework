@@ -130,6 +130,10 @@ Plugin Framework provides the following officially supported catalogs:
 
 Source code for Plugin Framework is available from [GitHub](https://github.com/weikio/PluginFramework).
 
+## Constributors
+
+#### [@panoukos41](https://github.com/panoukos41)
+
 ## Support
 
 Commercial support for Plugin Framework is provided by [Adafy](https://adafy.com).

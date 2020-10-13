@@ -99,7 +99,7 @@ namespace Weikio.PluginFramework.Context
 
             return null;
         }
-
+        
         private bool TryUseHostApplicationAssembly(AssemblyName assemblyName)
         {
             Log(LogLevel.Debug, "Determining if {AssemblyName} should be loaded from host application's or from plugin's AssemblyLoadContext",

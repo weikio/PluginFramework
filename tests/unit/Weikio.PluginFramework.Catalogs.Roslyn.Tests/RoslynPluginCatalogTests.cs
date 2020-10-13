@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
@@ -56,6 +57,36 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
             Assert.Equal(typeof(Task), method.ReturnParameter.ParameterType);
         }
 
+        [Fact]
+        public async Task ScriptAssemblyContainsValidVersion()
+        {
+            // Arrange
+            var code = "Debug.WriteLine(\"Hello world!\");";
+
+            // Act
+            var type = (await TestHelpers.CreateCatalog(code)).Single();
+         
+            // Assert
+            var versionInfo = FileVersionInfo.GetVersionInfo(type.Assembly.Location);
+            var fileVersion = versionInfo.FileVersion;
+            Assert.NotNull(fileVersion);
+        }
+        
+        [Fact]
+        public async Task ScriptContainsVersion1000ByDefault()
+        {
+            // Arrange
+            var code = "Debug.WriteLine(\"Hello world!\");";
+
+            // Act
+            var type = (await TestHelpers.CreateCatalog(code)).Single();
+         
+            // Assert
+            var versionInfo = FileVersionInfo.GetVersionInfo(type.Assembly.Location);
+            var fileVersion = versionInfo.FileVersion;
+            Assert.Equal("1.0.0.0", fileVersion);
+        }
+        
         [Fact]
         public async Task CanHandleRegular()
         {
@@ -245,7 +276,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
 
             var options = new RoslynPluginCatalogOptions()
             {
-                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => "HelloThereFromGenerator" }
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => "HelloThereFromGenerator" },
             };
 
             var catalog = new RoslynPluginCatalog(code, options);

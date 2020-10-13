@@ -27,7 +27,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
             set
             {
                 _pluginVersion = value;
-
+                
                 PluginNameOptions.PluginVersionGenerator = (options, type) => _pluginVersion;
             }
         }

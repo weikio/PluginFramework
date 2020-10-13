@@ -43,7 +43,18 @@ namespace Weikio.PluginFramework.Abstractions
             {
                 var versionInfo = FileVersionInfo.GetVersionInfo(assemblyLocation);
 
-                version = Version.Parse(versionInfo.FileVersion);
+                if (string.IsNullOrWhiteSpace(versionInfo.FileVersion))
+                {
+                    version = new Version(1, 0, 0, 0);
+                }
+                else if (string.Equals(versionInfo.FileVersion, "0.0.0.0"))
+                {
+                    version = new Version(1, 0, 0, 0);
+                }
+                else
+                {
+                    version = Version.Parse(versionInfo.FileVersion);
+                }
             }
             else
             {

@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Scripting;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Scripting;
-using Weikio.PluginFramework.Tools;
+using Weikio.TypeGenerator;
 
 namespace Weikio.PluginFramework.Catalogs.Roslyn
 {
@@ -67,6 +67,8 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
                 code.AppendLine("using System.Text;");
                 code.AppendLine("using System.Collections;");
                 code.AppendLine("using System.Collections.Generic;");
+                code.AppendLine("using System.Reflection;");
+                code.AppendLine("[assembly: AssemblyFileVersion(\"1.0.0.0\")]");
                 
                 if (_options.AdditionalNamespaces?.Any() == true)
                 {
@@ -111,7 +113,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
 
                 var assemblySourceCode = code.ToString();
 
-                var result = generator.Generate(assemblySourceCode);
+                var result = generator.GenerateAssembly(assemblySourceCode);
 
                 return result;
             }

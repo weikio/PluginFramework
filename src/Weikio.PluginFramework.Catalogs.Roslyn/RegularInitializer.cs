@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Weikio.PluginFramework.Tools;
+using Weikio.TypeGenerator;
 
 namespace Weikio.PluginFramework.Catalogs.Roslyn
 {
@@ -60,7 +60,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
                 code.AppendLine(_code);
                 var assemblySourceCode = code.ToString();
 
-                var result = generator.Generate(assemblySourceCode);
+                var result = generator.GenerateAssembly(assemblySourceCode);
 
                 return Task.FromResult(result);
             }

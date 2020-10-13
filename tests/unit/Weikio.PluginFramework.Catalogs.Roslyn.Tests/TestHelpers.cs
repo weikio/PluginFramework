@@ -35,12 +35,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
             var catalog = new RoslynPluginCatalog(code, options);
             await catalog.Initialize();
 
-            var plugin = catalog.Single();
-
-            // var result = plugin.GetTypes().Where(x => x.GetCustomAttribute(typeof(CompilerGeneratedAttribute), true) == null).ToList();
-
             return catalog.GetPlugins().Select(x => x.Type).ToList();
-            // return result;
         }
     }
 }

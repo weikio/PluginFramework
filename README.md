@@ -79,6 +79,8 @@ The following Plugin Framework samples are available from GitHub:
 
 #### [Tagging & WinForms App](https://github.com/weikio/PluginFramework/tree/master/samples/WinFormsApp)
 
+#### [AppSettings.json & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppWithAppSettings)
+
 ## Background and introduction
 
 For more details related to Plugin Framework's background, please see the following [introduction article from InfoQ](https://www.infoq.com/articles/Plugin-Framework-DotNet/).

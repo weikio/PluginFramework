@@ -9,7 +9,7 @@ using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.AspNetCore
 {
-    public class PluginFrameworkInitializer : BackgroundService
+    public class PluginFrameworkInitializer : IHostedService
     {
         private readonly IEnumerable<IPluginCatalog> _pluginCatalogs;
         private readonly ILogger<PluginFrameworkInitializer> _logger;
@@ -20,7 +20,7 @@ namespace Weikio.PluginFramework.AspNetCore
             _logger = logger;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -56,6 +56,11 @@ namespace Weikio.PluginFramework.AspNetCore
 
                 throw;
             }
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

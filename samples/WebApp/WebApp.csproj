@@ -10,5 +10,11 @@
       <ProjectReference Include="..\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="Properties\launchSettings.json">
+        <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
 
 </Project>

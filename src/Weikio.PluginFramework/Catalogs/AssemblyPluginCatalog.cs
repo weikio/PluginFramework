@@ -185,12 +185,20 @@ namespace Weikio.PluginFramework.Catalogs
 
             var finder = new TypeFinder();
 
+            var handledPluginTypes = new List<Type>();
             foreach (var typeFinderCriteria in _options.TypeFinderOptions.TypeFinderCriterias)
             {
                 var pluginTypes = finder.Find(typeFinderCriteria, _assembly, _pluginAssemblyLoadContext);
 
                 foreach (var type in pluginTypes)
                 {
+                    if (handledPluginTypes.Contains(type))
+                    {
+                        // Make sure to create only a single type plugin catalog for each plugin type. 
+                        // The type catalog will add all the matching tags
+                        continue;
+                    }
+                    
                     var typePluginCatalog = new TypePluginCatalog(type,
                         new TypePluginCatalogOptions()
                         {
@@ -202,6 +210,8 @@ namespace Weikio.PluginFramework.Catalogs
                     await typePluginCatalog.Initialize();
 
                     _plugins.Add(typePluginCatalog);
+                    
+                    handledPluginTypes.Add(type);
                 }
             }
 

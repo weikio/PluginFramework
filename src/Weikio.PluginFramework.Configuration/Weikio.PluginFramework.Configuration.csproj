@@ -3,10 +3,24 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <nullable>enable</nullable>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>IConfiguration support for Plugin Framework.</Description>
+    <PackageDescription>IConfiguration support for Plugin Framework.</PackageDescription>
+    <PackageId>Weikio.PluginFramework.Configuration</PackageId>
+    <Product>Weikio.PluginFramework.Configuration</Product>
+    <AssemblyName>Weikio.PluginFramework.Configuration</AssemblyName>
+    <PackageTags>plugins;addons;aspnetextensions;plugin framework;configuration</PackageTags>
+    <PackageIcon>logo_transparent_color_256.png</PackageIcon>
+    <Title>IConfiguration support for Plugin Framework</Title>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
   </ItemGroup>
-
+  
 </Project>

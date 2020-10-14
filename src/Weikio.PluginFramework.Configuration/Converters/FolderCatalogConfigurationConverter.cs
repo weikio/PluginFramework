@@ -14,14 +14,14 @@ namespace Weikio.PluginFramework.Configuration.Converters
         ///<inheritdoc/>
         public bool CanConvert(string type)
         {
-            return type == CatalogTypes.Folder;
+            return string.Equals(type, "Folder", StringComparison.InvariantCultureIgnoreCase);
         }
 
         ///<inheritdoc/>
         public IPluginCatalog Convert(IConfigurationSection configuration)
         {
             var path = configuration.GetValue<string>("Path")
-                ?? throw new ArgumentException("PuglinFramework FolderCatalog requires a Path.");
+                ?? throw new ArgumentException("Plugin Framework's FolderCatalog requires a Path.");
 
             var options = new CatalogFolderOptions();
             configuration.Bind($"Options", options);

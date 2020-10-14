@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Extensions.Configuration;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
@@ -12,7 +13,7 @@ namespace Weikio.PluginFramework.Configuration.Converters
         ///<inheritdoc/>
         public bool CanConvert(string type)
         {
-            return type == CatalogTypes.Assembly;
+            return string.Equals(type, "Assembly", StringComparison.InvariantCultureIgnoreCase);
         }
 
         ///<inheritdoc/>

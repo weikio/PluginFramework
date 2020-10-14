@@ -6,6 +6,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
@@ -20,9 +21,21 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddPluginFramework(this IServiceCollection services)
+        public static IServiceCollection AddPluginFramework(this IServiceCollection services, Action<PluginFrameworkOptions> configure = null)
         {
+            if (configure != null)
+            {
+                services.Configure(configure);
+            }
+            
             services.AddHostedService<PluginFrameworkInitializer>();
+            services.AddTransient<PluginProvider>();
+
+            services.TryAddTransient(typeof(IPluginCatalogConfigurationLoader), typeof(PluginCatalogConfigurationLoader));
+            services.AddTransient(typeof(IConfigurationToCatalogConverter), typeof(FolderCatalogConfigurationConverter));
+            services.AddTransient(typeof(IConfigurationToCatalogConverter), typeof(AssemblyCatalogConfigurationCoverter));
+
+            services.AddConfiguration();
 
             services.AddSingleton(sp =>
             {
@@ -47,7 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             var aspNetCoreLocation = Path.GetDirectoryName(aspNetCoreControllerAssemblyLocation);
-            
+
             if (PluginLoadContextOptions.Defaults.AdditionalRuntimePaths == null)
             {
                 PluginLoadContextOptions.Defaults.AdditionalRuntimePaths = new List<string>();
@@ -60,7 +73,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-        
+
         public static IServiceCollection AddPluginFramework<TType>(this IServiceCollection services, string dllPath = "") where TType : class
         {
             services.AddPluginFramework();
@@ -87,81 +100,74 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddPluginCatalog(catalog);
 
             services.AddPluginType<TType>();
-            
+
             return services;
         }
 
         /// <summary>
-        /// Add plugins from the provided <see cref="IConfiguration"/> object.
+        /// Add plugins from the IConfiguration.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/> on which the plugins will be added.</param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> object that contains the plugin configurations.</param>
         /// <returns>This <see cref="IServiceCollection"/>.</returns>
-        public static IServiceCollection AddPluginFramework(
-            this IServiceCollection services,
-            IConfiguration configuration)
+        private static IServiceCollection AddConfiguration(this IServiceCollection services)
         {
-            // Register the default implementation of IPluginCatalogConfigurationLoader with the provided configuration.
-            services.AddTransient<IPluginCatalogConfigurationLoader>(serviceProvider =>
-                new PluginCatalogConfigurationLoader(configuration));
-
-            services.TryAddSingleton((Func<IServiceProvider, IPluginCatalog>)(serviceProvider =>
+            services.TryAddSingleton<IPluginCatalog>(serviceProvider =>
             {
-                // Grab all the IPluginCatalogConfigurationLoader implementations to laod catalog configurations.
+                var options = serviceProvider.GetService<IOptions<PluginFrameworkOptions>>().Value;
+
+                if (options.UseConfiguration == false)
+                {
+                    return new EmptyPluginCatalog();
+                }
+                
+                // Grab all the IPluginCatalogConfigurationLoader implementations to load catalog configurations.
                 var loaders = serviceProvider
                     .GetServices<IPluginCatalogConfigurationLoader>()
                     .ToList();
 
-                var converters = serviceProvider.GetServices<IConfigurationToCatalogConverter>();
+                var configuration = serviceProvider.GetService<IConfiguration>();
+
+                var converters = serviceProvider.GetServices<IConfigurationToCatalogConverter>().ToList();
                 var catalogs = new List<IPluginCatalog>();
 
                 foreach (var loader in loaders)
                 {
                     // Load the catalog configurations.
-                    var catalogConfigs = loader.GetCatalogConfigurations();
+                    var catalogConfigs = loader.GetCatalogConfigurations(configuration);
 
-                    if (catalogConfigs == null || catalogConfigs.Count == 0)
+                    if (catalogConfigs?.Any() != true)
                     {
-                        // if no configurations were provided continue.
                         continue;
                     }
 
                     for (var i = 0; i < catalogConfigs.Count; i++)
                     {
                         var item = catalogConfigs[i];
-                        var key = $"{loader.SectionKey}:{loader.CatalogsKey}:{i}";
+                        var key = $"{options.ConfigurationSection}:{loader.CatalogsKey}:{i}";
 
                         // Check if a type is provided.
-                        var type = string.IsNullOrWhiteSpace(item.Type)
-                               ? throw new ArgumentException($"A type must be provided for catalog at position {i + 1}")
-                               : item.Type;
+                        if (string.IsNullOrWhiteSpace(item.Type))
+                        {
+                            throw new ArgumentException($"A type must be provided for catalog at position {i + 1}");
+                        }
 
                         // Try to find any registered converter that can convert the specified type.
-                        var foundConverter = converters.FirstOrDefault(converter => converter.CanConvert(type));
+                        var foundConverter = converters.FirstOrDefault(converter => converter.CanConvert(item.Type));
 
-                        // Add a catalog to the list of catalogs.
-                        catalogs.Add(foundConverter != null
-                            // If a converter was found we call it's convert method.
-                            ? foundConverter.Convert(loader.Configuration.GetSection(key))
-                            // If no converter was found (it's null) we proceed with the built-in type converters.
-                            : type switch
-                            {
-                                // Assembly type.
-                                CatalogTypes.Assembly => new AssemblyCatalogConfigurationCoverter().Convert(configuration.GetSection(key)),
+                        if (foundConverter == null)
+                        {
+                            throw new ArgumentException($"The type provided for Plugin catalog at position {i + 1} is unknown.");
+                        }
 
-                                // Folder type.
-                                CatalogTypes.Folder => new FolderCatalogConfigurationConverter().Convert(configuration.GetSection(key)),
+                        var catalog = foundConverter.Convert(configuration.GetSection(key));
 
-                                // Unkown type.
-                                _ => throw new ArgumentException($"The type provided for catalog at position {i + 1} is unknown.")
-                            });
+                        catalogs.Add(catalog);
                     }
                 }
 
                 return new CompositePluginCatalog(catalogs.ToArray());
-            }));
+            });
 
-            services.AddPluginFramework();
             return services;
         }
 
@@ -172,48 +178,29 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddPluginType<T>(this IServiceCollection services, ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where T : class
+        public static IServiceCollection AddPluginType<T>(this IServiceCollection services, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+            where T : class
         {
             var serviceDescriptorEnumerable = new ServiceDescriptor(typeof(IEnumerable<T>), sp =>
             {
-                var result = GetTypes<T>(sp);
+                var pluginProvider = sp.GetService<PluginProvider>();
+                var result = pluginProvider.GetTypes<T>();
 
                 return result.AsEnumerable();
-                
             }, serviceLifetime);
-            
+
             var serviceDescriptorSingle = new ServiceDescriptor(typeof(T), sp =>
             {
-                var result = GetTypes<T>(sp);
+                var pluginProvider = sp.GetService<PluginProvider>();
+                var result = pluginProvider.GetTypes<T>();
 
                 return result.FirstOrDefault();
-                
             }, serviceLifetime);
 
             services.Add(serviceDescriptorEnumerable);
             services.Add(serviceDescriptorSingle);
 
             return services;
-        }
-
-        private static List<T> GetTypes<T>(IServiceProvider sp) where T : class
-        {
-            var result = new List<T>();
-            var catalogs = sp.GetServices<IPluginCatalog>();
-
-            foreach (var catalog in catalogs)
-            {
-                var plugins = catalog.GetPlugins();
-
-                foreach (var plugin in plugins.Where(x => typeof(T).IsAssignableFrom(x)))
-                {
-                    var op = plugin.Create<T>(sp);
-
-                    result.Add(op);
-                }
-            }
-
-            return result;
         }
     }
 }

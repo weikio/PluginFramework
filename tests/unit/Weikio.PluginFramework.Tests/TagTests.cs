@@ -137,6 +137,7 @@ namespace Weikio.PluginFramework.Tests
             {
                 TypeFinderOptions.Defaults.TypeFinderCriterias.Add(TypeFinderCriteriaBuilder.Create().Tag("CustomTag"));
                 TypeFinderOptions.Defaults.TypeFinderCriterias.Add(TypeFinderCriteriaBuilder.Create().HasName(nameof(TypePlugin)).Tag("MyTag_1"));
+                TypeFinderOptions.Defaults.TypeFinderCriterias.Add(TypeFinderCriteriaBuilder.Create().HasName("*Json*").Tag("MyTag_1"));
             }
 
             [Fact]
@@ -158,6 +159,32 @@ namespace Weikio.PluginFramework.Tests
                 TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();
             }
 
+            [Fact]
+            public async Task DefaultTagsWithFolderCatalogTypeShouldNotDuplicatePlugins()
+            {
+                var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0");
+                await catalog.Initialize();
+
+                Assert.Single(catalog.GetPlugins());
+                var plugin = catalog.Get();
+                
+                Assert.Equal(2, plugin.Tags.Count);
+                TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();
+            }
+            
+            [Fact]
+            public async Task DefaultTagsWithAssemblyCatalogTypeShouldNotDuplicatePlugins()
+            {
+                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
+                await catalog.Initialize();
+
+                Assert.Single(catalog.GetPlugins());
+                var plugin = catalog.Get();
+                
+                Assert.Equal(2, plugin.Tags.Count);
+                TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();
+            }
+            
             public void Dispose()
             {
                 TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();

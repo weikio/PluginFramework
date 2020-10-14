@@ -63,6 +63,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsPluginsLibrary", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Configuration", "Weikio.PluginFramework.Configuration\Weikio.PluginFramework.Configuration.csproj", "{882BB58E-D256-4BBF-8C5F-80C4FA39B775}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithAppSettings", "..\samples\WebAppWithAppSettings\WebAppWithAppSettings.csproj", "{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppPluginsLibrary", "..\samples\WebAppPluginsLibrary\WebAppPluginsLibrary.csproj", "{38CCE0F7-F998-4766-A14A-44C047E8D0AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -173,6 +177,14 @@ Global
 		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{882BB58E-D256-4BBF-8C5F-80C4FA39B775}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,6 +212,8 @@ Global
 		{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{6D392453-FC9E-45AD-A9A7-7596A93B3E6C} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{38CCE0F7-F998-4766-A14A-44C047E8D0AA} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AAEBC2B4-FB52-4272-8C25-571FB3CA01E5}

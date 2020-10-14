@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Weikio.PluginFramework.Abstractions;
 
 namespace Weikio.PluginFramework.Configuration.Providers
 {
@@ -9,26 +11,22 @@ namespace Weikio.PluginFramework.Configuration.Providers
     /// </summary>
     public class PluginCatalogConfigurationLoader : IPluginCatalogConfigurationLoader
     {
-        ///<inheritdoc/>
-        public virtual string SectionKey => "PluginFramework";
+        private PluginFrameworkOptions _options;
 
         ///<inheritdoc/>
         public virtual string CatalogsKey => "Catalogs";
 
-        ///<inheritdoc/>
-        public IConfiguration Configuration { get; private set; }
-
-        public PluginCatalogConfigurationLoader(IConfiguration configuration)
+        public PluginCatalogConfigurationLoader(IOptions<PluginFrameworkOptions> options)
         {
-            Configuration = configuration;
+            _options = options.Value;
         }
 
         ///<inheritdoc/>
-        public List<CatalogConfiguration> GetCatalogConfigurations()
+        public List<CatalogConfiguration> GetCatalogConfigurations(IConfiguration configuration)
         {
             var catalogs = new List<CatalogConfiguration>();
 
-            Configuration.Bind($"{SectionKey}:{CatalogsKey}", catalogs);
+            configuration.Bind($"{_options.ConfigurationSection}:{CatalogsKey}", catalogs);
 
             return catalogs;
         }

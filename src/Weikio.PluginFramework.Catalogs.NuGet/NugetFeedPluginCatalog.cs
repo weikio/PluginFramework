@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.NuGet;
-using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
 using Weikio.PluginFramework.TypeFinding;
 
 // ReSharper disable once CheckNamespace

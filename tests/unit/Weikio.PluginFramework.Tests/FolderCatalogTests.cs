@@ -21,9 +21,9 @@ namespace Weikio.PluginFramework.Tests
         {
             var catalog = new FolderPluginCatalog(_pluginFolder);
             await catalog.Initialize();
-            
+
             var plugins = catalog.GetPlugins();
-            
+
             Assert.NotEmpty(plugins);
         }
 
@@ -34,39 +34,96 @@ namespace Weikio.PluginFramework.Tests
             {
                 configure.HasName("*Plugin");
             });
-            
+
             await catalog.Initialize();
 
             var pluginCount = catalog.GetPlugins().Count;
-            
+
             Assert.Equal(2, pluginCount);
+        }
+
+        [Fact]
+        public async Task CanConfigureNamingOptions()
+        {
+            var options = new FolderPluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" }
+            };
+
+            var catalog = new FolderPluginCatalog(_pluginFolder, options);
+            await catalog.Initialize();
+
+            var plugins = catalog.GetPlugins();
+
+            foreach (var plugin in plugins)
+            {
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+        }
+
+        [Fact]
+        public async Task CanConfigureDefaultNamingOptions()
+        {
+            FolderPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+            };
+
+            var catalog = new FolderPluginCatalog(_pluginFolder);
+            await catalog.Initialize();
+
+            var plugins = catalog.GetPlugins();
+
+            foreach (var plugin in plugins)
+            {
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+        }
+        
+        [Fact]
+        public async Task DefaultAssemblyNamingOptionsDoesntAffectFolderCatalogs()
+        {
+            AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+            };
+
+            var catalog = new FolderPluginCatalog(_pluginFolder);
+            await catalog.Initialize();
+
+            var plugins = catalog.GetPlugins();
+
+            foreach (var plugin in plugins)
+            {
+                Assert.False(plugin.Name.EndsWith("Modified"));
+            }
         }
 
         [Fact]
         public async Task CanUseReferencedDependencies()
         {
             PluginLoadContextOptions.Defaults.UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Never;
-            
+
             Action<TypeFinderCriteriaBuilder> configureFinder = configure =>
             {
                 configure.HasName("*JsonResolver");
             };
-            
+
             var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0", configureFinder);
             var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
-            
+
             await folder1Catalog.Initialize();
             await folder2Catalog.Initialize();
 
             var newPlugin = folder1Catalog.Single();
             var oldPlugin = folder2Catalog.Single();
-            
+
             dynamic newPluginJsonResolver = Activator.CreateInstance(newPlugin);
             var newPluginVersion = newPluginJsonResolver.GetVersion();
-            
+
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
-            
+
             Assert.Equal("10.0.0.0", newPluginVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
         }
@@ -76,6 +133,7 @@ namespace Weikio.PluginFramework.Tests
         {
             // Make sure that the referenced version of JSON.NET is loaded into memory
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);
+
             // Make sure that the referenced version of Microsoft.Extensions.Logging is loaded into memory
             var logging = new Microsoft.Extensions.Logging.LoggerFactory();
 
@@ -93,11 +151,11 @@ namespace Weikio.PluginFramework.Tests
             await catalog.Initialize();
 
             var oldPlugin = catalog.Single();
-            
+
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
-            
+
             Assert.Equal("3.1.2.0", loggerVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
         }

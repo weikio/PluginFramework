@@ -46,7 +46,12 @@ namespace Weikio.PluginFramework.Catalogs
         /// <summary>
         /// Gets or sets how the plugin names and version should be defined. <seealso cref="PluginNameOptions"/>
         /// </summary>
-        public PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        public PluginNameOptions PluginNameOptions { get; set; } = Defaults.PluginNameOptions;
+        
+        public static class Defaults
+        {
+            public static PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        }
         
     }
 }

@@ -158,6 +158,19 @@ namespace Weikio.PluginFramework.Tests
                 
                 TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();
             }
+            
+            [Fact]
+            public async Task TypeCatalogCanTagUsingDefaultOptions()
+            {
+                var typePluginCatalog = new TypePluginCatalog(typeof(TypePlugin));
+
+                await typePluginCatalog.Initialize();
+
+                var myTaggedPlugins = typePluginCatalog.GetByTag("MyTag_1");
+                Assert.Single(myTaggedPlugins);
+                
+                TypeFinderOptions.Defaults.TypeFinderCriterias.Clear();
+            }
 
             [Fact]
             public async Task DefaultTagsWithFolderCatalogTypeShouldNotDuplicatePlugins()

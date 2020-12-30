@@ -21,13 +21,13 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly HashSet<string> _pluginAssemblyNames = new HashSet<string>();
 
         private List<NugetPackagePluginCatalog> _pluginCatalogs = new List<NugetPackagePluginCatalog>();
-        private readonly NugetPluginCatalogOptions _options;
+        private readonly NugetFeedPluginCatalogOptions _options;
 
         public string PackagesFolder { get; }
 
         public NugetFeedPluginCatalog(NuGetFeed packageFeed, string searchTerm = null,
             bool includePrereleases = false, int maxPackages = 128,
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, NugetPluginCatalogOptions options = null)
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, NugetFeedPluginCatalogOptions options = null)
         {
             _packageFeed = packageFeed;
             _searchTerm = searchTerm;
@@ -46,7 +46,7 @@ namespace Weikio.PluginFramework.Catalogs
                 criterias = new Dictionary<string, TypeFinderCriteria>();
             }
 
-            _options = options ?? new NugetPluginCatalogOptions();
+            _options = options ?? new NugetFeedPluginCatalogOptions();
 
             if (configureFinder != null)
             {
@@ -93,7 +93,7 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var packageAndRepo in packages)
             {
-                var options = new NugetPluginCatalogOptions() { TypeFinderOptions = _options.TypeFinderOptions };
+                var options = new NugetPluginCatalogOptions() { TypeFinderOptions = _options.TypeFinderOptions, PluginNameOptions = _options.PluginNameOptions};
                 
                 var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(),
                     _includePrereleases, _packageFeed, PackagesFolder, options: options);

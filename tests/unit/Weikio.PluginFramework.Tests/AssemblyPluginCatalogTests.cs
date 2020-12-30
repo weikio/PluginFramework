@@ -71,6 +71,63 @@ namespace Weikio.PluginFramework.Tests
         }
         
         [Fact]
+        public async Task CanConfigureDefaultNamingOptions()
+        {
+            AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+            };
+            
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            
+            await catalog.Initialize();
+
+            var allPlugins = catalog.GetPlugins();
+
+            foreach (var plugin in allPlugins)
+            {
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+        }
+        
+        [Fact]
+        public async Task CanOverrideDefaultNamingOptions()
+        {
+            AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+            };
+            
+            var options = new AssemblyPluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "Overridden"
+                }
+            };
+            
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            var catalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly2.dll", options);
+            
+            await catalog.Initialize();
+            await catalog2.Initialize();
+
+            var catalog1Plugins = catalog.GetPlugins();
+
+            foreach (var plugin in catalog1Plugins)
+            {
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+            
+            var catalog2Plugins = catalog2.GetPlugins();
+
+            foreach (var plugin in catalog2Plugins)
+            {
+                Assert.EndsWith("Overridden", plugin.Name);
+            }
+        }
+        
+        [Fact]
         public async Task ByDefaultOnlyContainsPublicNonAbstractClasses()
         {
             var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");

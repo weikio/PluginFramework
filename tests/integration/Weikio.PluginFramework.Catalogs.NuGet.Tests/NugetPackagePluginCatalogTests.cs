@@ -93,26 +93,6 @@ namespace PluginFramework.Catalogs.NuGet.Tests
         }
 
         [Fact]
-        public async Task CanConfigureDefaultNamingOptions()
-        {
-            NugetPluginCatalogOptions.Defaults.PluginNameOptions =
-                new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" };
-
-            // Arrange
-            var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", configureFinder: configure =>
-            {
-                configure.HasName("Serilog.Core.Logger");
-            });
-
-            // Act
-            await catalog.Initialize();
-            var plugin = catalog.Single();
-
-            // Assert
-            Assert.EndsWith("Modified", plugin.Name);
-        }
-
-        [Fact]
         public async Task InstallPackageWithDepencencies()
         {
             // Arrange
@@ -206,6 +186,38 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
             // Assert
             Assert.NotEmpty(plugins);
+        }
+        
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class DefaultOptions : IDisposable
+        {
+            public DefaultOptions()
+            {
+                NugetPluginCatalogOptions.Defaults.PluginNameOptions =
+                    new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" };
+            }
+            
+            [Fact]
+            public async Task CanConfigureDefaultNamingOptions()
+            {
+                // Arrange
+                var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", configureFinder: configure =>
+                {
+                    configure.HasName("Serilog.Core.Logger");
+                });
+
+                // Act
+                await catalog.Initialize();
+                var plugin = catalog.Single();
+
+                // Assert
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+            
+            public void Dispose()
+            {
+                NugetPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+            }
         }
     }
 }

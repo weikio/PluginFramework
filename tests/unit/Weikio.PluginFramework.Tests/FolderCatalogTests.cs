@@ -61,43 +61,8 @@ namespace Weikio.PluginFramework.Tests
             }
         }
 
-        [Fact]
-        public async Task CanConfigureDefaultNamingOptions()
-        {
-            FolderPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
-            {
-                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
-            };
 
-            var catalog = new FolderPluginCatalog(_pluginFolder);
-            await catalog.Initialize();
-
-            var plugins = catalog.GetPlugins();
-
-            foreach (var plugin in plugins)
-            {
-                Assert.EndsWith("Modified", plugin.Name);
-            }
-        }
-        
-        [Fact]
-        public async Task DefaultAssemblyNamingOptionsDoesntAffectFolderCatalogs()
-        {
-            AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
-            {
-                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
-            };
-
-            var catalog = new FolderPluginCatalog(_pluginFolder);
-            await catalog.Initialize();
-
-            var plugins = catalog.GetPlugins();
-
-            foreach (var plugin in plugins)
-            {
-                Assert.False(plugin.Name.EndsWith("Modified"));
-            }
-        }
+       
 
         [Fact]
         public async Task CanUseReferencedDependencies()
@@ -158,6 +123,57 @@ namespace Weikio.PluginFramework.Tests
 
             Assert.Equal("3.1.2.0", loggerVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
+        }
+        
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class DefaultOptions : IDisposable
+        {
+            public DefaultOptions()
+            {
+                FolderPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+                };
+            }
+
+            [Fact]
+            public async Task CanConfigureDefaultNamingOptions()
+            {
+                var catalog = new FolderPluginCatalog(_pluginFolder);
+                await catalog.Initialize();
+
+                var plugins = catalog.GetPlugins();
+
+                foreach (var plugin in plugins)
+                {
+                    Assert.EndsWith("Modified", plugin.Name);
+                }
+            }
+        
+            [Fact]
+            public async Task DefaultAssemblyNamingOptionsDoesntAffectFolderCatalogs()
+            {
+                AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "ModifiedAssembly"
+                };
+                
+                var catalog = new FolderPluginCatalog(_pluginFolder);
+                await catalog.Initialize();
+
+                var plugins = catalog.GetPlugins();
+
+                foreach (var plugin in plugins)
+                {
+                    Assert.False(plugin.Name.EndsWith("ModifiedAssembly"));
+                }
+            }
+            
+            public void Dispose()
+            {
+                AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+                FolderPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+            }
         }
     }
 }

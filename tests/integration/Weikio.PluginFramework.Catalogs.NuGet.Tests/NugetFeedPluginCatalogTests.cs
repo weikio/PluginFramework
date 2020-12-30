@@ -94,28 +94,41 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             // Assert
             Assert.EndsWith("Modified", plugin.Name);
         }
-
-        [Fact]
-        public async Task CanConfigureDefaultNamingOptions()
+ 
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class DefaultOptions : IDisposable
         {
-            NugetFeedPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            public DefaultOptions()
             {
-                PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
-            };
-
-            // Arrange
-            var feed = new NuGetFeed("nuget.org", "https://api.nuget.org/v3/index.json");
-            var catalog = new NugetFeedPluginCatalog(feed, searchTerm: "tags:mocking", maxPackages: 1, configureFinder: configure =>
+                NugetFeedPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+                };
+            }
+            
+            [Fact]
+            public async Task CanConfigureDefaultNamingOptions()
             {
-                configure.HasName("Moq.Range");
-            });
 
-            // Act
-            await catalog.Initialize();
-            var plugin = catalog.Single();
+                // Arrange
+                var feed = new NuGetFeed("nuget.org", "https://api.nuget.org/v3/index.json");
+                var catalog = new NugetFeedPluginCatalog(feed, searchTerm: "tags:mocking", maxPackages: 1, configureFinder: configure =>
+                {
+                    configure.HasName("Moq.Range");
+                });
 
-            // Assert
-            Assert.EndsWith("Modified", plugin.Name);
+                // Act
+                await catalog.Initialize();
+                var plugin = catalog.Single();
+
+                // Assert
+                Assert.EndsWith("Modified", plugin.Name);
+            } 
+            
+            public void Dispose()
+            {
+                NugetFeedPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+            }
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using Xunit;
 
-namespace Weikio.PluginFramework.Tests
+namespace PluginFramework.Catalogs.NuGet.Tests
 {
     [CollectionDefinition(nameof(NotThreadSafeResourceCollection), DisableParallelization = true)]
-    public class NotThreadSafeResourceCollection
-    {
-    }
+    public class NotThreadSafeResourceCollection { }
 }

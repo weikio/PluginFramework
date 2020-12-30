@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -65,13 +66,13 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
 
             // Act
             var type = (await TestHelpers.CreateCatalog(code)).Single();
-         
+
             // Assert
             var versionInfo = FileVersionInfo.GetVersionInfo(type.Assembly.Location);
             var fileVersion = versionInfo.FileVersion;
             Assert.NotNull(fileVersion);
         }
-        
+
         [Fact]
         public async Task ScriptContainsVersion1000ByDefault()
         {
@@ -80,13 +81,13 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
 
             // Act
             var type = (await TestHelpers.CreateCatalog(code)).Single();
-         
+
             // Assert
             var versionInfo = FileVersionInfo.GetVersionInfo(type.Assembly.Location);
             var fileVersion = versionInfo.FileVersion;
             Assert.Equal("1.0.0.0", fileVersion);
         }
-        
+
         [Fact]
         public async Task CanHandleRegular()
         {
@@ -310,7 +311,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
             {
                 PluginNameOptions = new PluginNameOptions() { PluginVersionGenerator = (nameOptions, type) => new Version(2, 0, 0) }
             };
-    
+
             var catalog = new RoslynPluginCatalog(code, options);
 
             // Act
@@ -319,6 +320,46 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn.Tests
 
             // Assert
             Assert.Equal(new Version(2, 0, 0), plugin.Version);
+        }
+
+        [Fact]
+        public async Task CanTagCode()
+        {
+            // Arrange
+            var code = @"public class MyClass
+                   {
+                       public void RunThings()
+                       {
+                           var y = 0;
+                           var a = 1;
+           
+                           a = y + 10;
+                       
+                           Debug.WriteLine(y + a);
+                       }
+                   }";
+
+            var catalog = new RoslynPluginCatalog(code, new RoslynPluginCatalogOptions() { Tags = new List<string>() { "CustomTag" } });
+
+            await catalog.Initialize();
+            var plugin = catalog.Single();
+
+            Assert.Equal("CustomTag", plugin.Tag);
+        }
+
+        [Fact]
+        public async Task CanTagScript()
+        {
+            // Arrange
+            var code = "Debug.WriteLine(\"Hello world!\");";
+
+            var catalog = new RoslynPluginCatalog(code, new RoslynPluginCatalogOptions() { Tags = new List<string>() { "CustomTag" } });
+
+            await catalog.Initialize();
+
+            var plugin = catalog.Single();
+
+            Assert.Equal("CustomTag", plugin.Tag);
         }
     }
 }

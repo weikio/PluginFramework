@@ -27,7 +27,7 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
             set
             {
                 _pluginVersion = value;
-                
+
                 PluginNameOptions.PluginVersionGenerator = (options, type) => _pluginVersion;
             }
         }
@@ -42,5 +42,10 @@ namespace Weikio.PluginFramework.Catalogs.Roslyn
         public List<Assembly> AdditionalReferences { get; set; } = new List<Assembly>();
         public List<string> AdditionalNamespaces { get; set; } = new List<string>();
         public PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        
+        /// <summary>
+        /// Gets or sets the tags assigned to plugin
+        /// </summary>
+        public List<string> Tags { get; set; } = new List<string>();
     }
 }

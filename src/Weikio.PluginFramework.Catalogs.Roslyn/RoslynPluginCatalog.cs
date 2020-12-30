@@ -8,6 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Scripting;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.Roslyn;
+using Weikio.PluginFramework.TypeFinding;
 
 // ReSharper disable once CheckNamespace
 namespace Weikio.PluginFramework.Catalogs
@@ -88,9 +89,21 @@ namespace Weikio.PluginFramework.Catalogs
                     _assembly = await regularInitializer.CreateAssembly();
                 }
 
-                var options = new AssemblyPluginCatalogOptions { PluginNameOptions = _options.PluginNameOptions };
+                var assemblyCatalogOptions = new AssemblyPluginCatalogOptions { PluginNameOptions = _options.PluginNameOptions};
 
-                _catalog = new AssemblyPluginCatalog(_assembly, options);
+                if (_options.Tags?.Any() == true)
+                {
+                    assemblyCatalogOptions.TypeFinderOptions = new TypeFinderOptions() { TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        new TypeFinderCriteria()
+                        {
+                            Query = (context, type) => true,
+                            Tags = _options.Tags
+                        }
+                    } };
+                }
+
+                _catalog = new AssemblyPluginCatalog(_assembly, assemblyCatalogOptions);
                 await _catalog.Initialize();
 
                 IsInitialized = true;

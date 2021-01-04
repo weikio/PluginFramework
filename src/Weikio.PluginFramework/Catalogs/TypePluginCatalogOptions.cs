@@ -13,7 +13,7 @@ namespace Weikio.PluginFramework.Catalogs
         /// <summary>
         /// Gets or sets how the plugin names and version should be defined. <seealso cref="PluginNameOptions"/>.
         /// </summary>
-        public PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        public PluginNameOptions PluginNameOptions { get; set; } = Defaults.PluginNameOptions;
 
         [Obsolete("Please use TypeFinderOptions. This will be removed in a future release.")]
         public Dictionary<string, TypeFinderCriteria> TypeFinderCriterias = new Dictionary<string, TypeFinderCriteria>();
@@ -27,5 +27,10 @@ namespace Weikio.PluginFramework.Catalogs
         /// Gets or sets the <see cref="ITypeFindingContext"/>.
         /// </summary>
         public ITypeFindingContext TypeFindingContext { get; set; } = null;
+        
+        public static class Defaults
+        {
+            public static PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+        }
     }
 }

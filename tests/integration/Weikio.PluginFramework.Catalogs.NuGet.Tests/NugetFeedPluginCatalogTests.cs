@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Catalogs.NuGet;
 using Xunit;
 
 namespace PluginFramework.Catalogs.NuGet.Tests
@@ -70,6 +71,65 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
             // Assert
             Assert.Equal("MockSolutions", plugin.Tag);
+        }
+        
+        [Fact]
+        public async Task CanConfigureNamingOptions()
+        {
+            var options = new NugetFeedPluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" }
+            };
+
+            // Arrange
+            var feed = new NuGetFeed("nuget.org", "https://api.nuget.org/v3/index.json");
+            var catalog = new NugetFeedPluginCatalog(feed, searchTerm: "tags:mocking", maxPackages: 1, configureFinder: configure =>
+            {
+                configure.HasName("Moq.Range");
+            }, options: options);
+
+            // Act
+            await catalog.Initialize();
+            var plugin = catalog.Single();
+
+            // Assert
+            Assert.EndsWith("Modified", plugin.Name);
+        }
+ 
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class DefaultOptions : IDisposable
+        {
+            public DefaultOptions()
+            {
+                NugetFeedPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+                {
+                    PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified"
+                };
+            }
+            
+            [Fact]
+            public async Task CanConfigureDefaultNamingOptions()
+            {
+
+                // Arrange
+                var feed = new NuGetFeed("nuget.org", "https://api.nuget.org/v3/index.json");
+                var catalog = new NugetFeedPluginCatalog(feed, searchTerm: "tags:mocking", maxPackages: 1, configureFinder: configure =>
+                {
+                    configure.HasName("Moq.Range");
+                });
+
+                // Act
+                await catalog.Initialize();
+                var plugin = catalog.Single();
+
+                // Assert
+                Assert.EndsWith("Modified", plugin.Name);
+            } 
+            
+            public void Dispose()
+            {
+                NugetFeedPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+            }
         }
     }
 }

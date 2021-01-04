@@ -55,5 +55,66 @@ namespace Weikio.PluginFramework.Tests
         
             Assert.Equal("MyCustomName", thePlugin.Name);
         }
+        
+        
+        [Fact]
+        public async Task CanConfigureNamingOptions()
+        {
+            var options = new TypePluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (opt, type) => "HelloOptions" }
+            };
+            
+            var catalog = new TypePluginCatalog(typeof(TypePlugin), options);
+        
+            await catalog.Initialize();
+
+            var thePlugin = catalog.Single();
+        
+            Assert.Equal("HelloOptions", thePlugin.Name);
+        }
+        
+        [Fact]
+        public async Task CanConfigureDefaultNamingOptions()
+        {
+            TypePluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => "HelloOptions"
+            };
+            
+            var catalog = new TypePluginCatalog(typeof(TypePlugin));
+        
+            await catalog.Initialize();
+
+            var thePlugin = catalog.Single();
+        
+            Assert.Equal("HelloOptions", thePlugin.Name);
+        }
+        
+        [Fact]
+        public async Task CanOverrideDefaultNamingOptions()
+        {
+            var options = new TypePluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (opt, type) => "Overridden" }
+            };
+            
+            TypePluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions()
+            {
+                PluginNameGenerator = (nameOptions, type) => "HelloOptions"
+            };
+            
+            var catalog = new TypePluginCatalog(typeof(TypePlugin));
+            var catalog2 = new TypePluginCatalog(typeof(TypePlugin), options);
+
+            await catalog.Initialize();
+            await catalog2.Initialize();
+
+            var thePlugin = catalog.Single();
+            Assert.Equal("HelloOptions", thePlugin.Name);
+
+            var anotherPlugin = catalog2.Single();
+            Assert.Equal("Overridden", anotherPlugin.Name);
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Catalogs.NuGet;
 using Xunit;
 
 namespace PluginFramework.Catalogs.NuGet.Tests
@@ -51,7 +52,7 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             Assert.StartsWith("2.9.0", plugins[0].Version.ToString());
             AssertAssemblyFrameWork(".NETStandard,Version=v2.0", catalog.Single().Assembly);
         }
-        
+
         [Fact]
         public async Task CanTag()
         {
@@ -68,6 +69,28 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
             // Assert
             Assert.Equal("CustomTag", plugin.Tag);
+        }
+
+        [Fact]
+        public async Task CanConfigureNamingOptions()
+        {
+            var options = new NugetPluginCatalogOptions()
+            {
+                PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" }
+            };
+
+            // Arrange
+            var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", configureFinder: configure =>
+            {
+                configure.HasName("Serilog.Core.Logger");
+            }, options: options);
+
+            // Act
+            await catalog.Initialize();
+            var plugin = catalog.Single();
+
+            // Assert
+            Assert.EndsWith("Modified", plugin.Name);
         }
 
         [Fact]
@@ -137,7 +160,6 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             Assert.NotEmpty(plugins);
         }
 
-
         [Fact]
         public async Task InstallPackageFromFeedUsingFeedName()
         {
@@ -156,7 +178,8 @@ namespace PluginFramework.Catalogs.NuGet.Tests
         public async Task InstallPackageFromFeedUsingCustomNuGetConfig()
         {
             // Arrange
-            var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", packageFeed: new NuGetFeed("nuget.org_test"), packagesFolder: _packagesFolderInTestsBin);
+            var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", packageFeed: new NuGetFeed("nuget.org_test"),
+                packagesFolder: _packagesFolderInTestsBin);
 
             // Act
             await catalog.Initialize();
@@ -164,6 +187,38 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
             // Assert
             Assert.NotEmpty(plugins);
+        }
+        
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class DefaultOptions : IDisposable
+        {
+            public DefaultOptions()
+            {
+                NugetPluginCatalogOptions.Defaults.PluginNameOptions =
+                    new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" };
+            }
+            
+            [Fact]
+            public async Task CanConfigureDefaultNamingOptions()
+            {
+                // Arrange
+                var catalog = new NugetPackagePluginCatalog("Serilog", "2.9.0", configureFinder: configure =>
+                {
+                    configure.HasName("Serilog.Core.Logger");
+                });
+
+                // Act
+                await catalog.Initialize();
+                var plugin = catalog.Single();
+
+                // Assert
+                Assert.EndsWith("Modified", plugin.Name);
+            }
+            
+            public void Dispose()
+            {
+                NugetPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
+            }
         }
     }
 }

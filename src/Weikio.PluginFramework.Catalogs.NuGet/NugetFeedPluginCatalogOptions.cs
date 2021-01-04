@@ -1,13 +1,13 @@
 using System;
 using NuGet.Common;
+using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.NuGet;
-using Weikio.NugetDownloader;
 using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs.NuGet
 {
-    public class NugetPluginCatalogOptions
+    public class NugetFeedPluginCatalogOptions
     {
         /// <summary>
         /// Gets or sets the function which is used to create the logger for Nuget activities

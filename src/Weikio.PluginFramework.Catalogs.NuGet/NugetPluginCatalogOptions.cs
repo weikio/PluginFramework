@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using NuGet.Common;
 using Weikio.PluginFramework.Abstractions;
-using Weikio.PluginFramework.Catalogs.NuGet.PackageManagement;
+using Weikio.PluginFramework.Catalogs.NuGet;
+using Weikio.NugetDownloader;
 using Weikio.PluginFramework.TypeFinding;
 
 namespace Weikio.PluginFramework.Catalogs.NuGet

@@ -63,7 +63,9 @@ The following Plugin Framework samples are available from GitHub:
 
 #### [Plugin Framework & .NET Console Application](https://github.com/weikio/PluginFramework/tree/master/samples/ConsoleApp)
 
-#### [Plugin Framework & ASP.NET Core](https://github.com/weikio/PluginFramework/tree/master/samples/WebApp)
+#### [Plugin Framework & ASP.NET Core 3.1](https://github.com/weikio/PluginFramework/tree/master/samples/WebApp)
+
+#### [Plugin Framework & ASP.NET Core 5.0](https://github.com/weikio/PluginFramework/tree/master/samples/WebAppDotNet5)
 
 #### [Plugin Framework & Blazor](https://github.com/weikio/PluginFramework/tree/master/samples/BlazorApp)
 

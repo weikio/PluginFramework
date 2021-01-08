@@ -6,6 +6,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj" />
+      <ProjectReference Include="..\..\src\Weikio.PluginFramework.Catalogs.NuGet\Weikio.PluginFramework.Catalogs.NuGet.csproj" />
       <ProjectReference Include="..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\Weikio.PluginFramework.Samples.SharedPlugins.csproj" />
       <ProjectReference Include="..\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj" />
       <ProjectReference Include="..\WebAppPluginsLibrary\WebAppPluginsLibrary.csproj" />

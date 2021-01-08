@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Weikio.PluginFramework.Samples.Shared;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
 
 namespace WebApp

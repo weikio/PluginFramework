@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions.DependencyInjection\Weikio.PluginFramework.Abstractions.DependencyInjection.csproj" />
     <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
     <ProjectReference Include="..\Weikio.PluginFramework.Configuration\Weikio.PluginFramework.Configuration.csproj" />
     <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />

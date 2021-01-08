@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Weikio.PluginFramework.Catalogs.NuGet;
 using Weikio.PluginFramework.Samples.Shared;
 using Weikio.PluginFramework.TypeFinding;
 
@@ -13,7 +14,8 @@ namespace WebAppWithAppSettings
         {
             TypeFinderOptions.Defaults.TypeFinderCriterias.Add(TypeFinderCriteriaBuilder.Create().Implements<IOperator>().Tag("MathOperator"));
             TypeFinderOptions.Defaults.TypeFinderCriterias.Add(TypeFinderCriteriaBuilder.Create().Tag("All"));
-            services.AddPluginFramework();
+            services.AddPluginFramework()
+                .AddNugetConfiguration();
             
             services.AddControllers();
         }

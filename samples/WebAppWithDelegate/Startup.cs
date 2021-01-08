@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
 using Weikio.PluginFramework.Catalogs.Delegates;
 
@@ -53,6 +54,7 @@ namespace WebAppWithDelegate
 
             services.AddPluginFramework()
                 .AddPluginCatalog(new CompositePluginCatalog(actionCatalog, funcCatalog, funcWithExternalServiceCatalog));
+
 
             services.AddSingleton<ExternalService>();
             services.AddControllers();

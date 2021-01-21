@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.Abstractions.DependencyInjection;
 using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
 using Weikio.PluginFramework.Configuration;
@@ -21,8 +22,10 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddPluginFramework(this IServiceCollection services, Action<PluginFrameworkOptions> configure = null)
+        public static IPluginFrameworkBuilder AddPluginFramework(this IServiceCollection services, Action<PluginFrameworkOptions> configure = null)
         {
+            var frameworkBuilder = new PluginFrameworkBuilder(services);
+
             if (configure != null)
             {
                 services.Configure(configure);
@@ -56,7 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             if (string.IsNullOrWhiteSpace(aspNetCoreControllerAssemblyLocation))
             {
-                return services;
+                return frameworkBuilder;
             }
 
             var aspNetCoreLocation = Path.GetDirectoryName(aspNetCoreControllerAssemblyLocation);
@@ -71,11 +74,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 PluginLoadContextOptions.Defaults.AdditionalRuntimePaths.Add(aspNetCoreLocation);
             }
 
-            return services;
+            return frameworkBuilder;
         }
 
-        public static IServiceCollection AddPluginFramework<TType>(this IServiceCollection services, string dllPath = "") where TType : class
+        public static IPluginFrameworkBuilder AddPluginFramework<TType>(this IServiceCollection services, string dllPath = "") where TType : class
         {
+            var frameworkBuilder = new PluginFrameworkBuilder(services);
+
             services.AddPluginFramework();
 
             if (string.IsNullOrWhiteSpace(dllPath))
@@ -97,11 +102,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Build();
 
             var catalog = new FolderPluginCatalog(dllPath, typeFinderCriteria);
-            services.AddPluginCatalog(catalog);
+            frameworkBuilder.AddPluginCatalog(catalog);
 
-            services.AddPluginType<TType>();
+            frameworkBuilder.AddPluginType<TType>();
 
-            return services;
+            return frameworkBuilder;
         }
 
         /// <summary>
@@ -167,38 +172,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 return new CompositePluginCatalog(catalogs.ToArray());
             });
-
-            return services;
-        }
-
-        public static IServiceCollection AddPluginCatalog(this IServiceCollection services, IPluginCatalog pluginCatalog)
-        {
-            services.TryAddEnumerable(ServiceDescriptor.Singleton(typeof(IPluginCatalog), pluginCatalog));
-
-            return services;
-        }
-
-        public static IServiceCollection AddPluginType<T>(this IServiceCollection services, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-            where T : class
-        {
-            var serviceDescriptorEnumerable = new ServiceDescriptor(typeof(IEnumerable<T>), sp =>
-            {
-                var pluginProvider = sp.GetService<PluginProvider>();
-                var result = pluginProvider.GetTypes<T>();
-
-                return result.AsEnumerable();
-            }, serviceLifetime);
-
-            var serviceDescriptorSingle = new ServiceDescriptor(typeof(T), sp =>
-            {
-                var pluginProvider = sp.GetService<PluginProvider>();
-                var result = pluginProvider.GetTypes<T>();
-
-                return result.FirstOrDefault();
-            }, serviceLifetime);
-
-            services.Add(serviceDescriptorEnumerable);
-            services.Add(serviceDescriptorSingle);
 
             return services;
         }

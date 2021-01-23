@@ -61,11 +61,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsApp", "..\samples\W
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsPluginsLibrary", "..\samples\WinFormsPluginsLibrary\WinFormsPluginsLibrary.csproj", "{E92B0C5D-FFAC-4AB9-B069-869AEED565B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.Configuration", "Weikio.PluginFramework.Configuration\Weikio.PluginFramework.Configuration.csproj", "{882BB58E-D256-4BBF-8C5F-80C4FA39B775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Weikio.PluginFramework.Configuration", "Weikio.PluginFramework.Configuration\Weikio.PluginFramework.Configuration.csproj", "{882BB58E-D256-4BBF-8C5F-80C4FA39B775}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithAppSettings", "..\samples\WebAppWithAppSettings\WebAppWithAppSettings.csproj", "{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithAppSettings", "..\samples\WebAppWithAppSettings\WebAppWithAppSettings.csproj", "{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppPluginsLibrary", "..\samples\WebAppPluginsLibrary\WebAppPluginsLibrary.csproj", "{38CCE0F7-F998-4766-A14A-44C047E8D0AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppPluginsLibrary", "..\samples\WebAppPluginsLibrary\WebAppPluginsLibrary.csproj", "{38CCE0F7-F998-4766-A14A-44C047E8D0AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppDotNet5", "..\samples\WebAppDotNet5\WebAppDotNet5.csproj", "{ABB6FB45-C9BA-40FE-A224-370673F8DA7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -185,6 +187,10 @@ Global
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABB6FB45-C9BA-40FE-A224-370673F8DA7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABB6FB45-C9BA-40FE-A224-370673F8DA7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABB6FB45-C9BA-40FE-A224-370673F8DA7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABB6FB45-C9BA-40FE-A224-370673F8DA7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +220,7 @@ Global
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{ABB6FB45-C9BA-40FE-A224-370673F8DA7F} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AAEBC2B4-FB52-4272-8C25-571FB3CA01E5}

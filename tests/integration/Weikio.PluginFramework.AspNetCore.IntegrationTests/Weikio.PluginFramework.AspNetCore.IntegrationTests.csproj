@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+    </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="3.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.4.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="NLog" Version="4.7.0" />
+    <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="xunit.runner.json">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\samples\Shared\Weikio.PluginFramework.Samples.SharedPlugins\Weikio.PluginFramework.Samples.SharedPlugins.csproj" />
+      <ProjectReference Include="..\..\..\samples\Shared\Weikio.PluginFramework.Samples.Shared\Weikio.PluginFramework.Samples.Shared.csproj" />
+      <ProjectReference Include="..\..\..\src\Weikio.PluginFramework.AspNetCore\Weikio.PluginFramework.AspNetCore.csproj" />
+      <ProjectReference Include="..\WebSites\PluginFrameworkTestBed\PluginFrameworkTestBed.csproj" />
+    </ItemGroup>
+
+</Project>

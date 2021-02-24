@@ -67,6 +67,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppWithAppSettings", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAppPluginsLibrary", "..\samples\WebAppPluginsLibrary\WebAppPluginsLibrary.csproj", "{38CCE0F7-F998-4766-A14A-44C047E8D0AA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebSites", "WebSites", "{38E778EC-D2F9-46E8-9D48-9405B1D05BDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginFrameworkTestBed", "..\tests\integration\WebSites\PluginFrameworkTestBed\PluginFrameworkTestBed.csproj", "{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.AspNetCore.IntegrationTests", "..\tests\integration\Weikio.PluginFramework.AspNetCore.IntegrationTests\Weikio.PluginFramework.AspNetCore.IntegrationTests.csproj", "{7AA40D04-0826-4F4A-9028-2270BAED0B9B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -185,6 +191,14 @@ Global
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +228,9 @@ Global
 		{E92B0C5D-FFAC-4AB9-B069-869AEED565B0} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{A5FAE1A5-74A0-4A83-9520-DCABF6610ADE} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
 		{38CCE0F7-F998-4766-A14A-44C047E8D0AA} = {FF3A507D-D242-44F6-8940-49E0B51B6F02}
+		{38E778EC-D2F9-46E8-9D48-9405B1D05BDC} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
+		{1F634A43-B7E4-4C8A-9877-AE6A03E9ACB5} = {38E778EC-D2F9-46E8-9D48-9405B1D05BDC}
+		{7AA40D04-0826-4F4A-9028-2270BAED0B9B} = {DE041517-4760-4748-97F6-DB71D6AFFF5B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AAEBC2B4-FB52-4272-8C25-571FB3CA01E5}

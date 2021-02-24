@@ -31,7 +31,10 @@ namespace WebApp
 
             services.AddPluginFramework()
                 .AddPluginCatalog(folderPluginCatalog)
-                .AddPluginType<IOperator>();
+                .AddPluginType<IOperator>(configureDefault: option =>
+                {
+                    option.DefaultType = (provider, types) => typeof(SumOperator);
+                });
 
             // Alternatively
             // services.AddPluginFramework<IOperator>(@"..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1");

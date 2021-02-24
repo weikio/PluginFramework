@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Weikio.PluginFramework.Samples.Shared;
 using Weikio.PluginFramework.Abstractions;
+using Weikio.PluginFramework.AspNetCore;
 using Weikio.PluginFramework.Catalogs;
+using Weikio.PluginFramework.Samples.SharedPlugins;
 
 namespace WebApp
 {
@@ -33,6 +35,18 @@ namespace WebApp
 
             // Alternatively
             // services.AddPluginFramework<IOperator>(@"..\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1");
+
+            // Default plugin type returned can be optionally configured with DefaultType function
+            //services.AddPluginFramework()
+            //    .AddPluginCatalog(folderPluginCatalog)
+            //    .AddPluginType<IOperator>(configureDefault: option =>
+            //    {
+            //        option.DefaultType = (serviceProvider, implementingTypes) => typeof(MultiplyOperator);
+            //    });
+
+            // Alternatively default plugin type can be also configured with Configure and provided with the same DefaultType function
+            //services.Configure<DefaultPluginOption>(nameof(IOperator), option =>
+            //    option.DefaultType = (serviceProvider, implementingTypes) => typeof(MultiplyOperator));
 
             services.AddControllers();
         }

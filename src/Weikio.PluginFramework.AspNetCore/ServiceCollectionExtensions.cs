@@ -178,7 +178,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddPluginType<T>(this IServiceCollection services, ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        public static IServiceCollection AddPluginType<T>(this IServiceCollection services, ServiceLifetime serviceLifetime = ServiceLifetime.Transient,
+            Action<DefaultPluginOption> configureDefault = null)
             where T : class
         {
             var serviceDescriptorEnumerable = new ServiceDescriptor(typeof(IEnumerable<T>), sp =>
@@ -191,16 +192,43 @@ namespace Microsoft.Extensions.DependencyInjection
 
             var serviceDescriptorSingle = new ServiceDescriptor(typeof(T), sp =>
             {
+                var defaultPluginOption = GetDefaultPluginOptions<T>(configureDefault, sp);
+
                 var pluginProvider = sp.GetService<PluginProvider>();
                 var result = pluginProvider.GetTypes<T>();
 
-                return result.FirstOrDefault();
+                var defaultType = defaultPluginOption.DefaultType(sp, result.Select(r => r.GetType()));
+
+                return result.FirstOrDefault(r => r.GetType() == defaultType);
             }, serviceLifetime);
 
             services.Add(serviceDescriptorEnumerable);
             services.Add(serviceDescriptorSingle);
 
             return services;
+        }
+
+        private static DefaultPluginOption GetDefaultPluginOptions<T>(Action<DefaultPluginOption> configureDefault, IServiceProvider sp) where T : class
+        {
+            var defaultPluginOption = new DefaultPluginOption();
+
+            // If no configuration is provided though action try to get configuration from named options
+            if (configureDefault == null)
+            {
+                var optionsFromMonitor =
+                    sp.GetService<IOptionsMonitor<DefaultPluginOption>>().Get(typeof(T).Name);
+
+                if (optionsFromMonitor != null)
+                {
+                    defaultPluginOption = optionsFromMonitor;
+                }
+            }
+            else
+            {
+                configureDefault(defaultPluginOption);
+            }
+
+            return defaultPluginOption;
         }
     }
 }

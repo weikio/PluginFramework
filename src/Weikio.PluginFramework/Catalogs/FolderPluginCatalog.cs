@@ -189,9 +189,9 @@ namespace Weikio.PluginFramework.Catalogs
                     return false;
                 }
 
-                if (_options.TypeFinderCriterias?.Any() != true)
+                if (_options.TypeFinderOptions?.TypeFinderCriterias?.Any() != true)
                 {
-                    // If there are no resolvers, assume that each DLL is a plugin
+                    // If there are no type finders configured, assume that each DLL is a plugin
                     return true;
                 }
 
@@ -245,9 +245,9 @@ namespace Weikio.PluginFramework.Catalogs
 
                     var typeFinder = new TypeFinder();
 
-                    foreach (var finderCriteria in _options.TypeFinderCriterias)
+                    foreach (var finderCriteria in _options.TypeFinderOptions.TypeFinderCriterias)
                     {
-                        var typesFound = typeFinder.Find(finderCriteria.Value, readonlyAssembly, metadataPluginLoadContext);
+                        var typesFound = typeFinder.Find(finderCriteria, readonlyAssembly, metadataPluginLoadContext);
 
                         if (typesFound?.Any() == true)
                         {

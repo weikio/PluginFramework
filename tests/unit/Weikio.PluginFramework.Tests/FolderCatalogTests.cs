@@ -43,6 +43,62 @@ namespace Weikio.PluginFramework.Tests
         }
 
         [Fact]
+        public async Task CanUseFolderOptions()
+        {
+            var options = new FolderPluginCatalogOptions
+            {
+                TypeFinderOptions = new TypeFinderOptions()
+                {
+                    TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        TypeFinderCriteriaBuilder
+                            .Create()
+                            .HasName("SecondPlugin")
+                            .Tag("MyPlugin"),
+                    }
+                }
+            };
+
+            var catalog = new FolderPluginCatalog(_pluginFolder, options);
+
+            await catalog.Initialize();
+
+            var pluginCount = catalog.GetPlugins().Count;
+
+            Assert.Equal(1, pluginCount);
+            Assert.Equal("SecondPlugin", catalog.Single().Type.Name);
+        }
+
+        [Fact]
+        public async Task FolderOptionsAreUsedToLimitLoadedAssemblies()
+        {
+            var options = new FolderPluginCatalogOptions
+            {
+                TypeFinderOptions = new TypeFinderOptions()
+                {
+                    TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        TypeFinderCriteriaBuilder
+                            .Create()
+                            .HasName("SecondPlugin")
+                            .Tag("MyPlugin"),
+                    }
+                }
+            };
+
+            var catalog = new FolderPluginCatalog(_pluginFolder, options);
+
+            await catalog.Initialize();
+
+            var field = catalog.GetType().GetField("_catalogs", BindingFlags.Instance | BindingFlags.NonPublic);
+            // ReSharper disable once PossibleNullReferenceException
+            var loadedAssemblies = (List<AssemblyPluginCatalog>) field.GetValue(catalog);
+
+            // ReSharper disable once AssignNullToNotNullAttribute
+            Assert.Single(loadedAssemblies);
+        }
+
+        [Fact]
         public async Task CanConfigureNamingOptions()
         {
             var options = new FolderPluginCatalogOptions()
@@ -60,9 +116,6 @@ namespace Weikio.PluginFramework.Tests
                 Assert.EndsWith("Modified", plugin.Name);
             }
         }
-
-
-       
 
         [Fact]
         public async Task CanUseReferencedDependencies()
@@ -124,7 +177,7 @@ namespace Weikio.PluginFramework.Tests
             Assert.Equal("3.1.2.0", loggerVersion);
             Assert.Equal("9.0.0.0", oldPluginVersion);
         }
-        
+
         [Collection(nameof(NotThreadSafeResourceCollection))]
         public class DefaultOptions : IDisposable
         {
@@ -149,7 +202,7 @@ namespace Weikio.PluginFramework.Tests
                     Assert.EndsWith("Modified", plugin.Name);
                 }
             }
-        
+
             [Fact]
             public async Task DefaultAssemblyNamingOptionsDoesntAffectFolderCatalogs()
             {
@@ -157,7 +210,7 @@ namespace Weikio.PluginFramework.Tests
                 {
                     PluginNameGenerator = (nameOptions, type) => type.FullName + "ModifiedAssembly"
                 };
-                
+
                 var catalog = new FolderPluginCatalog(_pluginFolder);
                 await catalog.Initialize();
 
@@ -168,7 +221,7 @@ namespace Weikio.PluginFramework.Tests
                     Assert.False(plugin.Name.EndsWith("ModifiedAssembly"));
                 }
             }
-            
+
             public void Dispose()
             {
                 AssemblyPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();

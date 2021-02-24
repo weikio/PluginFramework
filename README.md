@@ -87,7 +87,7 @@ For more details related to Plugin Framework's background, please see the follow
 
 ## Main concepts
 
-Using Plugin Framework concentrates mainly around two concepts: **Plugins** and **Plugin Catalogs**.
+Using Plugin Framework concentrates around two concepts: **Plugins** and **Plugin Catalogs**.
 
 ### Plugin
 

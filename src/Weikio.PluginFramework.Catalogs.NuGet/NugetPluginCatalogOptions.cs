@@ -23,6 +23,11 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// Gets or sets how the plugin names and version should be defined. <seealso cref="PluginNameOptions"/>.
         /// </summary>
         public PluginNameOptions PluginNameOptions { get; set; } = Defaults.PluginNameOptions;
+
+        /// <summary>
+        /// Gets or sets if system feeds should be used as secondary feeds for finding packages when feed url is defined.
+        /// </summary>
+        public bool IncludeSystemFeedsAsSecondary { get; set; } = false;
         
         public static class Defaults
         {

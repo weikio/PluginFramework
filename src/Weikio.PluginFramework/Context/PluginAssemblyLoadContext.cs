@@ -146,7 +146,7 @@ namespace Weikio.PluginFramework.Context
         {
             var logger = GetLogger();
 
-            logger.Log(logLevel, message, ex, args);
+            logger.Log(logLevel, ex, message, args);
         }
 
         private static string loggerLock = "lock";

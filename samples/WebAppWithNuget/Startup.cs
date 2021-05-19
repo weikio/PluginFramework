@@ -40,7 +40,6 @@ namespace WebAppWithNuget
                 .AddPluginType<IOperator>();
 
             services.AddControllers();
-
         }
         
 

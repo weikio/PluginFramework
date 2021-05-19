@@ -7,7 +7,6 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.InteropServices;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
@@ -234,6 +233,26 @@ namespace Weikio.PluginFramework.Catalogs
                 }
 
                 paths = paths.Distinct().ToList();
+
+                // Also make sure to include only one dll of each. If same dll is found from multiple locations, use the first found dll and remove the others.
+                var duplicateDlls = paths.Select(x => new {FullPath = x, FileName = Path.GetFileName(x)}).GroupBy(x => x.FileName)
+                    .Where(x => x.Count() > 1)
+                    .ToList();
+
+                var removed = new List<string>();
+
+                foreach (var duplicateDll in duplicateDlls)
+                {
+                    foreach (var duplicateDllPath in duplicateDll.Skip(1))
+                    {
+                        removed.Add(duplicateDllPath.FullPath);
+                    }
+                }
+
+                foreach (var re in removed)
+                {
+                    paths.Remove(re);
+                }
 
                 var resolver = new PathAssemblyResolver(paths);
 

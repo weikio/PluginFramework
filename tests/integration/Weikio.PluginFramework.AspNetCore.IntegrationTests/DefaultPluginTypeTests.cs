@@ -12,7 +12,6 @@ namespace Weikio.PluginFramework.AspNetCore.IntegrationTests
 {
     public class DefaultPluginTypeTests : TestBase
     {
-        
         public DefaultPluginTypeTests(WebApplicationFactory<Startup> factory, ITestOutputHelper output) : base(factory, output)
         {
         }

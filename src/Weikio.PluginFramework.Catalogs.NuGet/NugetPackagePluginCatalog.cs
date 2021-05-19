@@ -92,7 +92,7 @@ namespace Weikio.PluginFramework.Catalogs
         public async Task Initialize()
         {
             var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
-            var pluginAssemblyFileNames = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed);
+            var pluginAssemblyFileNames = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed, includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary);
 
             foreach (var f in pluginAssemblyFileNames)
             {

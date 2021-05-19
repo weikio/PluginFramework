@@ -27,7 +27,8 @@ namespace Weikio.PluginFramework.Catalogs
 
         public NugetFeedPluginCatalog(NuGetFeed packageFeed, string searchTerm = null,
             bool includePrereleases = false, int maxPackages = 128,
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, NugetFeedPluginCatalogOptions options = null)
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, 
+            NugetFeedPluginCatalogOptions options = null)
         {
             _packageFeed = packageFeed;
             _searchTerm = searchTerm;

@@ -15,7 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.*" />
+    <PackageReference Include="MinVer" Version="2.0.*" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.6.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.6.0" />
     <PackageReference Include="Weikio.TypeGenerator" Version="1.2.4" />

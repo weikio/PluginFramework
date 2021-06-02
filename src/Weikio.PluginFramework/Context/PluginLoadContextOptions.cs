@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Microsoft.Extensions.DependencyModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -32,7 +34,12 @@ namespace Weikio.PluginFramework.Context
         /// Gets or sets the additional runtime paths which are used when locating plugin assemblies  
         /// </summary>
         public List<string> AdditionalRuntimePaths { get; set; } = Defaults.AdditionalRuntimePaths;
-        
+
+        /// <summary>
+        /// Gets or sets the func for retuning current runtime identifier  
+        /// </summary>
+        public static Func<string> GetRuntimeIdentifier { get; set; } = Defaults.GetRuntimeIdentifier;
+
         public static class Defaults
         {
             /// <summary>
@@ -56,7 +63,44 @@ namespace Weikio.PluginFramework.Context
             /// Gets or sets the additional runtime paths which are used when locating plugin assemblies  
             /// </summary>
             public static List<string> AdditionalRuntimePaths { get; set; } = new List<string>();
+
+            /// <summary>
+            /// Gets or sets the func for retuning current runtime identifier  
+            /// </summary>
+            public static Func<string> GetRuntimeIdentifier { get; set; } = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment.GetRuntimeIdentifier;
+
+            /// <summary>
+            /// Gets or sets the func for retuning supported runtime identifiers  
+            /// </summary>
+            public static Func<List<string>> GetSupportedRuntimeIdentifiers { get; set; } = () =>
+            {
+                var result = new List<string>();
+                var defaultDependencyContext = DependencyContext.Default;
+
+                if (defaultDependencyContext == null)
+                {
+                    return result;
+                }
+
+                var runtimeIdentifier = GetRuntimeIdentifier();
+
+                if (string.IsNullOrWhiteSpace(runtimeIdentifier))
+                {
+                    return result;
+                }
+
+                result.Add(runtimeIdentifier);
+
+                var fallbacks = defaultDependencyContext.RuntimeGraph
+                    .FirstOrDefault(x => string.Equals(x.Runtime, runtimeIdentifier, StringComparison.InvariantCulture))?.Fallbacks;
+
+                if (fallbacks?.Any() == true)
+                {
+                    result.AddRange(fallbacks);
+                }
+                
+                return result;
+            };
         }
     }
-
 }

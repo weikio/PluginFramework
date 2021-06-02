@@ -15,19 +15,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.6.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.6.0" />
-    <PackageReference Include="Weikio.TypeGenerator" Version="1.2.4" />
+    <PackageReference Include="MinVer" Version="2.0.*" PrivateAssets="all"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="3.6.0"/>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.6.0"/>
+    <PackageReference Include="Weikio.TypeGenerator" Version="1.2.4"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
-    <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
+    <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj"/>
+    <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj"/>
   </ItemGroup>
-  
+
   <ItemGroup>
-    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>

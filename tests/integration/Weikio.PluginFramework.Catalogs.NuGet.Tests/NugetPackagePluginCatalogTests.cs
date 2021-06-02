@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
 using Weikio.PluginFramework.Catalogs.NuGet;
+using Weikio.PluginFramework.TypeFinding;
 using Xunit;
 
 namespace PluginFramework.Catalogs.NuGet.Tests
@@ -186,6 +188,41 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
             // Assert
             Assert.NotEmpty(plugins);
+        }
+        
+        [Fact]
+        public async Task CanInstallPackageWithNativeDepencencies()
+        {
+            var options = new NugetPluginCatalogOptions()
+            {
+                TypeFinderOptions = new TypeFinderOptions()
+                {
+                    TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        new TypeFinderCriteria()
+                        {
+                            Query = (context, type) =>
+                            {
+                                if (string.Equals(type.Name, "SqlConnection"))
+                                {
+                                    return true;
+                                }
+
+                                return false;
+                            }
+                        }
+                    }
+                }
+            };
+            // Arrange
+            var catalog = new NugetPackagePluginCatalog("Microsoft.Data.SqlClient", "2.1.2", options: options, packagesFolder:"c:\\temp\\sqltestpackage");
+
+            // Act
+            await catalog.Initialize();
+
+            var plugin = catalog.Single();
+
+            var conn = Activator.CreateInstance(plugin, "Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password=myPassword;");
         }
         
         [Collection(nameof(NotThreadSafeResourceCollection))]

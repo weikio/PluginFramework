@@ -15,11 +15,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.0" />
+    <PackageReference Include="MinVer" Version="2.0.0" PrivateAssets="all"/>
   </ItemGroup>
-  
+
 </Project>

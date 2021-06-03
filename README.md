@@ -11,6 +11,7 @@ Here are some of the main features of Plugin Framework:
 * Everything is a plugin! Deliver plugins as Nuget-packages, .NET assemblies, Roslyn scripts and more.
 * Easy integration into a new or an existing .NET Core application.
 * Automatic dependency management.
+* Handles platform specific runtime DLLs and native DLLs when using Nuget-packages.
 * MIT-licensed, commercial support available.
 
 ## Quickstart: Plugin Framework & ASP.NET Core

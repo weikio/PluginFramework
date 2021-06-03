@@ -32,6 +32,11 @@ namespace Weikio.PluginFramework.Context
         /// Gets or sets the additional runtime paths which are used when locating plugin assemblies  
         /// </summary>
         public List<string> AdditionalRuntimePaths { get; set; } = Defaults.AdditionalRuntimePaths;
+
+        /// <summary>
+        /// Gets or sets a list of assemblies and paths which can be used to override default assembly loading. Useful in situations where in runtime we want to load a DLL from a separate location.
+        /// </summary>
+        public List<RuntimeAssemblyHint> RuntimeAssemblyHints { get; set; } = Defaults.RuntimeAssemblyHints;
         
         public static class Defaults
         {
@@ -56,7 +61,11 @@ namespace Weikio.PluginFramework.Context
             /// Gets or sets the additional runtime paths which are used when locating plugin assemblies  
             /// </summary>
             public static List<string> AdditionalRuntimePaths { get; set; } = new List<string>();
+
+            /// <summary>
+            /// Gets or sets a list of assemblies and paths which can be used to override default assembly loading. Useful in situations where in runtime we want to load a DLL from a separate location.
+            /// </summary>
+            public static List<RuntimeAssemblyHint> RuntimeAssemblyHints { get; set; } = new List<RuntimeAssemblyHint>();
         }
     }
-
 }

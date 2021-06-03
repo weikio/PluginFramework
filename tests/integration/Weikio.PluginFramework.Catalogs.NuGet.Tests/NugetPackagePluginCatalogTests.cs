@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
 using Weikio.PluginFramework.Catalogs.NuGet;
+using Weikio.PluginFramework.TypeFinding;
 using Xunit;
 
 namespace PluginFramework.Catalogs.NuGet.Tests
@@ -219,6 +221,56 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             {
                 NugetPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
             }
+        }
+        
+        [Fact]
+        public async Task CanInstallPackageWithNativeDepencencies()
+        {
+            var options = new NugetPluginCatalogOptions()
+            {
+                TypeFinderOptions = new TypeFinderOptions()
+                {
+                    TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        new TypeFinderCriteria()
+                        {
+                            Query = (context, type) =>
+                            {
+                                if (string.Equals(type.Name, "SqlConnection"))
+                                {
+                                    return true;
+                                }
+
+                                return false;
+                            }
+                        }
+                    }
+                }
+            };
+            // Arrange
+            var catalog = new NugetPackagePluginCatalog("Microsoft.Data.SqlClient", "2.1.2", options: options);
+
+            // Act
+            await catalog.Initialize();
+
+            var plugin = catalog.Single();
+
+            // This is the connection string part of the Weik.io docs. It provides readonly access to the Adventureworks database sample.
+            // So it should be ok to have it here.
+            dynamic conn = Activator.CreateInstance(plugin, "Server=tcp:adafydevtestdb001.database.windows.net,1433;User ID=docs;Password=3h1@*6PXrldU4F95;Integrated Security=false;Initial Catalog=adafyweikiodevtestdb001;");
+
+            conn.Open();
+
+            var cmd = conn.CreateCommand();
+            cmd.CommandText = "select top 1 * from SalesLT.Customer";
+
+            var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Console.WriteLine(String.Format("{0}", reader[0]));
+            }
+
+            conn.Dispose();
         }
     }
 }

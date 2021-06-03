@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.NuGet;
+using Weikio.PluginFramework.Context;
 using Weikio.PluginFramework.TypeFinding;
 
 // ReSharper disable once CheckNamespace
@@ -60,7 +61,7 @@ namespace Weikio.PluginFramework.Catalogs
             foreach (var finderCriteria in criterias)
             {
                 finderCriteria.Value.Tags = new List<string>() { finderCriteria.Key };
-                
+
                 _options.TypeFinderOptions.TypeFinderCriterias.Add(finderCriteria.Value);
             }
         }
@@ -92,16 +93,33 @@ namespace Weikio.PluginFramework.Catalogs
         public async Task Initialize()
         {
             var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
-            var pluginAssemblyFileNames = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed, includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary);
 
-            foreach (var f in pluginAssemblyFileNames)
+            var nugetDownloadResult = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed,
+                includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary).ConfigureAwait(false);
+
+            foreach (var f in nugetDownloadResult.PackageAssemblyFiles)
             {
                 _pluginAssemblyFilePaths.Add(Path.Combine(PackagesFolder, f));
             }
 
             foreach (var pluginAssemblyFilePath in _pluginAssemblyFilePaths)
             {
-                var options = new AssemblyPluginCatalogOptions { TypeFinderOptions = _options.TypeFinderOptions, PluginNameOptions = _options.PluginNameOptions};
+                var options = new AssemblyPluginCatalogOptions
+                {
+                    TypeFinderOptions = _options.TypeFinderOptions, PluginNameOptions = _options.PluginNameOptions
+                };
+
+                var downloadedRuntimeDlls = nugetDownloadResult.RunTimeDlls.Where(x => x.IsRecommended).ToList();
+
+                var runtimeAssemblyHints = new List<RuntimeAssemblyHint>();
+
+                foreach (var runTimeDll in downloadedRuntimeDlls)
+                {
+                    var runtimeAssembly = new RuntimeAssemblyHint(runTimeDll.FileName, runTimeDll.FullFilePath, runTimeDll.IsNative);
+                    runtimeAssemblyHints.Add(runtimeAssembly);
+                }
+
+                options.PluginLoadContextOptions.RuntimeAssemblyHints = runtimeAssemblyHints;
 
                 var assemblyCatalog = new AssemblyPluginCatalog(pluginAssemblyFilePath, options);
                 await assemblyCatalog.Initialize();

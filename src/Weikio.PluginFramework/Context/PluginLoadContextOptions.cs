@@ -38,6 +38,11 @@ namespace Weikio.PluginFramework.Context
         /// </summary>
         public List<RuntimeAssemblyHint> RuntimeAssemblyHints { get; set; } = Defaults.RuntimeAssemblyHints;
         
+        /// <summary>
+        /// Enables Unload for AssemblyLoadContext
+        /// </summary>
+        public bool EnableUnload { get; set; }
+        
         public static class Defaults
         {
             /// <summary>

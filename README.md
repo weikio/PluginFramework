@@ -133,17 +133,19 @@ Plugin Framework provides the following officially supported catalogs:
 
 Source code for Plugin Framework is available from [GitHub](https://github.com/weikio/PluginFramework).
 
-## Constributors
+## Support & Build by
 
-#### [@panoukos41](https://github.com/panoukos41)
-
-## Support
-
-Commercial support for Plugin Framework is provided by [Adafy](https://adafy.com).
+Plugin Framework is build by [Adafy](https://adafy.com). Adafy also provides commercial support for the framework.
 
 ![Adafy Logo](docs/Adafy_logo_256.png)
 
 Adafy is a Finnish software development house, focusing on Microsoft technologies.
+
+## Constributors
+
+Thanks to the following contributors who have helped with the project:
+
+#### [@panoukos41](https://github.com/panoukos41)
 
 ## License
 

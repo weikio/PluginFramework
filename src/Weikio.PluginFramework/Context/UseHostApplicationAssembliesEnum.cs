@@ -15,6 +15,11 @@
         /// <summary>
         /// Always try to use host application's assemblies
         /// </summary>
-        Always
+        Always,
+        
+        /// <summary>
+        /// Prefer plugin's referenced assemblies, fallback to host application's assemblies
+        /// </summary>
+        PreferPlugin
     }
 }

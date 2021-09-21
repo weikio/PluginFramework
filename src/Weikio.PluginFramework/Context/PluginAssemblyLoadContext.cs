@@ -56,21 +56,19 @@ namespace Weikio.PluginFramework.Context
 
             if (TryUseHostApplicationAssembly(assemblyName))
             {
-                try
-                {
-                    var defaultAssembly = Default.LoadFromAssemblyName(assemblyName);
+                var foundFromHostApplication = LoadHostApplicationAssembly(assemblyName);
 
+                if (foundFromHostApplication)
+                {
                     Log(LogLevel.Debug, "Assembly {AssemblyName} is available through host application's AssemblyLoadContext. Use it. ", ex: null,
                         assemblyName);
 
                     return null;
                 }
-                catch
-                {
-                    Log(LogLevel.Debug,
-                        "Host application's AssemblyLoadContext doesn't contain {AssemblyName}. Try to resolve it through the plugin's references.", ex: null,
-                        assemblyName);
-                }
+
+                Log(LogLevel.Debug,
+                    "Host application's AssemblyLoadContext doesn't contain {AssemblyName}. Try to resolve it through the plugin's references.", ex: null,
+                    assemblyName);
             }
 
             string assemblyPath;
@@ -94,6 +92,19 @@ namespace Weikio.PluginFramework.Context
 
                 var result = LoadFromAssemblyPath(assemblyPath);
                 return result;
+            }
+
+            if (_options.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.PreferPlugin)
+            {
+                var foundFromHostApplication = LoadHostApplicationAssembly(assemblyName);
+
+                if (foundFromHostApplication)
+                {
+                    Log(LogLevel.Debug, "Assembly {AssemblyName} not available from plugin's references but is available through host application's AssemblyLoadContext. Use it. ", ex: null,
+                        assemblyName);
+
+                    return null;
+                }
             }
 
             if (_options.AdditionalRuntimePaths?.Any() != true)
@@ -122,7 +133,7 @@ namespace Weikio.PluginFramework.Context
 
             return null;
         }
-        
+
         private bool TryUseHostApplicationAssembly(AssemblyName assemblyName)
         {
             Log(LogLevel.Debug, "Determining if {AssemblyName} should be loaded from host application's or from plugin's AssemblyLoadContext",
@@ -143,16 +154,43 @@ namespace Weikio.PluginFramework.Context
                 return true;
             }
 
-            var name = assemblyName.Name;
+            if (_options.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.Selected)
+            {
+                var name = assemblyName.Name;
 
-            var result = _options.HostApplicationAssemblies?.Any(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase)) == true;
+                var result = _options.HostApplicationAssemblies?.Any(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase)) == true;
 
-            Log(LogLevel.Debug, "UseHostApplicationAssemblies is set to Selected. {AssemblyName} listed in the HostApplicationAssemblies: {Result}", ex: null,
-                assemblyName, result);
+                Log(LogLevel.Debug, "UseHostApplicationAssemblies is set to Selected. {AssemblyName} listed in the HostApplicationAssemblies: {Result}", ex: null,
+                    assemblyName, result);
 
-            return result;
+                return result;
+            }
+
+            if (_options.UseHostApplicationAssemblies == UseHostApplicationAssembliesEnum.PreferPlugin)
+            {
+                Log(LogLevel.Debug, "UseHostApplicationAssemblies is set to PreferPlugin. Try to load assembly from plugin's AssemblyLoadContext and fallback to host application's AssemblyLoadContext",
+                    args: assemblyName);
+
+                return false;
+            }
+            
+            return false;
         }
 
+        private bool LoadHostApplicationAssembly(AssemblyName assemblyName)
+        {
+            try
+            {
+                Default.LoadFromAssemblyName(assemblyName);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
         protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
         {
             var nativeHint = _runtimeAssemblyHints.FirstOrDefault(x => x.IsNative && string.Equals(x.FileName, unmanagedDllName));

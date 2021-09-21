@@ -9,12 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TestIntefaces\TestIntefaces.csproj" />
+    <ProjectReference Include="..\TestIntefaces\TestIntefaces.csproj"/>
   </ItemGroup>
-  
+
 </Project>

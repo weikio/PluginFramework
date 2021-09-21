@@ -176,7 +176,7 @@ namespace Weikio.PluginFramework.Tests
         }
 
         [Fact]
-        public async Task CanUseSelectedHoststDependencies()
+        public async Task CanUseSelectedHostsDependencies()
         {
             // Make sure that the referenced version of JSON.NET is loaded into memory
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(1);

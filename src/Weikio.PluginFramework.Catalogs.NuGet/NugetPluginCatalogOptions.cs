@@ -28,6 +28,11 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// Gets or sets if system feeds should be used as secondary feeds for finding packages when feed url is defined.
         /// </summary>
         public bool IncludeSystemFeedsAsSecondary { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the target platform. If not set, EntryAssembly's target framework is used.
+        /// </summary>
+        public string TargetFramework { get; set; } = Defaults.TargetFramework;
         
         public static class Defaults
         {
@@ -36,7 +41,15 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
             /// </summary>
             public static Func<ILogger> LoggerFactory { get; set; } = () => new ConsoleLogger();
             
+            /// <summary>
+            /// Gets or sets the default of how the plugin names and version should be defined. <seealso cref="PluginNameOptions"/>.
+            /// </summary>
             public static PluginNameOptions PluginNameOptions { get; set; } = new PluginNameOptions();
+            
+            /// <summary>
+            /// Gets or sets the default target platform. If not set, EntryAssembly's target framework is used.
+            /// </summary>
+            public static string TargetFramework { get; set; } = string.Empty;
         }
     }
 }

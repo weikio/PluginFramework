@@ -95,7 +95,7 @@ namespace Weikio.PluginFramework.Catalogs
             var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
 
             var nugetDownloadResult = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed,
-                includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary).ConfigureAwait(false);
+                includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary, targetFramework: _options.TargetFramework).ConfigureAwait(false);
 
             foreach (var f in nugetDownloadResult.PackageAssemblyFiles)
             {

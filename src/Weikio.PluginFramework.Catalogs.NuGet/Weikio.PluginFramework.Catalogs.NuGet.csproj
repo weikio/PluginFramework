@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\NugetDownloader\src\Weikio.NugetDownloader\Weikio.NugetDownloader.csproj" />
     <ProjectReference Include="..\Weikio.PluginFramework.Abstractions\Weikio.PluginFramework.Abstractions.csproj" />
     <ProjectReference Include="..\Weikio.PluginFramework\Weikio.PluginFramework.csproj" />
   </ItemGroup>

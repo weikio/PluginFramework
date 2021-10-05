@@ -181,7 +181,7 @@ namespace Weikio.PluginFramework.Context
         {
             try
             {
-                var asm = Default.LoadFromAssemblyName(assemblyName);
+                Default.LoadFromAssemblyName(assemblyName);
 
                 return true;
             }

@@ -20,6 +20,7 @@
   
   <ItemGroup>
     <None Include="../../docs/logo_transparent_color_256.png" Pack="true" Visible="false" PackagePath="" />
+    <None Include="../../readme.md" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

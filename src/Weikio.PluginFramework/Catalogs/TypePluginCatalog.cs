@@ -18,6 +18,17 @@ namespace Weikio.PluginFramework.Catalogs
         private readonly TypePluginCatalogOptions _options;
         private Plugin _plugin;
 
+        /// <summary>
+        /// Gets the <see cref="TypePluginCatalogOptions"/> for this catalog
+        /// </summary>
+        public TypePluginCatalogOptions Options
+        {
+            get
+            {
+                return _options;
+            }
+        }
+
         public TypePluginCatalog(Type pluginType) : this(pluginType, null, null, null)
         {
         }

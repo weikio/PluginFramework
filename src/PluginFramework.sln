@@ -73,8 +73,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginFrameworkTestBed", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.PluginFramework.AspNetCore.IntegrationTests", "..\tests\integration\Weikio.PluginFramework.AspNetCore.IntegrationTests\Weikio.PluginFramework.AspNetCore.IntegrationTests.csproj", "{7AA40D04-0826-4F4A-9028-2270BAED0B9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Weikio.NugetDownloader", "..\..\NugetDownloader\src\Weikio.NugetDownloader\Weikio.NugetDownloader.csproj", "{C2FF06BB-BBF2-44CD-8FE0-2998B7419536}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -201,10 +199,6 @@ Global
 		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AA40D04-0826-4F4A-9028-2270BAED0B9B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C2FF06BB-BBF2-44CD-8FE0-2998B7419536}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C2FF06BB-BBF2-44CD-8FE0-2998B7419536}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C2FF06BB-BBF2-44CD-8FE0-2998B7419536}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C2FF06BB-BBF2-44CD-8FE0-2998B7419536}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

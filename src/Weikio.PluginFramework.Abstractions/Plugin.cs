@@ -44,7 +44,7 @@ namespace Weikio.PluginFramework.Abstractions
         /// Gets the description of the plugin
         /// </summary>
         public string ProductVersion { get; }
-
+        
         /// <summary>
         /// Gets the tag of the plugin
         /// </summary>

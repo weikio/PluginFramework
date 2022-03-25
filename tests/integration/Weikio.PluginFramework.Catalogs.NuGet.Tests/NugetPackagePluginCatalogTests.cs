@@ -190,7 +190,7 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             // Assert
             Assert.NotEmpty(plugins);
         }
-        
+
         [Collection(nameof(NotThreadSafeResourceCollection))]
         public class DefaultOptions : IDisposable
         {
@@ -199,7 +199,7 @@ namespace PluginFramework.Catalogs.NuGet.Tests
                 NugetPluginCatalogOptions.Defaults.PluginNameOptions =
                     new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" };
             }
-            
+
             [Fact]
             public async Task CanConfigureDefaultNamingOptions()
             {
@@ -216,13 +216,83 @@ namespace PluginFramework.Catalogs.NuGet.Tests
                 // Assert
                 Assert.EndsWith("Modified", plugin.Name);
             }
-            
+
             public void Dispose()
             {
                 NugetPluginCatalogOptions.Defaults.PluginNameOptions = new PluginNameOptions();
             }
         }
-        
+
+        [Collection(nameof(NotThreadSafeResourceCollection))]
+        public class NugetDownloadResultsSerialisation : IDisposable
+        {
+            private string _packagesFolderInTestsBin;
+
+            public NugetDownloadResultsSerialisation()
+            {
+                var executingAssemblyDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                _packagesFolderInTestsBin = Path.Combine(executingAssemblyDir, "TestPackagesDownloadResult");
+            }
+
+            [Fact]
+            public async Task SaveDownloadResultIfGivenCustomPackagesPath()
+            {
+                var options = new NugetPluginCatalogOptions()
+                {
+                    TypeFinderOptions = new TypeFinderOptions()
+                    {
+                        TypeFinderCriterias = new List<TypeFinderCriteria>()
+                    {
+                        new TypeFinderCriteria()
+                        {
+                            Query = (context, type) =>
+                            {
+                                if (string.Equals(type.Name, "SqlConnection"))
+                                {
+                                    return true;
+                                }
+
+                                return false;
+                            }
+                        }
+                    }
+                    }
+                };
+
+                // Arrange
+                var catalog = new NugetPackagePluginCatalog("Microsoft.Data.SqlClient", "2.1.2", options: options, packagesFolder: _packagesFolderInTestsBin);
+
+                // Act
+                await catalog.Initialize();
+
+                var plugin = catalog.Single();
+
+                // This is the connection string part of the Weik.io docs. It provides readonly access to the Adventureworks database sample.
+                // So it should be ok to have it here.
+                dynamic conn = Activator.CreateInstance(plugin, "Server=tcp:adafydevtestdb001.database.windows.net,1433;User ID=docs;Password=3h1@*6PXrldU4F95;Integrated Security=false;Initial Catalog=adafyweikiodevtestdb001;");
+
+                conn.Open();
+
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "select top 1 * from SalesLT.Customer";
+
+                var reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine(String.Format("{0}", reader[0]));
+                }
+
+                conn.Dispose();
+
+                Assert.True(File.Exists(_packagesFolderInTestsBin + "/nugetDownloadResult.json"));
+            }
+
+            public void Dispose()
+            {
+                File.Delete(_packagesFolderInTestsBin + "/nugetDownloadResult.json");
+            }
+        }
+
         [Fact]
         public async Task CanInstallPackageWithNativeDepencencies()
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Weikio.NugetDownloader;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs.NuGet;
@@ -92,10 +93,21 @@ namespace Weikio.PluginFramework.Catalogs
 
         public async Task Initialize()
         {
-            var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
+            NugetDownloadResult nugetDownloadResult = null;
 
-            var nugetDownloadResult = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed,
+            if (File.Exists(PackagesFolder + "/nugetDownloadResult.json"))
+            {
+                var jsonFromDisk = await File.ReadAllTextAsync(PackagesFolder + "/nugetDownloadResult.json");
+
+                nugetDownloadResult = JsonConvert.DeserializeObject<NugetDownloadResult>(jsonFromDisk);
+            }
+            else
+            {
+                var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
+
+                nugetDownloadResult = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed,
                 includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary, targetFramework: _options.TargetFramework).ConfigureAwait(false);
+            }
 
             foreach (var f in nugetDownloadResult.PackageAssemblyFiles)
             {
@@ -106,7 +118,8 @@ namespace Weikio.PluginFramework.Catalogs
             {
                 var options = new AssemblyPluginCatalogOptions
                 {
-                    TypeFinderOptions = _options.TypeFinderOptions, PluginNameOptions = _options.PluginNameOptions
+                    TypeFinderOptions = _options.TypeFinderOptions,
+                    PluginNameOptions = _options.PluginNameOptions
                 };
 
                 var downloadedRuntimeDlls = nugetDownloadResult.RunTimeDlls.Where(x => x.IsRecommended).ToList();
@@ -128,6 +141,13 @@ namespace Weikio.PluginFramework.Catalogs
             }
 
             IsInitialized = true;
+
+            if (File.Exists(PackagesFolder + "/nugetDownloadResult.json") == false)
+            {
+                var jsonToWrite = JsonConvert.SerializeObject(nugetDownloadResult);
+
+                await File.WriteAllTextAsync(PackagesFolder + "/nugetDownloadResult.json", jsonToWrite);
+            }
         }
     }
 }

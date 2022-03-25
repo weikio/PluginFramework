@@ -26,6 +26,8 @@ namespace Weikio.PluginFramework.Catalogs
 
         public string PackagesFolder { get; }
 
+        private bool _isCustomPackagesFolder;
+
         public NugetPackagePluginCatalog(string packageName, string packageVersion = null, bool includePrerelease = false, NuGetFeed packageFeed = null,
             string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null,
             NugetPluginCatalogOptions options = null)
@@ -36,6 +38,8 @@ namespace Weikio.PluginFramework.Catalogs
             _packageFeed = packageFeed;
 
             PackagesFolder = packagesFolder ?? Path.Combine(Path.GetTempPath(), "NugetPackagePluginCatalog", Path.GetRandomFileName());
+
+            _isCustomPackagesFolder = packagesFolder != null;
 
             if (!Directory.Exists(PackagesFolder))
             {
@@ -95,7 +99,7 @@ namespace Weikio.PluginFramework.Catalogs
         {
             NugetDownloadResult nugetDownloadResult = null;
 
-            if (File.Exists(PackagesFolder + "/nugetDownloadResult.json"))
+            if (_isCustomPackagesFolder && File.Exists(PackagesFolder + "/nugetDownloadResult.json"))
             {
                 var jsonFromDisk = await File.ReadAllTextAsync(PackagesFolder + "/nugetDownloadResult.json");
 
@@ -142,7 +146,7 @@ namespace Weikio.PluginFramework.Catalogs
 
             IsInitialized = true;
 
-            if (File.Exists(PackagesFolder + "/nugetDownloadResult.json") == false)
+            if (_isCustomPackagesFolder && File.Exists(PackagesFolder + "/nugetDownloadResult.json") == false)
             {
                 var jsonToWrite = JsonConvert.SerializeObject(nugetDownloadResult);
 

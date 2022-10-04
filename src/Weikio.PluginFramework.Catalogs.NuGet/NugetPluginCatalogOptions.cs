@@ -33,6 +33,17 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// Gets or sets the target platform. If not set, EntryAssembly's target framework is used.
         /// </summary>
         public string TargetFramework { get; set; } = Defaults.TargetFramework;
+
+        /// <summary>
+        /// Gets or sets if Plugin Framework should take care of package caching. In some cases Nuget will download already downloaded package. This flag
+        /// tries to make sure that the package is downloaded only once. Note: Requires that PackagesFolder is set
+        /// </summary>
+        public bool ForcePackageCaching { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the folder where package is installed. Defaults to unique random temp path.
+        /// </summary>
+        public string CustomPackagesFolder { get; set; } = string.Empty;
         
         public static class Defaults
         {

@@ -26,7 +26,46 @@ namespace Weikio.PluginFramework.Catalogs
 
         public string PackagesFolder { get; }
 
-        private bool _isCustomPackagesFolder;
+        private bool HasCustomPackagesFolder
+        {
+            get
+            {
+                return string.IsNullOrWhiteSpace(PackagesFolder) == false;
+            }
+        }
+        
+        private bool ForcePackageCache
+        {
+            get
+            {
+                if (HasCustomPackagesFolder == false)
+                {
+                    return false;
+                }
+
+                if (_options?.ForcePackageCaching != true)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        private string NugetDownloadResultFilePath
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(PackagesFolder))
+                {
+                    return null;
+                }
+
+                var result = Path.Combine(PackagesFolder, ".nugetDownloadResult.json");
+
+                return result;
+            }
+        }
 
         public NugetPackagePluginCatalog(string packageName, string packageVersion = null, bool includePrerelease = false, NuGetFeed packageFeed = null,
             string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null,
@@ -37,9 +76,12 @@ namespace Weikio.PluginFramework.Catalogs
             _includePrerelease = includePrerelease;
             _packageFeed = packageFeed;
 
-            PackagesFolder = packagesFolder ?? Path.Combine(Path.GetTempPath(), "NugetPackagePluginCatalog", Path.GetRandomFileName());
+            PackagesFolder = packagesFolder ?? options?.CustomPackagesFolder;
 
-            _isCustomPackagesFolder = packagesFolder != null;
+            if (string.IsNullOrWhiteSpace(PackagesFolder))
+            {
+                PackagesFolder = Path.Combine(Path.GetTempPath(), "NugetPackagePluginCatalog", Path.GetRandomFileName());
+            }
 
             if (!Directory.Exists(PackagesFolder))
             {
@@ -99,18 +141,30 @@ namespace Weikio.PluginFramework.Catalogs
         {
             NugetDownloadResult nugetDownloadResult = null;
 
-            if (_isCustomPackagesFolder && File.Exists(PackagesFolder + "/nugetDownloadResult.json"))
-            {
-                var jsonFromDisk = await File.ReadAllTextAsync(PackagesFolder + "/nugetDownloadResult.json");
+            var logger = _options.LoggerFactory();
 
-                nugetDownloadResult = JsonConvert.DeserializeObject<NugetDownloadResult>(jsonFromDisk);
+            if (ForcePackageCache && File.Exists(NugetDownloadResultFilePath))
+            {
+                try
+                {
+                    var jsonFromDisk = await File.ReadAllTextAsync(NugetDownloadResultFilePath);
+
+                    nugetDownloadResult = JsonConvert.DeserializeObject<NugetDownloadResult>(jsonFromDisk);
+                    
+                    logger?.LogDebug($"Using previously downloaded package from {PackagesFolder}");
+                }
+                catch (Exception e)
+                {
+                    logger?.LogError($"Failed to deserialize nuget download result from path {NugetDownloadResultFilePath}: {e}");
+                }
             }
-            else
+
+            if (nugetDownloadResult == null)
             {
                 var nuGetDownloader = new NuGetDownloader(_options.LoggerFactory());
 
                 nugetDownloadResult = await nuGetDownloader.DownloadAsync(PackagesFolder, _packageName, _packageVersion, _includePrerelease, _packageFeed,
-                includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary, targetFramework: _options.TargetFramework).ConfigureAwait(false);
+                    includeSecondaryRepositories: _options.IncludeSystemFeedsAsSecondary, targetFramework: _options.TargetFramework).ConfigureAwait(false);
             }
 
             foreach (var f in nugetDownloadResult.PackageAssemblyFiles)
@@ -146,11 +200,20 @@ namespace Weikio.PluginFramework.Catalogs
 
             IsInitialized = true;
 
-            if (_isCustomPackagesFolder && File.Exists(PackagesFolder + "/nugetDownloadResult.json") == false)
+            if (ForcePackageCache)
             {
-                var jsonToWrite = JsonConvert.SerializeObject(nugetDownloadResult);
+                try
+                {
+                    var jsonToWrite = JsonConvert.SerializeObject(nugetDownloadResult, Formatting.Indented);
 
-                await File.WriteAllTextAsync(PackagesFolder + "/nugetDownloadResult.json", jsonToWrite);
+                    await File.WriteAllTextAsync(NugetDownloadResultFilePath, jsonToWrite);
+                    
+                    logger?.LogDebug($"Stored downloaded package details to {NugetDownloadResultFilePath}");
+                }
+                catch (Exception e)
+                {
+                    logger?.LogError($"Failed to store downloaded package details to {NugetDownloadResultFilePath}: {e}");
+                }
             }
         }
     }

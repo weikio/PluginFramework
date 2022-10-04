@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Plugin Framework is a powerful plugin platform for your .NET Core applications.</Description>
-    <PackageDescription>Everything is a plugin! Use assemblies, NuGet packages and C# Scripts as plugins in your .NET Core Applications.</PackageDescription>
+    <Description>Plugin Framework is a powerful plugin platform for your .NET applications.</Description>
+    <PackageDescription>Everything is a plugin! Use assemblies, NuGet packages and C# Scripts as plugins in your .NET Applications.</PackageDescription>
     <PackageId>Weikio.PluginFramework</PackageId>
     <Product>Weikio.PluginFramework</Product>
     <AssemblyName>Weikio.PluginFramework</AssemblyName>

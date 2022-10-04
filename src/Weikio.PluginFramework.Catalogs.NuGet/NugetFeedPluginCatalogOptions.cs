@@ -24,6 +24,12 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// </summary>
         public PluginNameOptions PluginNameOptions { get; set; } = Defaults.PluginNameOptions;
         
+        /// <summary>
+        /// Gets or sets if Plugin Framework should take care of package caching. In some cases Nuget will download already downloaded package. This flag
+        /// tries to make sure that the package is downloaded only once. Note: Requires that PackagesFolder is set
+        /// </summary>
+        public bool ForcePackageCaching { get; set; } = false;
+        
         public static class Defaults
         {
             /// <summary>

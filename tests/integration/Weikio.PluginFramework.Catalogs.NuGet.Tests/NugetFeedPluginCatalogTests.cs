@@ -51,7 +51,7 @@ namespace PluginFramework.Catalogs.NuGet.Tests
             Assert.Single(plugins);
             Assert.Equal("Moq.Range", plugins[0].Name);
             Assert.StartsWith("4.", plugins[0].Version.ToString());
-            AssertAssemblyFrameWork(".NETStandard,Version=v2.0", plugins.Single().Assembly);
+            AssertAssemblyFrameWork(".NETStandard,Version=v2.1", plugins.Single().Assembly);
         }
         
         [Fact]

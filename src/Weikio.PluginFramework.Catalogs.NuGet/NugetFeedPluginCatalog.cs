@@ -27,7 +27,7 @@ namespace Weikio.PluginFramework.Catalogs
 
         public NugetFeedPluginCatalog(NuGetFeed packageFeed, string searchTerm = null,
             bool includePrereleases = false, int maxPackages = 128,
-            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null, 
+            string packagesFolder = null, Action<TypeFinderCriteriaBuilder> configureFinder = null, Dictionary<string, TypeFinderCriteria> criterias = null,
             NugetFeedPluginCatalogOptions options = null)
         {
             _packageFeed = packageFeed;
@@ -58,13 +58,13 @@ namespace Weikio.PluginFramework.Catalogs
 
                 _options.TypeFinderOptions.TypeFinderCriterias.Add(criteria);
             }
-            
+
             foreach (var finderCriteria in criterias)
             {
                 finderCriteria.Value.Tags = new List<string>() { finderCriteria.Key };
-                
+
                 _options.TypeFinderOptions.TypeFinderCriterias.Add(finderCriteria.Value);
-            }            
+            }
         }
 
         Plugin IPluginCatalog.Get(string name, Version version)
@@ -94,8 +94,13 @@ namespace Weikio.PluginFramework.Catalogs
 
             foreach (var packageAndRepo in packages)
             {
-                var options = new NugetPluginCatalogOptions() { TypeFinderOptions = _options.TypeFinderOptions, PluginNameOptions = _options.PluginNameOptions};
-                
+                var options = new NugetPluginCatalogOptions()
+                {
+                    TypeFinderOptions = _options.TypeFinderOptions,
+                    PluginNameOptions = _options.PluginNameOptions,
+                    ForcePackageCaching = _options.ForcePackageCaching
+                };
+
                 var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(),
                     _includePrereleases, _packageFeed, PackagesFolder, options: options);
 

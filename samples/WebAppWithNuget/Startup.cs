@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -30,10 +31,16 @@ namespace WebAppWithNuget
         {
             NugetPluginCatalogOptions.Defaults.LoggerFactory = () => new NugetLogger(services);
 
+            var options = new NugetPluginCatalogOptions
+            {
+                ForcePackageCaching = true, 
+                CustomPackagesFolder = Path.Combine(Path.GetTempPath(), "NugetPackagePluginCatalog", "Sample")
+            };
+
             var nugetCatalog = new NugetPackagePluginCatalog("Weikio.PluginFramework.Samples.SharedPlugins", includePrerelease: true, configureFinder: finder =>
             {
                 finder.Implements<IOperator>();
-            });
+            }, options: options);
 
             services.AddPluginFramework()
                 .AddPluginCatalog(nugetCatalog)
@@ -41,7 +48,6 @@ namespace WebAppWithNuget
 
             services.AddControllers();
         }
-        
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

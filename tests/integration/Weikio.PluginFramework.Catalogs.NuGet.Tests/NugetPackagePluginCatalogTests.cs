@@ -284,7 +284,7 @@ namespace PluginFramework.Catalogs.NuGet.Tests
 
                 conn.Dispose();
 
-                Assert.True(File.Exists(_packagesFolderInTestsBin + "/nugetDownloadResult.json"));
+                Assert.True(File.Exists(_packagesFolderInTestsBin + "/.nugetDownloadResult.json"));
             }
 
             public void Dispose()

@@ -98,7 +98,8 @@ namespace Weikio.PluginFramework.Catalogs
                 {
                     TypeFinderOptions = _options.TypeFinderOptions,
                     PluginNameOptions = _options.PluginNameOptions,
-                    ForcePackageCaching = _options.ForcePackageCaching
+                    ForcePackageCaching = _options.ForcePackageCaching,
+                    AutoRetryPackageDownload = _options.AutoRetryPackageDownload
                 };
 
                 var packageCatalog = new NugetPackagePluginCatalog(packageAndRepo.Package.Identity.Id, packageAndRepo.Package.Identity.Version.ToString(),

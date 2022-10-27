@@ -45,6 +45,12 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// </summary>
         public string CustomPackagesFolder { get; set; } = string.Empty;
         
+        /// <summary>
+        /// Gets or sets if Plugin Framework should try to retry package download if it fails for the first time. If true and the download fails,
+        /// Plugin Framework will clear the Nuget cache and then tries again.
+        /// </summary>
+        public bool AutoRetryPackageDownload { get; set; } = false;
+        
         public static class Defaults
         {
             /// <summary>

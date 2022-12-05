@@ -26,13 +26,13 @@ Install-Package Weikio.PluginFramework.AspNetCore
 
 Using Plugin Framework can be as easy as adding a single new line into ConfigureServices:
 
-```
+```csharp
 services.AddPluginFramework<IOperator>(@".\myplugins");
 ```
 
 The code finds all the plugins (types that implement the custom IOperator-interface) from the myplugins-folder. The plugins can be used in a controller using constructor injection:
 
-```
+```csharp
 public CalculatorController(IEnumerable<IOperator> operator)
 {
 	_operators = operators;
@@ -41,7 +41,7 @@ public CalculatorController(IEnumerable<IOperator> operator)
 
 Alternatively, you can provide multiple plugin locations using catalogs:
 
-```
+```csharp
 var folderPluginCatalog = new FolderPluginCatalog(@".\myplugins", type =>
 {
     type.Implements<IOperator>();

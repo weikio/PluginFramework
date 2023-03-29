@@ -60,7 +60,7 @@ jobs:
       if: github.event_name != 'pull_request'
     - name: Deploy Weikio.PluginFramework.Catalogs.NuGet to GitHub Nuget
       run: dotnet nuget push "*.nupkg" --source "github"
-      working-directory: ./src/Weikio.PluginFramework.Catalogs.NuGete/bin/Release
+      working-directory: ./src/Weikio.PluginFramework.Catalogs.NuGet/bin/Release
       if: github.event_name != 'pull_request'
     - name: Deploy Weikio.PluginFramework.Catalogs.Roslyn to GitHub Nuget
       run: dotnet nuget push "*.nupkg" --source "github"

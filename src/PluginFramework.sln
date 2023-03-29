@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithRoslyn", "..\samp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAppWithDelegate", "..\samples\WebAppWithDelegate\WebAppWithDelegate.csproj", "{C2DD5D1C-2F8A-4EC9-BE90-66418A8602AE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp", "..\Samples\BlazorApp\BlazorApp.csproj", "{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorApp", "..\samples\BlazorApp\BlazorApp.csproj", "{A7EC9D91-CED0-43E7-BAB3-3B72230BFC0B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsApp", "..\samples\WinFormsApp\WinFormsApp.csproj", "{6D392453-FC9E-45AD-A9A7-7596A93B3E6C}"
 EndProject

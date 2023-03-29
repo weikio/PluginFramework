@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
@@ -37,7 +38,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanTagAssemblyPlugin()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", null,
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll".Replace(@"\",Path.DirectorySeparatorChar.ToString()), null,
                 taggedFilters: new Dictionary<string, Predicate<Type>>() { { "CustomTag", type => true } });
 
             await catalog.Initialize();
@@ -72,7 +73,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanTagFolderPlugin()
         {
-            var _pluginFolder = @"..\..\..\..\..\Assemblies\bin\netstandard2.0";
+            var _pluginFolder = @"..\..\..\..\..\Assemblies\bin\netstandard2.0".Replace(@"\",Path.DirectorySeparatorChar.ToString());
             var catalog = new FolderPluginCatalog(_pluginFolder, builder =>
             {
                 builder.Tag("test_folder_tag");
@@ -143,7 +144,7 @@ namespace Weikio.PluginFramework.Tests
             [Fact]
             public async Task CanTagUsingDefaultOptions()
             {
-                var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+                var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll".Replace(@"\",Path.DirectorySeparatorChar.ToString()));
                 var typePluginCatalog = new TypePluginCatalog(typeof(TypePlugin));
 
                 var compositeCatalog = new CompositePluginCatalog(assemblyPluginCatalog, typePluginCatalog);
@@ -175,7 +176,7 @@ namespace Weikio.PluginFramework.Tests
             [Fact]
             public async Task DefaultTagsWithFolderCatalogTypeShouldNotDuplicatePlugins()
             {
-                var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0");
+                var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0".Replace(@"\",Path.DirectorySeparatorChar.ToString()));
                 await catalog.Initialize();
 
                 Assert.Single(catalog.GetPlugins());
@@ -188,7 +189,7 @@ namespace Weikio.PluginFramework.Tests
             [Fact]
             public async Task DefaultTagsWithAssemblyCatalogTypeShouldNotDuplicatePlugins()
             {
-                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll");
+                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll".Replace(@"\",Path.DirectorySeparatorChar.ToString()));
                 await catalog.Initialize();
 
                 Assert.Single(catalog.GetPlugins());

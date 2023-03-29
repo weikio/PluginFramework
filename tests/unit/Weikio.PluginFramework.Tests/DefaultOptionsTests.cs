@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Weikio.PluginFramework.Abstractions;
 using Weikio.PluginFramework.Catalogs;
@@ -22,8 +23,8 @@ namespace Weikio.PluginFramework.Tests
                 configure.HasName("*JsonResolver");
             };
             
-            var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", configureFinder);
-            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
+            var assemblyPluginCatalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll".Replace(@"\",Path.DirectorySeparatorChar.ToString()), configureFinder);
+            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0".Replace(@"\",Path.DirectorySeparatorChar.ToString()), configureFinder);
             
             await assemblyPluginCatalog.Initialize();
             await folderPluginCatalog.Initialize();

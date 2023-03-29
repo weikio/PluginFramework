@@ -14,7 +14,7 @@ namespace Weikio.PluginFramework.Tests
 {
     public class FolderCatalogTests
     {
-        private const string _pluginFolder = @"..\..\..\..\..\Assemblies\bin\net7.0";
+        private static readonly string _pluginFolder = @"..\..\..\..\..\Assemblies\bin\net7.0".Replace(@"\",Path.DirectorySeparatorChar.ToString());
 
         [Fact]
         public async Task CanInitialize()
@@ -127,8 +127,8 @@ namespace Weikio.PluginFramework.Tests
                 configure.HasName("*JsonResolver");
             };
 
-            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\net7.0", configureFinder);
-            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0", configureFinder);
+            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\net7.0".Replace(@"\",Path.DirectorySeparatorChar.ToString()), configureFinder);
+            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0".Replace(@"\",Path.DirectorySeparatorChar.ToString()), configureFinder);
 
             await folder1Catalog.Initialize();
             await folder2Catalog.Initialize();
@@ -172,7 +172,7 @@ namespace Weikio.PluginFramework.Tests
                 .Assembly.GetName().Version?.ToString();
             var hostJsonAssemblyVersion = typeof(Newtonsoft.Json.JsonConvert)
                 .Assembly.GetName().Version?.ToString();
-            var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0", options);
+            var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0".Replace(@"\",Path.DirectorySeparatorChar.ToString()), options);
             await catalog.Initialize();
 
             var oldPlugin = catalog.Single();

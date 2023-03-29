@@ -24,7 +24,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanInitialize()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll");
             await catalog.Initialize();
 
             var allPlugins = catalog.GetPlugins();
@@ -35,7 +35,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanInitializeWithCriteria()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", configure =>
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll", configure =>
             {
                 configure.HasName("*Plugin");
             });
@@ -55,7 +55,7 @@ namespace Weikio.PluginFramework.Tests
                 PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Modified" }
             };
 
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", options);
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll", options);
 
             await catalog.Initialize();
 
@@ -70,7 +70,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task ByDefaultOnlyContainsPublicNonAbstractClasses()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll");
             await catalog.Initialize();
 
             var allPlugins = catalog.GetPlugins();
@@ -83,7 +83,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task CanIncludeAbstractClassesUsingCriteria()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll", builder =>
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll", builder =>
             {
                 builder.IsAbstract(true);
             });
@@ -99,7 +99,7 @@ namespace Weikio.PluginFramework.Tests
         [Fact]
         public async Task ThrowsIfAssemblyNotFound()
         {
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\notexists.dll");
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\notexists.dll");
 
             await Assert.ThrowsAsync<ArgumentException>(async () => await catalog.Initialize());
         }
@@ -125,10 +125,10 @@ namespace Weikio.PluginFramework.Tests
                 PluginLoadContextOptions = new PluginLoadContextOptions() { UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Never }
             };
 
-            var assemblyCatalog1 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", options);
+            var assemblyCatalog1 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\net7.0\JsonNetNew.dll", options);
             await assemblyCatalog1.Initialize();
 
-            var assemblyCatalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
+            var assemblyCatalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0\JsonNetOld.dll", options);
             await assemblyCatalog2.Initialize();
 
             var newPlugin = assemblyCatalog1.Single();
@@ -156,10 +156,10 @@ namespace Weikio.PluginFramework.Tests
                 PluginLoadContextOptions = new PluginLoadContextOptions() { UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Always }
             };
 
-            var folder1Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0\JsonNetNew.dll", options);
+            var folder1Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\net7.0\JsonNetNew.dll", options);
             await folder1Catalog.Initialize();
 
-            var folder2Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
+            var folder2Catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0\JsonNetOld.dll", options);
             await folder2Catalog.Initialize();
 
             var newPlugin = folder1Catalog.Single();
@@ -171,8 +171,8 @@ namespace Weikio.PluginFramework.Tests
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
 
-            Assert.Equal("12.0.0.0", newPluginVersion);
-            Assert.Equal("12.0.0.0", oldPluginVersion);
+            Assert.Equal("13.0.0.0", newPluginVersion);
+            Assert.Equal("13.0.0.0", oldPluginVersion);
         }
 
         [Fact]
@@ -190,10 +190,18 @@ namespace Weikio.PluginFramework.Tests
             options.PluginLoadContextOptions = new PluginLoadContextOptions()
             {
                 UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
-                HostApplicationAssemblies = new List<AssemblyName>() { typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName() }
+                HostApplicationAssemblies = new List<AssemblyName>()
+                {
+                    typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName(),
+                    typeof(Newtonsoft.Json.JsonConvert).Assembly.GetName()
+                }
             };
+            var hostLogAssemblyVersion = typeof(Microsoft.Extensions.Logging.LoggerFactory)
+                .Assembly.GetName().Version?.ToString();
+            var hostJsonAssemblyVersion = typeof(Newtonsoft.Json.JsonConvert)
+                .Assembly.GetName().Version?.ToString();
 
-            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0\JsonNetOld.dll", options);
+            var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0\JsonNetOld.dll", options);
             await catalog.Initialize();
 
             var oldPlugin = catalog.Single();
@@ -202,8 +210,8 @@ namespace Weikio.PluginFramework.Tests
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
 
-            Assert.Equal("3.1.2.0", loggerVersion);
-            Assert.Equal("9.0.0.0", oldPluginVersion);
+            Assert.Equal(hostLogAssemblyVersion, loggerVersion);
+            Assert.Equal(hostJsonAssemblyVersion, oldPluginVersion);
         }
 
         [Collection(nameof(NotThreadSafeResourceCollection))]
@@ -220,7 +228,7 @@ namespace Weikio.PluginFramework.Tests
             [Fact]
             public async Task CanConfigureDefaultNamingOptions()
             {
-                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
+                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll");
 
                 await catalog.Initialize();
 
@@ -240,8 +248,8 @@ namespace Weikio.PluginFramework.Tests
                     PluginNameOptions = new PluginNameOptions() { PluginNameGenerator = (nameOptions, type) => type.FullName + "Overridden" }
                 };
 
-                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly1.dll");
-                var catalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\netstandard2.0\TestAssembly2.dll", options);
+                var catalog = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly1.dll");
+                var catalog2 = new AssemblyPluginCatalog(@"..\..\..\..\..\Assemblies\bin\net7.0\TestAssembly2.dll", options);
 
                 await catalog.Initialize();
                 await catalog2.Initialize();

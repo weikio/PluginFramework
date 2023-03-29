@@ -14,7 +14,7 @@ namespace Weikio.PluginFramework.Tests
 {
     public class FolderCatalogTests
     {
-        private const string _pluginFolder = @"..\..\..\..\..\Assemblies\bin\netstandard2.0";
+        private const string _pluginFolder = @"..\..\..\..\..\Assemblies\bin\net7.0";
 
         [Fact]
         public async Task CanInitialize()
@@ -127,8 +127,8 @@ namespace Weikio.PluginFramework.Tests
                 configure.HasName("*JsonResolver");
             };
 
-            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\netstandard2.0", configureFinder);
-            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", configureFinder);
+            var folder1Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonNew\net7.0", configureFinder);
+            var folder2Catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0", configureFinder);
 
             await folder1Catalog.Initialize();
             await folder2Catalog.Initialize();
@@ -161,11 +161,18 @@ namespace Weikio.PluginFramework.Tests
                 PluginLoadContextOptions = new PluginLoadContextOptions()
                 {
                     UseHostApplicationAssemblies = UseHostApplicationAssembliesEnum.Selected,
-                    HostApplicationAssemblies = new List<AssemblyName>() { typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName() }
+                    HostApplicationAssemblies = new List<AssemblyName>()
+                    {
+                        typeof(Microsoft.Extensions.Logging.LoggerFactory).Assembly.GetName(),
+                        typeof(Newtonsoft.Json.JsonConvert).Assembly.GetName()
+                    }
                 }
             };
-
-            var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\netstandard2.0", options);
+            var hostLogAssemblyVersion = typeof(Microsoft.Extensions.Logging.LoggerFactory)
+                .Assembly.GetName().Version?.ToString();
+            var hostJsonAssemblyVersion = typeof(Newtonsoft.Json.JsonConvert)
+                .Assembly.GetName().Version?.ToString();
+            var catalog = new FolderPluginCatalog(@"..\..\..\..\..\Assemblies\bin\JsonOld\net7.0", options);
             await catalog.Initialize();
 
             var oldPlugin = catalog.Single();
@@ -174,8 +181,8 @@ namespace Weikio.PluginFramework.Tests
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             var loggerVersion = oldPluginJsonResolver.GetLoggingVersion();
 
-            Assert.Equal("3.1.2.0", loggerVersion);
-            Assert.Equal("9.0.0.0", oldPluginVersion);
+            Assert.Equal(hostLogAssemblyVersion, loggerVersion);
+            Assert.Equal(hostJsonAssemblyVersion, oldPluginVersion);
         }
 
         [Collection(nameof(NotThreadSafeResourceCollection))]

@@ -1,0 +1,69 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+    
+permissions:
+  packages: write
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Setup .NET 3.1
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 3.1.x
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Setup .NET 7
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Setup GitHub Nuget
+      run: dotnet nuget add source --username ${{ vars.NUGET_USERNAME }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ vars.NUGET_NAMESPACE }}/index.json"
+      working-directory: ./src
+    - name: Restore dependencies
+      run: dotnet restore
+      working-directory: ./src
+    - name: Build for Test
+      run: dotnet build --no-restore
+      working-directory: ./src
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      working-directory: ./src
+    - name: Build for Release
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ./src
+    - name: Deploy Weikio.PluginFramework.Abstractions to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework.Abstractions/bin/Release
+    - name: Deploy Weikio.PluginFramework to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework/bin/Release
+    - name: Deploy Weikio.PluginFramework.Configuration to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework.Configuration/bin/Release
+    - name: Deploy Weikio.PluginFramework.AspNetCore to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework.AspNetCore/bin/Release
+    - name: Deploy Weikio.PluginFramework.Catalogs.NuGet to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework.Catalogs.NuGete/bin/Release
+    - name: Deploy Weikio.PluginFramework.Catalogs.Roslyn to GitHub Nuget
+      run: dotnet nuget push "*.nupkg" --source "github"
+      working-directory: ./src/Weikio.PluginFramework.Catalogs.Roslyn/bin/Release

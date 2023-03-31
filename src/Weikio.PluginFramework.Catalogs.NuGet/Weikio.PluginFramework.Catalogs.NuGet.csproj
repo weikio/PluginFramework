@@ -16,7 +16,7 @@
 
   <ItemGroup>
     <PackageReference Include="MinVer" Version="4.3.0" PrivateAssets="all" />
-    <PackageReference Include="Weikio.NugetDownloader" Version="2.2.0" />
+    <PackageReference Include="Weikio.NugetDownloader" Version="2.2.1-alpha.0.1" />
   </ItemGroup>
 
   <ItemGroup>

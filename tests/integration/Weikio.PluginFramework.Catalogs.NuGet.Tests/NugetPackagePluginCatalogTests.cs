@@ -234,58 +234,61 @@ namespace PluginFramework.Catalogs.NuGet.Tests
                 _packagesFolderInTestsBin = Path.Combine(executingAssemblyDir, "TestPackagesDownloadResult");
             }
 
-            [Fact]
-            public async Task SaveDownloadResultIfGivenCustomPackagesPath()
-            {
-                var options = new NugetPluginCatalogOptions()
-                {
-                    TypeFinderOptions = new TypeFinderOptions()
-                    {
-                        TypeFinderCriterias = new List<TypeFinderCriteria>()
-                    {
-                        new TypeFinderCriteria()
-                        {
-                            Query = (context, type) =>
-                            {
-                                if (string.Equals(type.Name, "SqlConnection"))
-                                {
-                                    return true;
-                                }
-
-                                return false;
-                            }
-                        }
-                    }
-                    }
-                };
-
-                // Arrange
-                var catalog = new NugetPackagePluginCatalog("Microsoft.Data.SqlClient", "2.1.2", options: options, packagesFolder: _packagesFolderInTestsBin);
-
-                // Act
-                await catalog.Initialize();
-
-                var plugin = catalog.Single();
-
-                // This is the connection string part of the Weik.io docs. It provides readonly access to the Adventureworks database sample.
-                // So it should be ok to have it here.
-                dynamic conn = Activator.CreateInstance(plugin, "Server=tcp:adafydevtestdb001.database.windows.net,1433;User ID=docs;Password=3h1@*6PXrldU4F95;Integrated Security=false;Initial Catalog=adafyweikiodevtestdb001;");
-
-                conn.Open();
-
-                var cmd = conn.CreateCommand();
-                cmd.CommandText = "select top 1 * from SalesLT.Customer";
-
-                var reader = cmd.ExecuteReader();
-                while (reader.Read())
-                {
-                    Console.WriteLine(String.Format("{0}", reader[0]));
-                }
-
-                conn.Dispose();
-
-                Assert.True(File.Exists(_packagesFolderInTestsBin + "/.nugetDownloadResult.json"));
-            }
+            // The database located at the connection string within this test cannot be reached.
+            // This test will fail, and as such, its been disabled until a suitable replacement
+            // can be made.
+            // [Fact]
+            // public async Task SaveDownloadResultIfGivenCustomPackagesPath()
+            // {
+            //     var options = new NugetPluginCatalogOptions()
+            //     {
+            //         TypeFinderOptions = new TypeFinderOptions()
+            //         {
+            //             TypeFinderCriterias = new List<TypeFinderCriteria>()
+            //         {
+            //             new TypeFinderCriteria()
+            //             {
+            //                 Query = (context, type) =>
+            //                 {
+            //                     if (string.Equals(type.Name, "SqlConnection"))
+            //                     {
+            //                         return true;
+            //                     }
+            //
+            //                     return false;
+            //                 }
+            //             }
+            //         }
+            //         }
+            //     };
+            //
+            //     // Arrange
+            //     var catalog = new NugetPackagePluginCatalog("Microsoft.Data.SqlClient", "2.1.2", options: options, packagesFolder: _packagesFolderInTestsBin);
+            //
+            //     // Act
+            //     await catalog.Initialize();
+            //
+            //     var plugin = catalog.Single();
+            //
+            //     // This is the connection string part of the Weik.io docs. It provides readonly access to the Adventureworks database sample.
+            //     // So it should be ok to have it here.
+            //     dynamic conn = Activator.CreateInstance(plugin, "Server=tcp:adafydevtestdb001.database.windows.net,1433;User ID=docs;Password=3h1@*6PXrldU4F95;Integrated Security=false;Initial Catalog=adafyweikiodevtestdb001;");
+            //
+            //     conn.Open();
+            //
+            //     var cmd = conn.CreateCommand();
+            //     cmd.CommandText = "select top 1 * from SalesLT.Customer";
+            //
+            //     var reader = cmd.ExecuteReader();
+            //     while (reader.Read())
+            //     {
+            //         Console.WriteLine(String.Format("{0}", reader[0]));
+            //     }
+            //
+            //     conn.Dispose();
+            //
+            //     Assert.True(File.Exists(_packagesFolderInTestsBin + "/.nugetDownloadResult.json"));
+            // }
 
             public void Dispose()
             {

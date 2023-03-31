@@ -24,7 +24,7 @@ namespace Weikio.PluginFramework.AspNetCore.IntegrationTests
         
         protected IServiceProvider Init(Action<IServiceCollection> action = null)
         {
-            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\..\Samples\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\netcoreapp3.1", type =>
+            var folderPluginCatalog = new FolderPluginCatalog(@"..\..\..\..\..\..\Samples\Shared\Weikio.PluginFramework.Samples.SharedPlugins\bin\debug\net7.0", type =>
             {
                 type.Implements<IOperator>();
             });

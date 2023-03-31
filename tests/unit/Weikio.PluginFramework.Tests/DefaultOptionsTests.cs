@@ -37,8 +37,8 @@ namespace Weikio.PluginFramework.Tests
             dynamic oldPluginJsonResolver = Activator.CreateInstance(oldPlugin);
             var oldPluginVersion = oldPluginJsonResolver.GetVersion();
             
-            Assert.Equal("12.0.0.0", newPluginVersion);
-            Assert.Equal("12.0.0.0", oldPluginVersion);
+            Assert.Equal("13.0.0.0", newPluginVersion);
+            Assert.Equal("13.0.0.0", oldPluginVersion);
         }
     }
 }

@@ -141,7 +141,7 @@ Plugin Framework is build by [Adafy](https://adafy.com). Adafy also provides com
 
 Adafy is a Finnish software development house, focusing on Microsoft technologies.
 
-## Constributors
+## Contributors
 
 Thanks to the following contributors who have helped with the project:
 

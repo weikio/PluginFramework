@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <nullable>enable</nullable>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.*" PrivateAssets="all" />
+    <PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
   
   <ItemGroup>

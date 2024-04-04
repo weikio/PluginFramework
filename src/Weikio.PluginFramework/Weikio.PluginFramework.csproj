@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Plugin Framework is a powerful plugin platform for your .NET applications.</Description>
@@ -20,11 +20,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.*" PrivateAssets="all" />
-    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="4.7.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.2" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.3.1" />
-    <PackageReference Include="Weikio.TypeGenerator" Version="1.4.1" />
+    <PackageReference Include="MinVer" Version="5.0.*" PrivateAssets="all" />
+    <PackageReference Include="System.Reflection.MetadataLoadContext" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+    <PackageReference Include="Weikio.TypeGenerator" Version="1.5.0" />
   </ItemGroup>
 
   <ItemGroup>

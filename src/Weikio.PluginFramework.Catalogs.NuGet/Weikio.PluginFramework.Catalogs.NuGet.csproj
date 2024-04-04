@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>NuGet catalog for Plugin Framework allows you to use NuGet packages as plugins with Plugin Framework.</Description>
@@ -15,8 +15,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MinVer" Version="2.0.*" PrivateAssets="all" />
-    <PackageReference Include="Weikio.NugetDownloader" Version="2.2.0" />
+    <PackageReference Include="MinVer" Version="5.0.*" PrivateAssets="all" />
+    <PackageReference Include="Weikio.NugetDownloader" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>

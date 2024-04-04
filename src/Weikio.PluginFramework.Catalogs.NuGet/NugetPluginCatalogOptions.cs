@@ -51,6 +51,11 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
         /// </summary>
         public bool AutoRetryPackageDownload { get; set; } = false;
         
+        /// <summary>
+        /// Gets or sets the target rid. If not set, RuntimeInformation.RuntimeIdentifier is used.
+        /// </summary>
+        public string TargetRid { get; set; } = Defaults.TargetRid;
+        
         public static class Defaults
         {
             /// <summary>
@@ -67,6 +72,11 @@ namespace Weikio.PluginFramework.Catalogs.NuGet
             /// Gets or sets the default target platform. If not set, EntryAssembly's target framework is used.
             /// </summary>
             public static string TargetFramework { get; set; } = string.Empty;
+            
+            /// <summary>
+            /// Gets or sets the default target rid. If not set, RuntimeInformation.RuntimeIdentifier is used.
+            /// </summary>
+            public static string TargetRid { get; set; } = string.Empty;
         }
     }
 }
